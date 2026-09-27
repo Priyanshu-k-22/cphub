@@ -114,6 +114,11 @@ const AppLayout = () => {
                             element={<Gallery />}
                         />
 
+                         <Route
+                                path="/resources"
+                                element={<Resources />}
+                            />
+
 
                         {/* ================================
                             AUTHENTICATION
@@ -196,10 +201,7 @@ const AppLayout = () => {
                             />
 
 
-                            <Route
-                                path="/resources"
-                                element={<Resources />}
-                            />
+                           
 
                         </Route>
 
