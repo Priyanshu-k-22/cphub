@@ -1,7 +1,6 @@
 import React from "react";
 import { ArrowUpRight, Code2 } from "lucide-react";
 
-import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import { dsaTopics } from "../data/dsaTopics.js";
 
@@ -9,7 +8,7 @@ const DSAPractice = () => {
     return (
         <div className="min-h-screen bg-[#060A10] text-[#EDF2F7]">
 
-            <Navbar />
+      
 
             <main className="mx-auto max-w-6xl px-5 py-20">
 
