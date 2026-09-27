@@ -1,5 +1,6 @@
 import React, {
     useEffect,
+    useRef,
     useState
 } from "react";
 
@@ -34,6 +35,7 @@ import {
 
 
 const UserDashboard = () => {
+    const initialLoadStarted = useRef(false);
 
     /*
     |--------------------------------------------------------------------------
@@ -79,14 +81,38 @@ const UserDashboard = () => {
                 setLoading(true);
                 setError(null);
 
-
-                const response =
+                const storedResponse =
                     await getCodeforcesProfile();
 
+                const storedProfile = storedResponse?.data || null;
+                setCodeforces(storedProfile);
 
-                setCodeforces(
-                    response.data
-                );
+                const lastSyncedAt = storedProfile?.lastSyncedAt
+                    ? new Date(storedProfile.lastSyncedAt).getTime()
+                    : 0;
+                const profileIsFresh = lastSyncedAt > 0 &&
+                    Date.now() - lastSyncedAt < 24 * 60 * 60 * 1000;
+
+                if (!profileIsFresh) {
+                    setSyncing(true);
+                    try {
+                        const syncResponse = await syncCodeforces();
+                        const syncedProfile = syncResponse?.data || storedProfile;
+                        setCodeforces(syncedProfile);
+                        if (!syncResponse?.data) {
+                            setError("Codeforces returned no profile data. Please try Sync again.");
+                        }
+                    } catch (syncError) {
+                        console.error("Automatic Codeforces sync failed:", syncError);
+                        setCodeforces(storedProfile);
+                        setError(storedProfile
+                            ? "Could not refresh Codeforces. Showing the last saved profile."
+                            : syncError?.response?.data?.message || "Could not fetch your Codeforces profile. Check your registered handle and try Sync again."
+                        );
+                    } finally {
+                        setSyncing(false);
+                    }
+                }
 
             } catch (error) {
 
@@ -96,6 +122,7 @@ const UserDashboard = () => {
                 );
 
                 setError(
+                    error?.response?.data?.message ||
                     "Failed to load Codeforces data"
                 );
 
@@ -114,9 +141,9 @@ const UserDashboard = () => {
     */
 
     useEffect(() => {
-
+        if (initialLoadStarted.current) return;
+        initialLoadStarted.current = true;
         fetchCodeforces();
-
     }, []);
 
 
@@ -141,22 +168,11 @@ const UserDashboard = () => {
                 |--------------------------------------------------------------------------
                 */
 
-                await syncCodeforces();
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Fetch freshly saved data
-                |--------------------------------------------------------------------------
-                */
-
-                const response =
-                    await getCodeforcesProfile();
-
-
-                setCodeforces(
-                    response.data
-                );
+                const response = await syncCodeforces();
+                if (!response?.data) {
+                    throw new Error("Codeforces did not return profile data.");
+                }
+                setCodeforces(response.data);
 
 
             } catch (error) {
@@ -169,6 +185,7 @@ const UserDashboard = () => {
 
                 setError(
                     error?.response?.data?.message ||
+                    error?.message ||
                     "Failed to sync Codeforces data"
                 );
 

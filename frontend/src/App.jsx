@@ -43,6 +43,49 @@ import ResourcesDSA from "./pages/ResourcesDSA.jsx";
 import ResourcesCP from "./pages/ResourcesCP.jsx";
 import ResourcesWeb from "./pages/ResourcesWeb.jsx";
 
+//Admin
+
+import AdminDashboard
+    from "./pages/admin/AdminDashboard";
+
+import DailyProblems
+    from "./pages/admin/dailyProblems/DailyProblems";
+
+import CPSheetAdmin
+    from "./pages/admin/cpSheet/CPSheetAdmin";
+
+import DSASheetAdmin
+    from "./pages/admin/dsaSheet/DSASheetAdmin";
+
+import ContestsAdmin
+    from "./pages/admin/contests/ContestsAdmin";
+
+import CTCAdmin
+    from "./pages/admin/ctc/CTCAdmin";
+
+import InterviewAdmin
+    from "./pages/admin/interview/InterviewAdmin";
+
+import SystemDesignAdmin
+    from "./pages/admin/systemDesign/SystemDesignAdmin";
+
+import MiscellaneousAdmin
+    from "./pages/admin/miscellaneous/MiscellaneousAdmin";
+
+import UsersAdmin
+    from "./pages/admin/users/UsersAdmin";
+
+import UserActivity
+    from "./pages/admin/users/UserActivity";
+
+import UserProgress
+    from "./pages/admin/users/UserProgress";
+
+import UserProfile
+    from "./pages/admin/users/UserProfile";
+
+import AdminSettings
+    from "./pages/admin/settings/AdminSettings";
 const AppLayout = () => {
 
     const [menuOpen, setMenuOpen] =
@@ -225,9 +268,77 @@ const AppLayout = () => {
                                 path="/dsa/sheets"
                                 element={<DSASheets />}
                             />
+                            <Route element={<ProtectedRoute requireAdmin />}>
+                            <Route
+                                path="/admin/dashboard"
+                                element={<AdminDashboard />}
+                            />
 
+                            <Route
+                                path="/admin/daily-problems"
+                                element={<DailyProblems />}
+                            />
 
+                            <Route
+                                path="/admin/cp-sheet"
+                                element={<CPSheetAdmin />}
+                            />
 
+                            <Route
+                                path="/admin/dsa-sheet"
+                                element={<DSASheetAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/contests"
+                                element={<ContestsAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/ctc"
+                                element={<CTCAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/interview"
+                                element={<InterviewAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/system-design"
+                                element={<SystemDesignAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/miscellaneous"
+                                element={<MiscellaneousAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/users"
+                                element={<UsersAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/users/:userId"
+                                element={<UserProfile />}
+                            />
+
+                            <Route
+                                path="/admin/activity"
+                                element={<UserActivity />}
+                            />
+
+                            <Route
+                                path="/admin/progress"
+                                element={<UserProgress />}
+                            />
+
+                            <Route
+                                path="/admin/settings"
+                                element={<AdminSettings />}
+                            />
+                            </Route>
 
                         </Route>
 

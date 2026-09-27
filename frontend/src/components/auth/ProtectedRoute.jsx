@@ -11,7 +11,7 @@ import {
 } from "../../context/AuthContext";
 
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ requireAdmin = false }) => {
 
     const {
         user,
@@ -97,6 +97,10 @@ const ProtectedRoute = () => {
                 }}
             />
         );
+    }
+
+    if (requireAdmin && user.role !== "admin") {
+        return <Navigate to="/dashboard" replace />;
     }
 
 

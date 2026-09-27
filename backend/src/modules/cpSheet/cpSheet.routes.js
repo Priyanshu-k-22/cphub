@@ -3,11 +3,14 @@ const express = require("express");
 const {
     getCPSheetController,
     createProblem,
+    updateProblemController,
+    deleteProblemController,
     markProblemCompleteController,
     markProblemIncompleteController,
 }= require( "./cpSheet.controller.js");
 
 const authMiddleware = require("../../middlewares/auth.middleware.js");
+const requireAdmin = require("../../middlewares/admin.middleware.js");
 
 
 const router = express.Router();
@@ -31,7 +34,22 @@ router.get(
 router.post(
     "/",
     authMiddleware,
+    requireAdmin,
     createProblem
+);
+
+router.put(
+    "/:problemId",
+    authMiddleware,
+    requireAdmin,
+    updateProblemController
+);
+
+router.delete(
+    "/:problemId",
+    authMiddleware,
+    requireAdmin,
+    deleteProblemController
 );
 
 /*

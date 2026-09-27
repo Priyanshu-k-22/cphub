@@ -1,5 +1,7 @@
 const CPProblem = require("./cpProblem.model.js");
 const CPProgress = require("./cpProgress.model.js");
+const mongoose = require("mongoose");
+const ApiError = require("../../utils/ApiError.js");
 
 const getCPSheet = async ({
     userId,
@@ -204,9 +206,84 @@ const createCPProblem = async ({
 };
 
 
+/* -------------------------------------------
+   Update CP Problem
+-------------------------------------------- */
+
+const updateCPProblem = async (problemId, data) => {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        throw new ApiError(400, "Invalid CP problem ID");
+    }
+
+    const allowedRatings = [800, 900, 1000, 1100, 1200];
+    const title = typeof data.title === "string" ? data.title.trim() : "";
+    const codeforcesId = typeof data.codeforcesId === "string"
+        ? data.codeforcesId.trim()
+        : "";
+    const rating = Number(data.rating);
+    const order = Number(data.order);
+    const hint = typeof data.hint === "string" ? data.hint.trim() : "";
+
+    if (!title || !codeforcesId) {
+        throw new ApiError(400, "Title and Codeforces ID are required");
+    }
+    if (!allowedRatings.includes(rating)) {
+        throw new ApiError(400, "Invalid CP rating");
+    }
+    if (!Number.isInteger(order) || order < 1) {
+        throw new ApiError(400, "Order must be a positive integer");
+    }
+
+    const existingProblem = await CPProblem.findById(problemId);
+    if (!existingProblem || !existingProblem.isActive) {
+        throw new ApiError(404, "CP problem not found");
+    }
+
+    const duplicate = await CPProblem.findOne({
+        codeforcesId,
+        _id: { $ne: problemId },
+    });
+    if (duplicate) {
+        throw new ApiError(409, "A problem with this Codeforces ID already exists");
+    }
+
+    existingProblem.title = title;
+    existingProblem.codeforcesId = codeforcesId;
+    existingProblem.rating = rating;
+    existingProblem.order = order;
+    existingProblem.hint = hint;
+    existingProblem.url = `https://codeforces.com/problemset/problem/${codeforcesId}`;
+
+    await existingProblem.save();
+    return existingProblem;
+};
+
+
+/* -------------------------------------------
+   Delete CP Problem and its progress
+-------------------------------------------- */
+
+const deleteCPProblem = async (problemId) => {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        throw new ApiError(400, "Invalid CP problem ID");
+    }
+
+    const problem = await CPProblem.findById(problemId);
+    if (!problem) {
+        throw new ApiError(404, "CP problem not found");
+    }
+
+    await CPProgress.deleteMany({ problem: problemId });
+    await problem.deleteOne();
+    return problem;
+};
+
+
 module.exports = {
     getCPSheet,
     createCPProblem,
+    updateCPProblem,
+    deleteCPProblem,
     markProblemComplete,
     markProblemIncomplete,
 };

@@ -68,6 +68,70 @@ const createProblem = async (data) => {
     return problem;
 };
 
+const getAllProblems = async () => {
+    return Problem.find()
+        .sort({ dailyDate: -1, createdAt: -1 })
+        .lean();
+};
+
+const updateProblem = async (problemId, data) => {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        throw new ApiError(400, "Invalid problem ID");
+    }
+
+    const dailyDate = normalizeDailyDate(data.dailyDate);
+    const problem = await Problem.findById(problemId);
+    if (!problem) {
+        throw new ApiError(404, "Problem not found");
+    }
+
+    const existingForDate = await Problem.findOne({
+        _id: { $ne: problemId },
+        category: data.category,
+        dailyDate,
+    });
+    if (existingForDate) {
+        throw new ApiError(409, `${data.category} problem already exists for this date`);
+    }
+
+    const existingSlug = await Problem.findOne({
+        _id: { $ne: problemId },
+        slug: data.slug,
+    });
+    if (existingSlug) {
+        throw new ApiError(409, "A problem with this slug already exists");
+    }
+
+    Object.assign(problem, data, { dailyDate });
+    if (data.category === "DSA") {
+        problem.intuition = "";
+        problem.approach = "";
+        problem.code = "";
+        problem.timeComplexity = "";
+        problem.spaceComplexity = "";
+    } else {
+        problem.brute = undefined;
+        problem.better = undefined;
+        problem.optimal = undefined;
+    }
+
+    await problem.save();
+    return problem;
+};
+
+const deleteProblem = async (problemId) => {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        throw new ApiError(400, "Invalid problem ID");
+    }
+
+    const problem = await Problem.findByIdAndDelete(problemId);
+    if (!problem) {
+        throw new ApiError(404, "Problem not found");
+    }
+
+    return problem;
+};
+
 
 /*
     Get today's published problems.
@@ -212,6 +276,9 @@ const getProblemHistory = async ({
 
 module.exports = {
     createProblem,
+    getAllProblems,
+    updateProblem,
+    deleteProblem,
     getDailyProblems,
     getProblemById,
     getProblemHistory

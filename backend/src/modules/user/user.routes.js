@@ -1,5 +1,6 @@
 const express  =require("express");
 const authenticate = require("../../middlewares/auth.middleware");
+const requireAdmin = require("../../middlewares/admin.middleware");
 
 const userController = require("./user.controller");
 
@@ -10,6 +11,20 @@ const {
 }  = require("./user.validation");
 
 const router = express.Router();
+
+router.get(
+    "/admin",
+    authenticate,
+    requireAdmin,
+    userController.getAllUsersAdmin
+);
+
+router.get(
+    "/admin/:userId",
+    authenticate,
+    requireAdmin,
+    userController.getUserProfileAdmin
+);
 
 router.get(
     "/me", 

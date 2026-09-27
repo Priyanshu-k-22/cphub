@@ -7,9 +7,9 @@ import api from "./api";
 |--------------------------------------------------------------------------
 */
 
-export const getCPSheet = (rating) => {
+export const getCPSheet = async (rating) => {
 
-    return api.get(
+    const response = await api.get(
         "/cp-sheet",
         {
             params: {
@@ -18,38 +18,72 @@ export const getCPSheet = (rating) => {
         }
     );
 
+    return response.data;
 };
 
 
 /*
 |--------------------------------------------------------------------------
-| Mark Problem Complete
+| Create CP Problem
 |--------------------------------------------------------------------------
 */
 
-export const markProblemComplete = (
-    problemId
+export const createCPProblem = async (
+    problemData
 ) => {
 
-    return api.patch(
-        `/cp-sheet/${problemId}/complete`
+    const response = await api.post(
+        "/cp-sheet",
+        problemData
     );
 
+    return response.data;
+};
+
+export const updateCPProblem = async (problemId, problemData) => {
+    const response = await api.put(
+        `/cp-sheet/${problemId}`,
+        problemData
+    );
+
+    return response.data;
+};
+
+export const deleteCPProblem = async (problemId) => {
+    const response = await api.delete(`/cp-sheet/${problemId}`);
+    return response.data;
 };
 
 
 /*
 |--------------------------------------------------------------------------
-| Mark Problem Incomplete
+| Mark Complete
 |--------------------------------------------------------------------------
 */
 
-export const markProblemIncomplete = (
-    problemId
-) => {
+export const markProblemComplete =
+    async (problemId) => {
 
-    return api.patch(
-        `/cp-sheet/${problemId}/incomplete`
-    );
+        const response = await api.patch(
+            `/cp-sheet/${problemId}/complete`
+        );
 
-};
+        return response.data;
+    };
+
+
+/*
+|--------------------------------------------------------------------------
+| Mark Incomplete
+|--------------------------------------------------------------------------
+*/
+
+export const markProblemIncomplete =
+    async (problemId) => {
+
+        const response = await api.patch(
+            `/cp-sheet/${problemId}/incomplete`
+        );
+
+        return response.data;
+    };

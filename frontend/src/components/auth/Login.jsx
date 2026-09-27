@@ -156,8 +156,10 @@ const Login = () => {
             */
 
             const destination =
-                location.state?.from?.pathname ||
-                "/dashboard";
+                loggedInUser.role === "admin"
+                    ? "/admin/dashboard"
+                    : location.state?.from?.pathname ||
+                      "/dashboard";
 
 
             navigate(

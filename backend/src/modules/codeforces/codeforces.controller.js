@@ -6,7 +6,8 @@ const ApiResponse =
 
 const codeforcesService =
     require("./codeforces.service");
-
+const bulkSyncService =
+    require("./bulkSync.service");
 
 /*
 |--------------------------------------------------------------------------
@@ -70,8 +71,26 @@ const getCodeforces =
         }
     );
 
+const startBulkSync = asyncHandler(async (req, res) => {
+    const job = await bulkSyncService.startBulkSync();
+
+    return res.status(202).json(
+        new ApiResponse(202, job, "Codeforces sync started for all users")
+    );
+});
+
+const getBulkSyncStatus = asyncHandler(async (req, res) => {
+    const job = bulkSyncService.getBulkSyncStatus();
+
+    return res.status(200).json(
+        new ApiResponse(200, job, "Codeforces sync status fetched")
+    );
+});
+
 
 module.exports = {
     syncCodeforces,
-    getCodeforces
+    getCodeforces,
+    startBulkSync,
+    getBulkSyncStatus,
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 
 const authenticate = require("../../middlewares/auth.middleware");
+const requireAdmin = require("../../middlewares/admin.middleware");
 const validate = require("../../middlewares/validate.middleware");
 
 const {
@@ -9,6 +10,9 @@ const {
 } = require("./problem.validation");
 const {
     create,
+    getAll,
+    update,
+    remove,
     getDaily,
     getById,
     getHistory
@@ -17,17 +21,35 @@ const {
 const router = express.Router();
 
 
-/*
-    Create a new problem
-
-    For now authentication is required.
-    Later we can add admin/creator authorization.
-*/
+/* Create and list daily problems for admins. */
 router.post(
     "/",
     authenticate,
+    requireAdmin,
     validate(createProblemSchema),
     create
+);
+
+router.get(
+    "/admin",
+    authenticate,
+    requireAdmin,
+    getAll
+);
+
+router.put(
+    "/:id",
+    authenticate,
+    requireAdmin,
+    validate(createProblemSchema),
+    update
+);
+
+router.delete(
+    "/:id",
+    authenticate,
+    requireAdmin,
+    remove
 );
 
 

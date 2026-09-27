@@ -51,17 +51,21 @@ const DashboardStats = ({
     |--------------------------------------------------------------------------
     */
 
-    const rating =
-        codeforces?.rating ?? 0;
+    const hasProfile = Boolean(codeforces);
 
-    const maxRating =
-        codeforces?.maxRating ?? 0;
+    const rating = codeforces?.rating > 0
+        ? codeforces.rating
+        : hasProfile ? "Unrated" : "—";
 
-    const solved =
-        codeforces?.solvedProblems ?? 0;
+    const maxRating = codeforces?.maxRating > 0
+        ? codeforces.maxRating
+        : "—";
 
-    const contests =
-        codeforces?.contestCount ?? 0;
+    const solved = codeforces?.solvedProblems ?? "—";
+
+    const contests = codeforces?.contestCount ?? "—";
+
+    const rank = codeforces?.rank || (hasProfile ? "Unrated" : "—");
 
 
     return (
@@ -81,7 +85,9 @@ const DashboardStats = ({
                     </p>
 
                     <p className="mt-1 text-xs text-[#6B7788]">
-                        Live profile statistics
+                        {codeforces?.lastSyncedAt
+                            ? `Last synced ${new Date(codeforces.lastSyncedAt).toLocaleString()}`
+                            : "Profile not synced yet"}
                     </p>
 
                 </div>
@@ -190,22 +196,22 @@ const DashboardStats = ({
                 </div>
 
 
-                {/* =====================================================
-                    STREAK
+                    {/* =====================================================
+                    RANK
                 ====================================================== */}
 
                 <div>
 
                     <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#556275]">
-                        Streak
+                        Rank
                     </p>
 
                     <p className="mt-1 text-xl font-semibold">
-                        12
+                        {rank}
                     </p>
 
                     <p className="mt-0.5 font-mono text-[9px] text-[#556275]">
-                        days
+                        current rank
                     </p>
 
                 </div>

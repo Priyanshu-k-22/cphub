@@ -1,4 +1,101 @@
 const User = require("./user.model");
+const mongoose = require("mongoose");
+const CPProblem = require("../cpSheet/cpProblem.model");
+const CPProgress = require("../cpSheet/cpProgress.model");
+const Codeforces = require("../codeforces/codeforces.model");
+const ApiError = require("../../utils/ApiError");
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const listUsersForAdmin = async ({ page = 1, limit = 20, search = "" } = {}) => {
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.min(50, Math.max(1, Number(limit) || 20));
+    const query = {};
+
+    if (search.trim()) {
+        const pattern = new RegExp(escapeRegex(search.trim()), "i");
+        query.$or = [
+            { username: pattern },
+            { email: pattern },
+        ];
+    }
+
+    const [users, total] = await Promise.all([
+        User.find(query)
+            .select("username email role profile createdAt")
+            .sort({ createdAt: -1, _id: -1 })
+            .skip((safePage - 1) * safeLimit)
+            .limit(safeLimit)
+            .lean(),
+        User.countDocuments(query),
+    ]);
+
+    return {
+        users: users.map((user) => ({ ...user, role: user.role || "student" })),
+        pagination: {
+            page: safePage,
+            limit: safeLimit,
+            total,
+            totalPages: Math.ceil(total / safeLimit),
+        },
+    };
+};
+
+const getUserAdminProfile = async (userId) => {
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+        throw new ApiError(400, "Invalid user ID");
+    }
+
+    const user = await User.findById(userId)
+        .select("username email role profile createdAt updatedAt")
+        .lean();
+
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    const [activeProblems, codeforces] = await Promise.all([
+        CPProblem.find({ isActive: true }).select("_id").lean(),
+        Codeforces.findOne({ user: userId })
+            .select("rating maxRating rank maxRank solvedProblems contestCount lastContest lastSyncedAt")
+            .lean(),
+    ]);
+    const activeProblemIds = activeProblems.map((problem) => problem._id);
+    const totalActiveCPProblems = activeProblemIds.length;
+    const progressQuery = {
+        user: userId,
+        solved: true,
+        problem: { $in: activeProblemIds },
+    };
+
+    const [solvedCount, recentSolved] = await Promise.all([
+        totalActiveCPProblems ? CPProgress.countDocuments(progressQuery) : 0,
+        totalActiveCPProblems ? CPProgress.find(progressQuery)
+            .sort({ solvedAt: -1 })
+            .limit(10)
+            .populate("problem", "title rating url")
+            .lean() : [],
+    ]);
+
+    return {
+        user: { ...user, role: user.role || "student" },
+        cpProgress: {
+            solved: solvedCount,
+            total: totalActiveCPProblems,
+            percentage: totalActiveCPProblems
+                ? Math.round((solvedCount / totalActiveCPProblems) * 100)
+                : 0,
+        },
+        recentSolved: recentSolved
+            .filter((item) => item.problem)
+            .map((item) => ({
+                id: item._id,
+                solvedAt: item.solvedAt,
+                problem: item.problem,
+            })),
+        codeforces,
+    };
+};
 
 const getCurrentUser = async (userId) => {
     const user = await User.findById(userId)
@@ -41,5 +138,7 @@ const updateProfile = async (
 
 module.exports = {
     getCurrentUser,
-    updateProfile
+    updateProfile,
+    listUsersForAdmin,
+    getUserAdminProfile,
 };

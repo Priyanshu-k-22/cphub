@@ -2,7 +2,9 @@ const {
     getCPSheet,
     markProblemComplete,
     markProblemIncomplete,
-    createCPProblem
+    createCPProblem,
+    updateCPProblem,
+    deleteCPProblem
 } = require("./cpSheet.service.js");
 
 const asyncHandler = require("../../middlewares/asyncHandler.js");
@@ -178,10 +180,39 @@ const createProblem = asyncHandler(
     }
 );
 
+const updateProblemController = asyncHandler(
+    async (req, res) => {
+        const problem = await updateCPProblem(
+            req.params.problemId,
+            req.body
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "CP problem updated successfully",
+            data: problem,
+        });
+    }
+);
+
+const deleteProblemController = asyncHandler(
+    async (req, res) => {
+        const problem = await deleteCPProblem(req.params.problemId);
+
+        return res.status(200).json({
+            success: true,
+            message: "CP problem deleted successfully",
+            data: { _id: problem._id },
+        });
+    }
+);
+
 
 module.exports = {
     getCPSheetController,
     markProblemCompleteController,
     markProblemIncompleteController,
     createProblem,
+    updateProblemController,
+    deleteProblemController,
 };

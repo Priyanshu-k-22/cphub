@@ -5,11 +5,15 @@ const router =
 
 const {
     syncCodeforces,
-    getCodeforces
+    getCodeforces,
+    startBulkSync,
+    getBulkSyncStatus
 } = require("./codeforces.controller");
 
 const authMiddleware =
     require("../../middlewares/auth.middleware");
+const requireAdmin =
+    require("../../middlewares/admin.middleware");
 const codeforcesService =
     require("./codeforces.service");
 
@@ -39,6 +43,20 @@ router.post(
     "/sync",
     authMiddleware,
     syncCodeforces
+);
+
+router.post(
+    "/sync-all",
+    authMiddleware,
+    requireAdmin,
+    startBulkSync
+);
+
+router.get(
+    "/sync-all/status",
+    authMiddleware,
+    requireAdmin,
+    getBulkSyncStatus
 );
 
 

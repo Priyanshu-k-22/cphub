@@ -30,7 +30,29 @@ const updateMe = asyncHandler(async (req, res) => {
     );
 });
 
+const getAllUsersAdmin = asyncHandler(async (req, res) => {
+    const result = await userService.listUsersForAdmin({
+        page: req.query.page,
+        limit: req.query.limit,
+        search: typeof req.query.search === "string" ? req.query.search : "",
+    });
+
+    return res.status(200).json(
+        new ApiResponse(200, result, "Users fetched successfully")
+    );
+});
+
+const getUserProfileAdmin = asyncHandler(async (req, res) => {
+    const profile = await userService.getUserAdminProfile(req.params.userId);
+
+    return res.status(200).json(
+        new ApiResponse(200, profile, "User profile fetched successfully")
+    );
+});
+
 module.exports = {
     getMe,
     updateMe,
+    getAllUsersAdmin,
+    getUserProfileAdmin,
 };

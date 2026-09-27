@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }) => {
 
             const currentUser =
                 response?.data?.user ||
+                response?.data?.data ||
                 response?.data;
 
 

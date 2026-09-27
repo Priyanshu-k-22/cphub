@@ -3,6 +3,9 @@ const ApiResponse = require("../../utils/ApiResponse");
 
 const {
     createProblem,
+    getAllProblems,
+    updateProblem,
+    deleteProblem,
     getDailyProblems,
     getProblemById,
     getProblemHistory
@@ -21,6 +24,30 @@ const create = asyncHandler(async (req, res) => {
             problem,
             "Problem created successfully"
         )
+    );
+});
+
+const getAll = asyncHandler(async (req, res) => {
+    const problems = await getAllProblems();
+
+    return res.status(200).json(
+        new ApiResponse(200, problems, "Problems fetched successfully")
+    );
+});
+
+const update = asyncHandler(async (req, res) => {
+    const problem = await updateProblem(req.params.id, req.body);
+
+    return res.status(200).json(
+        new ApiResponse(200, problem, "Problem updated successfully")
+    );
+});
+
+const remove = asyncHandler(async (req, res) => {
+    const problem = await deleteProblem(req.params.id);
+
+    return res.status(200).json(
+        new ApiResponse(200, { _id: problem._id }, "Problem deleted successfully")
     );
 });
 
@@ -100,6 +127,9 @@ const getHistory = asyncHandler(async (req, res) => {
 });
 module.exports = {
     create,
+    getAll,
+    update,
+    remove,
     getDaily,
     getById,
     getHistory
