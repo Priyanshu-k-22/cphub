@@ -32,6 +32,7 @@ import DSARoadmap from "./pages/DSARoadmap.jsx";
 import DSAPractice from "./pages/DSAPractice.jsx";
 import DSA from "./pages/DSA.jsx";
 import DSASheets from "./pages/DSASheets.jsx";
+import Resources from "./pages/Resources.jsx";
 
 
 const AppLayout = () => {
@@ -192,6 +193,12 @@ const AppLayout = () => {
                             <Route
                                 path="/dsa/sheets"
                                 element={<DSASheets />}
+                            />
+
+
+                            <Route
+                                path="/resources"
+                                element={<Resources />}
                             />
 
                         </Route>
