@@ -10,7 +10,8 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 const Navbar = ({
     menuOpen,
-    setMenuOpen
+    setMenuOpen,
+    brightMode,
 }) => {
 
     const {
@@ -81,7 +82,7 @@ const Navbar = ({
 
     /*
     |--------------------------------------------------------------------------
-    | SELECT NAVIGATION BASED ON AUTH STATE
+    | SELECT NAVIGATION
     |--------------------------------------------------------------------------
     */
 
@@ -96,9 +97,7 @@ const Navbar = ({
     |--------------------------------------------------------------------------
     */
 
-    const navLinkClass = ({
-        isActive
-    }) => `
+    const navLinkClass = ({ isActive }) => `
         relative
         px-2
         py-1
@@ -110,7 +109,9 @@ const Navbar = ({
         ${
             isActive
                 ? "text-[#4AFFC4]"
-                : "text-[#AEB9C7] hover:text-white"
+                : brightMode
+                    ? "text-gray-600 hover:text-gray-900"
+                    : "text-[#AEB9C7] hover:text-white"
         }
     `;
 
@@ -124,14 +125,20 @@ const Navbar = ({
     return (
 
         <header
-            className="
+            className={`
                 sticky
                 top-0
                 z-50
                 border-b
-                border-[#1C2734]
-                bg-[#060A10]
-            "
+                transition-colors
+                duration-300
+
+                ${
+                    brightMode
+                        ? "border-gray-200 bg-white"
+                        : "border-[#1C2734] bg-[#060A10]"
+                }
+            `}
         >
 
             <div
@@ -148,23 +155,26 @@ const Navbar = ({
 
                 <Link
                     to="/"
-                    className="
+                    className={`
                         ml-5
                         shrink-0
                         font-display
                         text-xl
                         font-bold
                         tracking-tight
-                        text-white
                         md:ml-7
-                    "
+
+                        ${
+                            brightMode
+                                ? "text-gray-900"
+                                : "text-white"
+                        }
+                    `}
                 >
 
                     Cp
 
-                    <span
-                        className="text-[#4AFFC4]"
-                    >
+                    <span className="text-[#4AFFC4]">
                         Hub
                     </span>
 
@@ -185,19 +195,17 @@ const Navbar = ({
                     "
                 >
 
-                    {primaryLinks.map(
-                        (link) => (
+                    {primaryLinks.map((link) => (
 
-                            <NavLink
-                                key={link.path}
-                                to={link.path}
-                                className={navLinkClass}
-                            >
-                                {link.name}
-                            </NavLink>
+                        <NavLink
+                            key={link.path}
+                            to={link.path}
+                            className={navLinkClass}
+                        >
+                            {link.name}
+                        </NavLink>
 
-                        )
-                    )}
+                    ))}
 
                 </nav>
 
@@ -216,15 +224,13 @@ const Navbar = ({
 
                     {/* =====================================================
                         LOGIN BUTTON
-
-                        Only visible when user is logged out.
                     ===================================================== */}
 
                     {!loading && !isAuthenticated && (
 
                         <Link
                             to="/login"
-                            className="
+                            className={`
                                 mr-3
                                 rounded-lg
                                 border
@@ -238,9 +244,13 @@ const Navbar = ({
                                 text-[#060A10]
                                 transition-all
                                 duration-200
-                                hover:bg-transparent
-                                hover:text-[#4AFFC4]
-                            "
+
+                                ${
+                                    brightMode
+                                        ? "hover:bg-transparent hover:text-[#4AFFC4]"
+                                        : "hover:bg-transparent hover:text-[#4AFFC4]"
+                                }
+                            `}
                         >
                             Login
                         </Link>
@@ -254,17 +264,14 @@ const Navbar = ({
 
                     <button
                         type="button"
-                        onClick={() =>
-                            setMenuOpen(
-                                !menuOpen
-                            )
-                        }
+                        onClick={() => setMenuOpen(!menuOpen)}
                         aria-label={
                             menuOpen
                                 ? "Close menu"
                                 : "Open menu"
                         }
-                        className="
+                        aria-expanded={menuOpen}
+                        className={`
                             mr-4
                             flex
                             h-10
@@ -273,14 +280,26 @@ const Navbar = ({
                             justify-center
                             rounded-lg
                             border
-                            border-[#1C2734]
-                            text-[#AEB9C7]
-                            transition
+                            transition-all
                             duration-200
-                            hover:border-[#4AFFC4]/40
-                            hover:text-[#4AFFC4]
                             md:mr-6
-                        "
+
+                            ${
+                                brightMode
+                                    ? `
+                                        border-gray-300
+                                        text-gray-600
+                                        hover:border-[#4AFFC4]/60
+                                        hover:text-[#4AFFC4]
+                                    `
+                                    : `
+                                        border-[#1C2734]
+                                        text-[#AEB9C7]
+                                        hover:border-[#4AFFC4]/40
+                                        hover:text-[#4AFFC4]
+                                    `
+                            }
+                        `}
                     >
 
                         {menuOpen ? (
