@@ -151,3 +151,23 @@ body {
     background-color: #0d141d;
     color: #edf2f7;
 }
+
+/* =========================================================
+   BRIGHT MODE
+========================================================= */
+
+.bright-mode {
+    --bg-main: #f4f7f6;
+    --bg-card: #ffffff;
+    --bg-secondary: #eef2f1;
+    --text-main: #111923;
+    --text-secondary: #52606d;
+    --border-main: #d7dfdd;
+}
+
+
+/* Main application background */
+.bright-mode {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}

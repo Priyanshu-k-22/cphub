@@ -7,6 +7,8 @@ import {
     useNavigate,
 } from "react-router-dom";
 
+import { Sun } from "lucide-react";
+
 import { useAuth } from "./context/AuthContext.jsx";
 
 import Navbar from "./components/Navbar.jsx";
@@ -47,6 +49,8 @@ const AppLayout = () => {
 
     const [menuOpen, setMenuOpen] =
         useState(false);
+    const [brightMode, setBrightMode] =
+        useState(false);
 
 
     return (
@@ -56,23 +60,53 @@ const AppLayout = () => {
                 MAIN APPLICATION
             ================================================= */}
 
-            <div
-                className={`
-                    min-h-screen
-                    transition-[margin-right]
-                    duration-300
-                    ease-in-out
-                    ${menuOpen
-                        ? "mr-[280px]"
-                        : "mr-0"
-                    }
-                `}
-            >
-
+         <div
+    className={`
+        min-h-screen
+        overflow-x-hidden
+        transition-colors
+        duration-300
+        ${brightMode ? "bright-mode bg-[#F4F7F6]" : "bg-[#060A10]"}
+    `}
+>
                 <Navbar
-                    menuOpen={menuOpen}
-                    setMenuOpen={setMenuOpen}
-                />
+    menuOpen={menuOpen}
+    setMenuOpen={setMenuOpen}
+    brightMode={brightMode}
+/>
+                <button
+                    type="button"
+                    onClick={() => setBrightMode(!brightMode)}
+                    aria-label="Toggle brightness"
+                    title={
+                        brightMode
+                            ? "Turn off bright mode"
+                            : "Turn on bright mode"
+                    }
+                    className={`
+        fixed
+        right-5
+        top-5
+        z-[100]
+        flex
+        h-10
+        w-10
+        items-center
+        justify-center
+        rounded-full
+        border
+        shadow-lg
+        transition-all
+        duration-300
+        hover:scale-105
+        ${brightMode
+                            ? "border-gray-300 bg-white text-gray-700"
+                            : "border-[#1C2734] bg-[#0A1018] text-[#4AFFC4]"
+                        }
+    `}
+                >
+                    <Sun size={19} />
+                </button>
 
 
                 <main>
@@ -259,7 +293,7 @@ const SideMenu = ({
 }) => {
 
     const navigate = useNavigate();
-    
+
     const {
         isAuthenticated,
         loading,
@@ -359,10 +393,9 @@ const SideMenu = ({
                 duration-300
                 ease-in-out
 
-                ${
-                    menuOpen
-                        ? "translate-x-0"
-                        : "translate-x-full"
+                ${menuOpen
+                    ? "translate-x-0"
+                    : "translate-x-full"
                 }
             `}
         >

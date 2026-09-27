@@ -10,7 +10,8 @@ import { useAuth } from "../context/AuthContext.jsx";
 
 const Navbar = ({
     menuOpen,
-    setMenuOpen
+    setMenuOpen,
+    brightMode,
 }) => {
 
     const {
@@ -99,20 +100,21 @@ const Navbar = ({
     const navLinkClass = ({
         isActive
     }) => `
-        relative
-        px-2
-        py-1
-        font-mono
-        text-sm
-        transition-colors
-        duration-200
+    relative
+    px-2
+    py-1
+    font-mono
+    text-sm
+    transition-colors
+    duration-200
 
-        ${
-            isActive
-                ? "text-[#4AFFC4]"
+    ${isActive
+            ? "text-[#4AFFC4]"
+            : brightMode
+                ? "text-gray-600 hover:text-gray-900"
                 : "text-[#AEB9C7] hover:text-white"
         }
-    `;
+`;
 
 
     /*
@@ -124,14 +126,18 @@ const Navbar = ({
     return (
 
         <header
-            className="
-                sticky
-                top-0
-                z-50
-                border-b
-                border-[#1C2734]
-                bg-[#060A10]
-            "
+            className={`
+        sticky
+        top-0
+        z-50
+        border-b
+        transition-colors
+        duration-300
+        ${brightMode
+                    ? "border-gray-200 bg-white"
+                    : "border-[#1C2734] bg-[#060A10]"
+                }
+    `}
         >
 
             <div
@@ -148,16 +154,19 @@ const Navbar = ({
 
                 <Link
                     to="/"
-                    className="
-                        ml-5
-                        shrink-0
-                        font-display
-                        text-xl
-                        font-bold
-                        tracking-tight
-                        text-white
-                        md:ml-7
-                    "
+                    className={`
+    ml-5
+    shrink-0
+    font-display
+    text-xl
+    font-bold
+    tracking-tight
+    md:ml-7
+    ${brightMode
+                            ? "text-gray-900"
+                            : "text-white"
+                        }
+`}
                 >
 
                     Cp
@@ -264,23 +273,24 @@ const Navbar = ({
                                 ? "Close menu"
                                 : "Open menu"
                         }
-                        className="
-                            mr-4
-                            flex
-                            h-10
-                            w-10
-                            items-center
-                            justify-center
-                            rounded-lg
-                            border
-                            border-[#1C2734]
-                            text-[#AEB9C7]
-                            transition
-                            duration-200
-                            hover:border-[#4AFFC4]/40
-                            hover:text-[#4AFFC4]
-                            md:mr-6
-                        "
+                        className={`
+    mr-4
+    flex
+    h-10
+    w-10
+    items-center
+    justify-center
+    rounded-lg
+    border
+    transition
+    duration-200
+    md:mr-6
+
+    ${brightMode
+                                ? "border-gray-300 text-gray-600 hover:border-[#4AFFC4]/60 hover:text-[#4AFFC4]"
+                                : "border-[#1C2734] text-[#AEB9C7] hover:border-[#4AFFC4]/40 hover:text-[#4AFFC4]"
+                            }
+`}
                     >
 
                         {menuOpen ? (
