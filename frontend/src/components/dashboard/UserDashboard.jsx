@@ -199,7 +199,7 @@ const UserDashboard = () => {
 
     return (
 
-        <div className="min-h-screen bg-[#060A10] text-[#EDF2F7]">
+        <div className="student-dashboard-ui min-h-screen bg-[#060A10] text-[#EDF2F7]">
 
             <main className="mx-auto max-w-7xl px-4 py-5 md:px-5">
 

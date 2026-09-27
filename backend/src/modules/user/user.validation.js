@@ -13,11 +13,13 @@ const updateProfileSchema = z.object({
         .max(300, "Bio cannot exceed 300 characters")
         .optional(),
 
-    avatar: z
-        .string()
-        .trim()
-        .url("Avatar must be a valid URL")
-        .optional()
+    avatar: z.union([
+        z.string()
+            .trim()
+            .max(500, "Avatar URL cannot exceed 500 characters")
+            .url("Avatar must be a valid URL"),
+        z.literal(""),
+    ]).optional()
 });
 
 module.exports = {

@@ -9,6 +9,7 @@ const AdminLayout = ({ children }) => {
     return (
         <div
             className="
+                admin-ui
                 min-h-screen
                 bg-[#060A0F]
                 text-white

@@ -2,6 +2,7 @@ import React, {
     createContext,
     useContext,
     useEffect,
+    useCallback,
     useRef,
     useState,
 } from "react";
@@ -20,6 +21,10 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     const [loading, setLoading] = useState(true);
+
+    const updateUser = useCallback((userData) => {
+        setUser(userData);
+    }, []);
 
 
     /*
@@ -237,6 +242,8 @@ export const AuthProvider = ({ children }) => {
                 login,
 
                 logout,
+
+                updateUser,
 
                 checkAuth,
             }}

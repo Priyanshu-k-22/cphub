@@ -568,7 +568,7 @@ const ContestCalendar = () => {
 
     return (
 
-        <section className="w-full px-3 py-4 md:px-6 md:py-6">
+        <section className="contest-calendar w-full px-3 py-4 md:px-6 md:py-6">
 
             {/* Header */}
 

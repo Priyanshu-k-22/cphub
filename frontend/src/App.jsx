@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     BrowserRouter,
     Routes,
@@ -6,8 +6,6 @@ import {
     Link,
     useNavigate,
 } from "react-router-dom";
-
-import { Sun } from "lucide-react";
 
 import { useAuth } from "./context/AuthContext.jsx";
 
@@ -34,6 +32,7 @@ import Register from "./components/auth/Register.jsx";
 
 import UserDashboard from "./components/dashboard/UserDashboard.jsx";
 import ProtectedRoute from "./components/auth/ProtectedRoute.jsx";
+import Profile from "./pages/Profile.jsx";
 
 import { AuthProvider } from "./context/AuthContext.jsx";
 import DSARoadmap from "./pages/DSARoadmap.jsx";
@@ -88,70 +87,55 @@ import UserProfile
 
 import AdminSettings
     from "./pages/admin/settings/AdminSettings";
+
+const RoleDashboard = () => {
+    const { user } = useAuth();
+    return user?.role === "admin" ? <AdminDashboard /> : <UserDashboard />;
+};
+
 const AppLayout = () => {
 
     const [menuOpen, setMenuOpen] =
         useState(false);
-    const [brightMode, setBrightMode] =
-        useState(false);
+    const [brightMode, setBrightMode] = useState(() => {
+        try {
+            return window.localStorage.getItem("cphub-theme") === "light";
+        } catch {
+            return false;
+        }
+    });
 
+    useEffect(() => {
+        const theme = brightMode ? "light" : "dark";
+        document.documentElement.dataset.theme = theme;
+        try {
+            window.localStorage.setItem("cphub-theme", theme);
+        } catch {
+            // The selected theme still applies for this session when storage is unavailable.
+        }
+    }, [brightMode]);
+
+    const toggleTheme = () => setBrightMode((current) => !current);
 
     return (
-        <div className="min-h-screen overflow-x-hidden bg-[#060A10] text-[#EDF2F7]">
+        <div
+            className="app-theme flex min-h-screen w-full overflow-x-hidden bg-[#060A10] text-[#EDF2F7]"
+            data-theme={brightMode ? "light" : "dark"}
+        >
 
             {/* =================================================
                 MAIN APPLICATION
             ================================================= */}
 
             <div
-                className={`
-        min-h-screen
-        overflow-x-hidden
-        transition-colors
-        duration-300
-        ${brightMode ? "bright-mode bg-[#F4F7F6]" : "bg-[#060A10]"}
-    `}
+                className="app-page min-h-screen min-w-0 flex-1 overflow-x-hidden"
             >
                 <Navbar
                     menuOpen={menuOpen}
                     setMenuOpen={setMenuOpen}
                     brightMode={brightMode}
+                    onToggleTheme={toggleTheme}
                 />
-                <button
-                    type="button"
-                    onClick={() => setBrightMode(!brightMode)}
-                    aria-label="Toggle brightness"
-                    title={
-                        brightMode
-                            ? "Turn off bright mode"
-                            : "Turn on bright mode"
-                    }
-                    className={`
-        fixed
-        right-20
-        top-5
-        z-[100]
-        flex
-        h-10
-        w-10
-        items-center
-        justify-center
-        rounded-full
-        border
-        shadow-lg
-        transition-all
-        duration-300
-        hover:scale-105
-        ${brightMode
-                            ? "border-gray-300 bg-white text-gray-700"
-                            : "border-[#1C2734] bg-[#0A1018] text-[#4AFFC4]"
-                        }
-    `}
-                >
-                    <Sun size={19} />
-                </button>
-
-
                 <main>
                     <Routes>
 
@@ -250,9 +234,12 @@ const AppLayout = () => {
 
                             <Route
                                 path="/dashboard"
-                                element={
-                                    <UserDashboard />
-                                }
+                                element={<RoleDashboard />}
+                            />
+
+                            <Route
+                                path="/profile"
+                                element={<Profile />}
                             />
 
                             <Route
@@ -388,6 +375,7 @@ const AppLayout = () => {
 
             <SideMenu
                 menuOpen={menuOpen}
+                setMenuOpen={setMenuOpen}
                 brightMode={brightMode}
             />
 
@@ -402,6 +390,7 @@ const AppLayout = () => {
 
 const SideMenu = ({
     menuOpen,
+    setMenuOpen,
     brightMode
 }) => {
 
@@ -410,8 +399,16 @@ const SideMenu = ({
     const {
         isAuthenticated,
         loading,
-        logout
+        logout,
+        user
     } = useAuth();
+
+    const avatarUrl = user?.profile?.avatar;
+    const [avatarFailed, setAvatarFailed] = useState(false);
+
+    useEffect(() => {
+        setAvatarFailed(false);
+    }, [avatarUrl]);
 
 
     const menuLinks = [
@@ -481,26 +478,44 @@ const SideMenu = ({
     const handleLogout = async () => {
 
         await logout();
+        setMenuOpen(false);
         navigate("/", {
             replace: true
         });
 
     };
 
+    const closeMenu = () => {
+        setMenuOpen(false);
+        window.requestAnimationFrame(() => {
+            document.querySelector('[aria-controls="site-navigation-drawer"]')?.focus();
+        });
+    };
+
+    useEffect(() => {
+        if (!menuOpen) return undefined;
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") closeMenu();
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [menuOpen]);
+
 
     return (
 
         <aside
+            id="site-navigation-drawer"
             className={`
-        fixed
-        right-0
+        sticky
         top-0
         z-[60]
         h-screen
-        w-[280px]
+        shrink-0
+        overflow-hidden
         border-l
-        shadow-[-15px_0_35px_rgba(0,0,0,0.25)]
-        transition-all
+        shadow-[-15px_0_35px_rgba(0,0,0,0.12)]
+        transition-[width,background-color,border-color]
         duration-300
         ease-in-out
 
@@ -510,10 +525,13 @@ const SideMenu = ({
                 }
 
         ${menuOpen
-                    ? "translate-x-0"
-                    : "translate-x-full"
+                    ? "border-l"
+                    : "border-l-0"
                 }
     `}
+            aria-hidden={!menuOpen}
+            inert={menuOpen ? undefined : ""}
+            style={{ width: menuOpen ? "min(280px, 42vw)" : "0px" }}
         >
 
             <div className="flex h-full flex-col">
@@ -525,6 +543,9 @@ const SideMenu = ({
 
                 <div
                     className={`
+    flex
+    items-start
+    justify-between
     border-b
     px-5
     py-5
@@ -547,8 +568,9 @@ const SideMenu = ({
                         navigation
                     </p>
 
-                    <h2
-                        className={`
+                    <div>
+                        <h2
+                            className={`
         mt-1
         text-xl
         font-semibold
@@ -557,9 +579,22 @@ const SideMenu = ({
                                 : "text-white"
                             }
     `}
+                        >
+                            More
+                        </h2>
+                    </div>
+
+                    <button
+                        type="button"
+                        onClick={closeMenu}
+                        aria-label="Close navigation menu"
+                        className={`flex h-9 w-9 items-center justify-center rounded-lg border text-xl leading-none transition ${brightMode
+                            ? "border-gray-200 text-gray-600 hover:bg-gray-100"
+                            : "border-[#1C2734] text-[#AEB9C7] hover:bg-[#111923] hover:text-white"
+                            }`}
                     >
-                        More
-                    </h2>
+                        ×
+                    </button>
 
                 </div>
 
@@ -585,6 +620,7 @@ const SideMenu = ({
                                 <Link
                                     key={link.path}
                                     to={link.path}
+                                    onClick={closeMenu}
                                     className={`
     block
     rounded-lg
@@ -631,6 +667,40 @@ const SideMenu = ({
                     ================================================= */}
 
                     {!loading && isAuthenticated && (
+                        <>
+                                <Link
+                                    to="/profile"
+                            onClick={closeMenu}
+                            className={`mb-3 flex items-center gap-3 rounded-xl border p-3 transition ${brightMode
+                                ? "border-gray-200 bg-gray-50 hover:border-emerald-300 hover:bg-emerald-50"
+                                : "border-[#1C2734] bg-[#0A1018] hover:border-[#4AFFC4]/40 hover:bg-[#111923]"
+                                }`}
+                        >
+                            <span className={`flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border font-display text-sm font-semibold ${brightMode
+                                ? "border-emerald-200 bg-emerald-100 text-emerald-800"
+                                : "border-[#1C2734] bg-[#10201B] text-[#4AFFC4]"
+                                }`}>
+                                {avatarUrl && !avatarFailed ? (
+                                    <img
+                                        src={avatarUrl}
+                                        alt=""
+                                        className="h-full w-full object-cover"
+                                        onError={() => setAvatarFailed(true)}
+                                    />
+                                ) : (
+                                    user?.username?.charAt(0)?.toUpperCase() || "U"
+                                )}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                                <span className={`block truncate text-sm font-semibold ${brightMode ? "text-gray-900" : "text-[#EDF2F7]"}`}>
+                                    {user?.username || "Your profile"}
+                                </span>
+                                <span className={`mt-0.5 block text-xs ${brightMode ? "text-gray-600" : "text-[#7F8B9C]"}`}>
+                                    View and edit profile
+                                </span>
+                            </span>
+                            <span aria-hidden="true" className={brightMode ? "text-gray-500" : "text-[#556275]"}>›</span>
+                        </Link>
 
                         <button
                             type="button"
@@ -656,7 +726,7 @@ const SideMenu = ({
                         >
                             Logout
                         </button>
-
+                        </>
                     )}
 
 

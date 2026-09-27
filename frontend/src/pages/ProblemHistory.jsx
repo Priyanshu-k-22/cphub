@@ -191,7 +191,7 @@ useEffect(() => {
     */
 
     return (
-        <div className="min-h-screen w-full bg-[#060a10] text-[#edf2f7]">
+        <div className="problem-history-page min-h-screen w-full bg-[#060a10] text-[#edf2f7]">
             <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-6 lg:px-8">
 
                 {/* =========================================================

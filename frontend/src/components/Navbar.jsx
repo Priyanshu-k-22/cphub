@@ -4,6 +4,7 @@ import {
     Link,
     NavLink
 } from "react-router-dom";
+import { Moon, Sun } from "lucide-react";
 
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -12,11 +13,13 @@ const Navbar = ({
     menuOpen,
     setMenuOpen,
     brightMode,
+    onToggleTheme,
 }) => {
 
     const {
         isAuthenticated,
-        loading
+        loading,
+        user
     } = useAuth();
 
 
@@ -55,7 +58,7 @@ const Navbar = ({
     const loggedInLinks = [
         {
             name: "Dashboard",
-            path: "/dashboard",
+            path: user?.role === "admin" ? "/admin/dashboard" : "/dashboard",
         },
         {
             name: "Problems",
@@ -186,13 +189,13 @@ const Navbar = ({
                 ========================================================= */}
 
                 <nav
-                    className="
+                    className={`
                         ml-8
                         hidden
                         items-center
                         gap-5
-                        md:flex
-                    "
+                        ${menuOpen ? "" : "md:flex"}
+                    `}
                 >
 
                     {primaryLinks.map((link) => (
@@ -257,6 +260,20 @@ const Navbar = ({
 
                     )}
 
+                    <button
+                        type="button"
+                        onClick={onToggleTheme}
+                        aria-label={brightMode ? "Switch to dark mode" : "Switch to light mode"}
+                        aria-pressed={brightMode}
+                        title={brightMode ? "Switch to dark mode" : "Switch to light mode"}
+                        className={`mr-2 flex h-10 w-10 items-center justify-center rounded-lg border transition-colors ${brightMode
+                            ? "border-gray-300 bg-white text-gray-700 hover:border-emerald-400 hover:text-emerald-700"
+                            : "border-[#1C2734] bg-[#0A1018] text-[#4AFFC4] hover:border-[#4AFFC4]/50"
+                            }`}
+                    >
+                        {brightMode ? <Moon size={17} /> : <Sun size={18} />}
+                    </button>
+
 
                     {/* =====================================================
                         MENU BUTTON
@@ -271,6 +288,7 @@ const Navbar = ({
                                 : "Open menu"
                         }
                         aria-expanded={menuOpen}
+                        aria-controls="site-navigation-drawer"
                         className={`
                             mr-4
                             flex
