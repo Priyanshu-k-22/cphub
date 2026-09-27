@@ -85,7 +85,7 @@ const AppLayout = () => {
                     }
                     className={`
         fixed
-        right-5
+        right-20
         top-5
         z-[100]
         flex

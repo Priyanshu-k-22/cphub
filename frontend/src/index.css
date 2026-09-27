@@ -7,7 +7,12 @@ html {
 }
 
 body {
-  background: #060a10;
+    background: #060a10;
+    transition: background-color 0.3s ease;
+}
+
+html:has(.bright-mode) body {
+    background: #f4f7f6;
 }
 
 ::selection {
@@ -156,6 +161,14 @@ body {
    BRIGHT MODE
 ========================================================= */
 
+/* =========================================================
+   BRIGHT MODE
+========================================================= */
+
+/* =========================================================
+   BRIGHT MODE
+========================================================= */
+
 .bright-mode {
     --bg-main: #f4f7f6;
     --bg-card: #ffffff;
@@ -163,11 +176,108 @@ body {
     --text-main: #111923;
     --text-secondary: #52606d;
     --border-main: #d7dfdd;
+
+    background-color: var(--bg-main);
+    color: var(--text-main);
 }
 
 
-/* Main application background */
-.bright-mode {
-    background-color: var(--bg-main);
-    color: var(--text-main);
+/* =========================================================
+   GLOBAL BACKGROUND OVERRIDES
+========================================================= */
+
+.bright-mode .bg-\[\#060A10\] {
+    background-color: #f4f7f6 !important;
+}
+
+.bright-mode .bg-\[\#060a10\] {
+    background-color: #f4f7f6 !important;
+}
+
+.bright-mode .bg-\[\#0A1018\] {
+    background-color: #ffffff !important;
+}
+
+.bright-mode .bg-\[\#080D14\] {
+    background-color: #ffffff !important;
+}
+
+.bright-mode .bg-\[\#0C131C\] {
+    background-color: #f1f4f3 !important;
+}
+
+.bright-mode .bg-\[\#0d141d\] {
+    background-color: #ffffff !important;
+}
+
+
+/* =========================================================
+   TEXT
+========================================================= */
+
+.bright-mode .text-\[\#EDF2F7\] {
+    color: #111923 !important;
+}
+
+.bright-mode .text-\[\#AEB9C7\] {
+    color: #52606d !important;
+}
+
+.bright-mode .text-\[\#778396\] {
+    color: #66727d !important;
+}
+
+.bright-mode .text-\[\#556275\] {
+    color: #68747f !important;
+}
+
+.bright-mode .text-white {
+    color: #111923 !important;
+}
+
+
+/* =========================================================
+   BORDERS
+========================================================= */
+
+.bright-mode .border-\[\#1C2734\] {
+    border-color: #d7dfdd !important;
+}
+
+
+/* =========================================================
+   HOVER BACKGROUNDS
+========================================================= */
+
+.bright-mode .hover\:bg-\[\#0C131C\]:hover {
+    background-color: #eef2f1 !important;
+}
+
+.bright-mode .hover\:bg-\[\#111923\]:hover {
+    background-color: #eef2f1 !important;
+}
+
+
+/* =========================================================
+   FILTER SELECT
+========================================================= */
+
+.bright-mode .filter-select {
+    border-color: #d7dfdd;
+    background-color: #ffffff;
+    color: #111923;
+}
+
+.bright-mode .filter-select option {
+    background-color: #ffffff;
+    color: #111923;
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.bright-mode body {
+    background-color: #f4f7f6;
 }
