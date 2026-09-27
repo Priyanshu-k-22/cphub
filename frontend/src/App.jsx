@@ -33,7 +33,7 @@ import DSAPractice from "./pages/DSAPractice.jsx";
 import DSA from "./pages/DSA.jsx";
 import DSASheets from "./pages/DSASheets.jsx";
 import Resources from "./pages/Resources.jsx";
-
+import ResourcesDSA from "./pages/ResourcesDSA.jsx";
 
 const AppLayout = () => {
 
@@ -117,6 +117,10 @@ const AppLayout = () => {
                         <Route
                             path="/resources"
                             element={<Resources />}
+                        />
+                        <Route
+                            path="/resources/dsa"
+                            element={<ResourcesDSA />}
                         />
 
 
@@ -280,7 +284,7 @@ const SideMenu = ({
         },
 
         {
-            name: "DSA",    
+            name: "DSA",
             path: "/dsa",
         },
     ];
