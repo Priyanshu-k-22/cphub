@@ -2,6 +2,7 @@ const asyncHandler = require("../../middlewares/asyncHandler");
 const ApiResponse = require("../../utils/ApiResponse");
 
 const userService = require("./user.service");
+const ApiError = require("../../utils/ApiError");
 
 const getMe = asyncHandler(async(req, res)=>{
 
@@ -30,6 +31,34 @@ const updateMe = asyncHandler(async (req, res) => {
     );
 });
 
+const uploadAvatar = asyncHandler(async (req, res) => {
+    if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+        throw new ApiError(400, "Choose a photo to upload");
+    }
+
+    const contentType = req.get("content-type")?.split(";")[0]?.toLowerCase();
+    const allowedTypes = new Set([
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif",
+        "image/avif",
+    ]);
+    if (!allowedTypes.has(contentType)) {
+        throw new ApiError(415, "Use a JPEG, PNG, WebP, GIF, or AVIF image");
+    }
+
+    const user = await userService.uploadAvatar(
+        req.user._id,
+        req.body,
+        contentType
+    );
+
+    return res.status(200).json(
+        new ApiResponse(200, user, "Profile photo uploaded successfully")
+    );
+});
+
 const getAllUsersAdmin = asyncHandler(async (req, res) => {
     const result = await userService.listUsersForAdmin({
         page: req.query.page,
@@ -53,6 +82,7 @@ const getUserProfileAdmin = asyncHandler(async (req, res) => {
 module.exports = {
     getMe,
     updateMe,
+    uploadAvatar,
     getAllUsersAdmin,
     getUserProfileAdmin,
 };

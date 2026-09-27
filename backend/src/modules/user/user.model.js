@@ -43,6 +43,26 @@ const userSchema = new mongoose.Schema(
             avatar: {
                 type: String,
                 default: ""
+            },
+
+            skills: {
+                type: [String],
+                default: []
+            },
+
+            department: {
+                type: String,
+                default: ""
+            },
+
+            currentSemester: {
+                type: String,
+                default: ""
+            },
+
+            links: {
+                github: { type: String, default: "" },
+                linkedin: { type: String, default: "" }
             }
         }
     },

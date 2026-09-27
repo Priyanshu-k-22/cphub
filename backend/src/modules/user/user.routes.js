@@ -39,4 +39,10 @@ router.put(
     userController.updateMe
 );
 
+router.post(
+    "/me/avatar",
+    authenticate,
+    userController.uploadAvatar
+);
+
 module.exports = router;

@@ -1,5 +1,6 @@
 const User = require("./user.model");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 const CPProblem = require("../cpSheet/cpProblem.model");
 const CPProgress = require("../cpSheet/cpProgress.model");
 const Codeforces = require("../codeforces/codeforces.model");
@@ -106,7 +107,7 @@ const getCurrentUser = async (userId) => {
 
 const updateProfile = async (
     userId,
-    { college, bio, avatar }
+    { college, bio, department, currentSemester, skills, links }
 ) => {
     const updateData = {};
 
@@ -118,8 +119,22 @@ const updateProfile = async (
         updateData["profile.bio"] = bio;
     }
 
-    if (avatar !== undefined) {
-        updateData["profile.avatar"] = avatar;
+    if (department !== undefined) {
+        updateData["profile.department"] = department;
+    }
+
+    if (currentSemester !== undefined) {
+        updateData["profile.currentSemester"] = currentSemester;
+    }
+
+    if (skills !== undefined) {
+        updateData["profile.skills"] = [...new Set(skills.map((skill) => skill.trim()).filter(Boolean))];
+    }
+
+    if (links) {
+        for (const [key, value] of Object.entries(links)) {
+            if (value !== undefined) updateData[`profile.links.${key}`] = value;
+        }
     }
 
     const user = await User.findByIdAndUpdate(
@@ -136,9 +151,67 @@ const updateProfile = async (
     return user;
 };
 
+const uploadAvatar = async (userId, imageBuffer, contentType) => {
+    const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+        throw new ApiError(503, "Profile photo uploads are not configured on the server");
+    }
+
+    const timestamp = Math.floor(Date.now() / 1000);
+    const folder = "cphub/profiles";
+    const publicId = `user_${userId}`;
+    const signedParams = {
+        folder,
+        overwrite: "true",
+        public_id: publicId,
+        timestamp: String(timestamp),
+    };
+    const signatureBase = Object.keys(signedParams)
+        .sort()
+        .map((key) => `${key}=${signedParams[key]}`)
+        .join("&");
+    const signature = crypto
+        .createHash("sha1")
+        .update(`${signatureBase}${CLOUDINARY_API_SECRET}`)
+        .digest("hex");
+
+    const form = new FormData();
+    form.append("file", new Blob([imageBuffer], { type: contentType }), "profile-photo");
+    form.append("api_key", CLOUDINARY_API_KEY);
+    form.append("timestamp", String(timestamp));
+    form.append("folder", folder);
+    form.append("public_id", publicId);
+    form.append("overwrite", "true");
+    form.append("signature", signature);
+
+    let uploadedImage;
+    try {
+        const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${encodeURIComponent(CLOUDINARY_CLOUD_NAME)}/image/upload`,
+            { method: "POST", body: form, signal: AbortSignal.timeout(30000) }
+        );
+        uploadedImage = await response.json();
+        if (!response.ok || !uploadedImage?.secure_url) {
+            throw new Error(uploadedImage?.error?.message || "Cloudinary rejected the photo upload");
+        }
+    } catch (error) {
+        throw new ApiError(502, error.message || "Could not upload the profile photo");
+    }
+
+    const user = await User.findByIdAndUpdate(
+        userId,
+        { $set: { "profile.avatar": uploadedImage.secure_url } },
+        { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) throw new ApiError(404, "User not found");
+    return user;
+};
+
 module.exports = {
     getCurrentUser,
     updateProfile,
+    uploadAvatar,
     listUsersForAdmin,
     getUserAdminProfile,
 };

@@ -39,6 +39,13 @@ app.use(
     })
 );
 
+app.use(
+    "/api/users/me/avatar",
+    express.raw({
+        type: ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"],
+        limit: "5mb",
+    })
+);
 app.use(express.json());
 app.use(cookieParser());
 

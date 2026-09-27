@@ -411,62 +411,45 @@ const SideMenu = ({
     }, [avatarUrl]);
 
 
-    const menuLinks = [
+    const isAdmin = user?.role === "admin";
+    const menuSections = [
         {
-            name: "About",
-            path: "/about",
+            title: "Explore",
+            links: [
+                { name: "Home", path: "/" },
+                { name: "About", path: "/about" },
+                { name: "Events", path: "/events" },
+                { name: "Contests", path: "/contests" },
+                { name: "Leaderboard", path: "/leaderboard" },
+                { name: "Achievements", path: "/achievements" },
+                { name: "Gallery", path: "/gallery" },
+                { name: "Our Team", path: "/team" },
+                { name: "Competitive Programming", path: "/cp" },
+                { name: "Resources", path: "/resources" },
+            ],
         },
-        {
-            name: "Events",
-            path: "/events",
-        },
-        {
-            name: "Leaderboard",
-            path: "/leaderboard",
-        },
-        {
-            name: "Achievements",
-            path: "/achievements",
-        },
-        {
-            name: "Gallery",
-            path: "/gallery",
-        },
-        {
-            name: "Our Team",
-            path: "/team",
-        },
-        {
-            name: "Interview Blogs",
-            path: "/interview-blogs",
-        },
-        {
-            name: "System Design",
-            path: "/system-design",
-        },
-        {
-            name: "Must Know",
-            path: "/must-know",
-        },
-        {
-            name: "Miscellaneous",
-            path: "/miscellaneous",
-        },
-        {
-            name: "DSA",
-            path: "/dsa/roadmap",
-        },
-
-        {
-            name: "Resources",
-            path: "/resources",
-        },
-
-        {
-            name: "DSA",
-            path: "/dsa",
-        },
+        ...(isAuthenticated ? [{
+            title: "Learning",
+            links: [
+                { name: "Dashboard", path: isAdmin ? "/admin/dashboard" : "/dashboard" },
+                { name: "Problems", path: "/problems" },
+                { name: "Problem History", path: "/problems/history" },
+                { name: "CP Sheet", path: "/cp-sheet" },
+                { name: "DSA Sheets", path: "/dsa/sheets" },
+            ],
+        }] : []),
     ];
+
+    // Keep the expanded navigation complete while guarding against accidental duplicate links.
+    const seenPaths = new Set();
+    const uniqueMenuSections = menuSections.map((section) => ({
+        ...section,
+        links: section.links.filter((link) => {
+            if (seenPaths.has(link.path)) return false;
+            seenPaths.add(link.path);
+            return true;
+        }),
+    })).filter((section) => section.links.length > 0);
 
 
     /*
@@ -612,36 +595,29 @@ const SideMenu = ({
                     "
                 >
 
-                    <div className="space-y-1">
-
-                        {menuLinks.map(
-                            (link) => (
-
-                                <Link
-                                    key={link.path}
-                                    to={link.path}
-                                    onClick={closeMenu}
-                                    className={`
-    block
-    rounded-lg
-    px-3
-    py-3
-    text-sm
-    transition
-    duration-200
-
-    ${brightMode
-                                            ? "text-gray-600 hover:bg-gray-100 hover:text-[#4AFFC4]"
-                                            : "text-[#AEB9C7] hover:bg-[#111923] hover:text-[#4AFFC4]"
-                                        }
-`}
-                                >
-                                    {link.name}
-                                </Link>
-
-                            )
-                        )}
-
+                    <div className="space-y-6">
+                        {uniqueMenuSections.map((section) => (
+                            <section key={section.title} aria-label={section.title}>
+                                <h3 className={`px-3 pb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] ${brightMode ? "text-gray-500" : "text-[#667386]"}`}>
+                                    {section.title}
+                                </h3>
+                                <div className="space-y-1">
+                                    {section.links.map((link) => (
+                                        <Link
+                                            key={link.path}
+                                            to={link.path}
+                                            onClick={closeMenu}
+                                            className={`block rounded-lg px-3 py-2.5 text-sm transition duration-200 ${brightMode
+                                                ? "text-gray-700 hover:bg-gray-100 hover:text-emerald-700"
+                                                : "text-[#AEB9C7] hover:bg-[#111923] hover:text-[#4AFFC4]"
+                                                }`}
+                                        >
+                                            {link.name}
+                                        </Link>
+                                    ))}
+                                </div>
+                            </section>
+                        ))}
                     </div>
 
                 </nav>
@@ -735,9 +711,10 @@ const SideMenu = ({
                     ================================================= */}
 
                     {!loading && !isAuthenticated && (
-
+                        <>
                         <Link
                             to="/login"
+                            onClick={closeMenu}
                             className="
                                 block
                                 w-full
@@ -761,6 +738,17 @@ const SideMenu = ({
                             Login
                         </Link>
 
+                        <Link
+                            to="/register"
+                            onClick={closeMenu}
+                            className={`mt-2 block w-full rounded-lg border px-4 py-3 text-left font-mono text-sm transition ${brightMode
+                                ? "border-gray-200 text-gray-700 hover:bg-gray-100"
+                                : "border-[#1C2734] text-[#AEB9C7] hover:bg-[#111923] hover:text-white"
+                                }`}
+                        >
+                            Create account
+                        </Link>
+                        </>
                     )}
 
                 </div>
