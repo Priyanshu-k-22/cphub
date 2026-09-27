@@ -38,7 +38,10 @@ import DSARoadmap from "./pages/DSARoadmap.jsx";
 import DSAPractice from "./pages/DSAPractice.jsx";
 import DSA from "./pages/DSA.jsx";
 import DSASheets from "./pages/DSASheets.jsx";
-
+import Resources from "./pages/Resources.jsx";
+import ResourcesDSA from "./pages/ResourcesDSA.jsx";
+import ResourcesCP from "./pages/ResourcesCP.jsx";
+import ResourcesWeb from "./pages/ResourcesWeb.jsx";
 
 const AppLayout = () => {
 
@@ -124,6 +127,26 @@ const AppLayout = () => {
                             element={<CP />}
                         />
 
+                        <Route
+                            //path="/cp"
+                            //element={<CP />}
+                            path="/resources"
+                            element={<Resources />}
+                        />
+                        <Route
+                            path="/resources/dsa"
+                            element={<ResourcesDSA />}
+                        />
+                        <Route
+                            path="/resources/cp"
+                            element={<ResourcesCP />}
+                        />
+
+                        <Route
+                            path="/resources/web-development"
+                            element={<ResourcesWeb />}
+                        />
+
 
                         {/* ================================
                             AUTHENTICATION
@@ -204,6 +227,9 @@ const AppLayout = () => {
                                 path="/dsa/sheets"
                                 element={<DSASheets />}
                             />
+
+
+
 
                         </Route>
 
@@ -287,6 +313,16 @@ const SideMenu = ({
         {
             name: "DSA",
             path: "/dsa/roadmap",
+        },
+
+        {
+            name: "Resources",
+            path: "/resources",
+        },
+
+        {
+            name: "DSA",
+            path: "/dsa",
         },
     ];
 

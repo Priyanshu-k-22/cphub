@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowRight, BookOpen, Code2, Map } from "lucide-react";
 
-import Navbar from "../components/Navbar.jsx";
+
 import Footer from "../components/Footer.jsx";
 
 const dsaSections = [
@@ -35,7 +35,7 @@ const DSA = () => {
     return (
         <div className="min-h-screen bg-[#060A10] text-[#EDF2F7]">
 
-            <Navbar />
+          
 
             <main className="mx-auto max-w-6xl px-5 py-20">
 

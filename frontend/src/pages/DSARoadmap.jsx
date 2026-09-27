@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowRight, BookOpen, CheckCircle2 } from "lucide-react";
 
-import Navbar from "../components/Navbar.jsx";
+
 import Footer from "../components/Footer.jsx";
 import { dsaRoadmap } from "../data/dsaRoadmap.js";
 
@@ -24,7 +24,7 @@ const DSARoadmap = () => {
     return (
         <div className="min-h-screen bg-[#060A10] font-body text-[#EDF2F7] antialiased">
 
-            <Navbar />
+        
 
             <main className="mx-auto max-w-6xl px-5 py-20">
 
@@ -157,32 +157,7 @@ const DSARoadmap = () => {
                 </section>
 
 
-                {/* Bottom CTA */}
-                <section className="mt-12 rounded-2xl border border-[#4AFFC4]/20 bg-[#4AFFC4]/5 p-8 text-center">
-
-                    <BookOpen
-                        size={28}
-                        className="mx-auto text-[#4AFFC4]"
-                    />
-
-                    <h2 className="mt-4 text-2xl font-semibold">
-                        Ready to practice?
-                    </h2>
-
-                    <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-[#AEB9C7]">
-                        Pick a topic from the roadmap and start solving
-                        problems to strengthen your understanding.
-                    </p>
-
-                    <a
-                        href="/problems"
-                        className="mt-6 inline-flex items-center gap-2 rounded-lg border border-[#4AFFC4]/30 bg-[#4AFFC4]/10 px-5 py-3 font-mono text-sm text-[#4AFFC4] transition hover:border-[#4AFFC4] hover:bg-[#4AFFC4]/20"
-                    >
-                        practice_problems
-                        <ArrowRight size={16} />
-                    </a>
-
-                </section>
+                
 
             </main>
 

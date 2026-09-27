@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 
-import Navbar from "../components/Navbar.jsx";
+
 import Footer from "../components/Footer.jsx";
 import { dsaSheets } from "../data/dsaSheets.js";
 
@@ -9,7 +9,7 @@ const DSASheets = () => {
     return (
         <div className="min-h-screen bg-[#060A10] text-[#EDF2F7]">
 
-            <Navbar />
+          
 
             <main className="mx-auto max-w-5xl px-5 py-20">
 
