@@ -2,6 +2,7 @@ const {
     getCPSheet,
     markProblemComplete,
     markProblemIncomplete,
+    createCPProblem
 } = require("./cpSheet.service.js");
 
 const asyncHandler = require("../../middlewares/asyncHandler.js");
@@ -162,9 +163,25 @@ const markProblemIncompleteController =
         });
     });
 
+const createProblem = asyncHandler(
+    async (req, res) => {
+
+        const problem =
+            await createCPProblem(req.body);
+
+        return res.status(201).json({
+            success: true,
+            message:
+                "CP problem created successfully",
+            data: problem,
+        });
+    }
+);
+
 
 module.exports = {
     getCPSheetController,
     markProblemCompleteController,
     markProblemIncompleteController,
+    createProblem,
 };

@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import {
     BrowserRouter,
     Routes,
-    Route
+    Route,
+    Link,
+    useNavigate,
 } from "react-router-dom";
+
+import { useAuth } from "./context/AuthContext.jsx";
 
 import Navbar from "./components/Navbar.jsx";
 
@@ -15,7 +19,9 @@ import Leaderboard from "./pages/Leaderboard.jsx";
 import Team from "./pages/Team.jsx";
 import Achievements from "./pages/Achievements.jsx";
 import Gallery from "./pages/Gallery.jsx";
+
 import CP from "./pages/CP.jsx";
+import CPSheet from "./pages/CPSheet";
 
 import Problems from "./pages/Problems.jsx";
 import ProblemDetails from "./pages/ProblemDetails.jsx";
@@ -113,6 +119,11 @@ const AppLayout = () => {
                             element={<Gallery />}
                         />
 
+                        <Route
+                            path="/cp"
+                            element={<CP />}
+                        />
+
 
                         {/* ================================
                             AUTHENTICATION
@@ -168,8 +179,8 @@ const AppLayout = () => {
                             />
 
                             <Route
-                                path="/cp"
-                                element={<CP />}
+                                path="/cp-sheet"
+                                element={<CPSheet />}
                             />
 
                             <Route
@@ -223,6 +234,15 @@ const SideMenu = ({
     menuOpen
 }) => {
 
+    const navigate = useNavigate();
+    
+    const {
+        isAuthenticated,
+        loading,
+        logout
+    } = useAuth();
+
+
     const menuLinks = [
         {
             name: "About",
@@ -264,12 +284,31 @@ const SideMenu = ({
             name: "Miscellaneous",
             path: "/miscellaneous",
         },
-
-        { path: "/dsa/roadmap", label: "DSA" },
+        {
+            name: "DSA",
+            path: "/dsa/roadmap",
+        },
     ];
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | LOGOUT
+    |--------------------------------------------------------------------------
+    */
+
+    const handleLogout = async () => {
+
+        await logout();
+        navigate("/", {
+            replace: true
+        });
+
+    };
+
+
     return (
+
         <aside
             className={`
                 fixed
@@ -285,26 +324,51 @@ const SideMenu = ({
                 transition-transform
                 duration-300
                 ease-in-out
-                ${menuOpen
-                    ? "translate-x-0"
-                    : "translate-x-full"
+
+                ${
+                    menuOpen
+                        ? "translate-x-0"
+                        : "translate-x-full"
                 }
             `}
         >
 
             <div className="flex h-full flex-col">
 
+
                 {/* =================================================
                     MENU HEADER
                 ================================================= */}
 
-                <div className="border-b border-[#1C2734] px-5 py-5">
+                <div
+                    className="
+                        border-b
+                        border-[#1C2734]
+                        px-5
+                        py-5
+                    "
+                >
 
-                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#556275]">
+                    <p
+                        className="
+                            font-mono
+                            text-[10px]
+                            uppercase
+                            tracking-[0.2em]
+                            text-[#556275]
+                        "
+                    >
                         navigation
                     </p>
 
-                    <h2 className="mt-1 text-xl font-semibold text-white">
+                    <h2
+                        className="
+                            mt-1
+                            text-xl
+                            font-semibold
+                            text-white
+                        "
+                    >
                         More
                     </h2>
 
@@ -315,32 +379,41 @@ const SideMenu = ({
                     MENU ITEMS
                 ================================================= */}
 
-                <nav className="flex-1 overflow-y-auto px-3 py-4">
+                <nav
+                    className="
+                        flex-1
+                        overflow-y-auto
+                        px-3
+                        py-4
+                    "
+                >
 
                     <div className="space-y-1">
 
-                        {menuLinks.map((link) => (
+                        {menuLinks.map(
+                            (link) => (
 
-                            <a
-                                key={link.path}
-                                href={link.path}
-                                className="
-                                    block
-                                    rounded-lg
-                                    px-3
-                                    py-3
-                                    text-sm
-                                    text-[#AEB9C7]
-                                    transition
-                                    duration-200
-                                    hover:bg-[#111923]
-                                    hover:text-[#4AFFC4]
-                                "
-                            >
-                                {link.name}
-                            </a>
+                                <Link
+                                    key={link.path}
+                                    to={link.path}
+                                    className="
+                                        block
+                                        rounded-lg
+                                        px-3
+                                        py-3
+                                        text-sm
+                                        text-[#AEB9C7]
+                                        transition
+                                        duration-200
+                                        hover:bg-[#111923]
+                                        hover:text-[#4AFFC4]
+                                    "
+                                >
+                                    {link.name}
+                                </Link>
 
-                        ))}
+                            )
+                        )}
 
                     </div>
 
@@ -348,32 +421,83 @@ const SideMenu = ({
 
 
                 {/* =================================================
-                    LOGOUT
+                    AUTH BUTTON
                 ================================================= */}
 
-                <div className="border-t border-[#1C2734] p-4">
+                <div
+                    className="
+                        border-t
+                        border-[#1C2734]
+                        p-4
+                    "
+                >
 
-                    <button
-                        type="button"
-                        className="
-                            w-full
-                            rounded-lg
-                            border
-                            border-red-500/20
-                            bg-red-500/5
-                            px-4
-                            py-3
-                            text-left
-                            font-mono
-                            text-sm
-                            text-red-400
-                            transition
-                            hover:border-red-500/40
-                            hover:bg-red-500/10
-                        "
-                    >
-                        Logout
-                    </button>
+                    {/* =================================================
+                        LOGGED IN → LOGOUT
+                    ================================================= */}
+
+                    {!loading && isAuthenticated && (
+
+                        <button
+                            type="button"
+                            onClick={handleLogout}
+                            className="
+                                w-full
+                                rounded-lg
+                                border
+                                border-red-500/20
+                                bg-red-500/5
+                                px-4
+                                py-3
+                                text-left
+                                font-mono
+                                text-sm
+                                text-red-400
+                                transition-all
+                                duration-200
+                                hover:border-red-500/40
+                                hover:bg-red-500/10
+                                hover:text-red-300
+                            "
+                        >
+                            Logout
+                        </button>
+
+                    )}
+
+
+                    {/* =================================================
+                        LOGGED OUT → LOGIN
+                    ================================================= */}
+
+                    {!loading && !isAuthenticated && (
+
+                        <Link
+                            to="/login"
+                            className="
+                                block
+                                w-full
+                                rounded-lg
+                                border
+                                border-[#4AFFC4]/30
+                                bg-[#4AFFC4]/5
+                                px-4
+                                py-3
+                                text-left
+                                font-mono
+                                text-sm
+                                font-medium
+                                text-[#4AFFC4]
+                                transition-all
+                                duration-200
+                                hover:border-[#4AFFC4]
+                                hover:bg-[#4AFFC4]/10
+                            "
+                        >
+                            Login
+                        </Link>
+
+                    )}
 
                 </div>
 

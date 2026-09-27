@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            lowercase: true,
             trim: true
         },
 
@@ -27,14 +26,11 @@ const userSchema = new mongoose.Schema(
         profile: {
             college: {
                 type: String,
-                trim: true,
                 default: ""
             },
 
             bio: {
                 type: String,
-                trim: true,
-                maxlength: 300,
                 default: ""
             },
 

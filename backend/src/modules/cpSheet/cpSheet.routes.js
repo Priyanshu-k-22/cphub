@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
     getCPSheetController,
+    createProblem,
     markProblemCompleteController,
     markProblemIncompleteController,
 }= require( "./cpSheet.controller.js");
@@ -27,6 +28,11 @@ router.get(
     getCPSheetController
 );
 
+router.post(
+    "/",
+    authMiddleware,
+    createProblem
+);
 
 /*
 |--------------------------------------------------------------------------

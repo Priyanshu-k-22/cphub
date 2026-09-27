@@ -1,190 +1,297 @@
-import React from "react";
-import { useAuth } from "../../context/AuthContext";
+import React, {
+    useEffect,
+    useState
+} from "react";
+
+import DashboardHeader
+    from "./DashboardHeader";
+
+import DashboardStats
+    from "./DashboardStats";
+
+import TodayProblems
+    from "./TodayProblems";
+
+import TodayProgress
+    from "./TodayProgress";
+
+import CPProgress
+    from "./CPProgress";
+
+import DSAProgress
+    from "./DSAProgress";
+
+import UpcomingContests
+    from "./UpcomingContests";
+
+import RecentActivity
+    from "./RecentActivity";
+
+import {
+    getCodeforcesProfile,
+    syncCodeforces
+} from "../../api/codeforces.api";
+
 
 const UserDashboard = () => {
-    const { user } = useAuth();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Codeforces state
+    |--------------------------------------------------------------------------
+    */
+
+    const [
+        codeforces,
+        setCodeforces
+    ] = useState(null);
+
+
+    const [
+        loading,
+        setLoading
+    ] = useState(true);
+
+
+    const [
+        syncing,
+        setSyncing
+    ] = useState(false);
+
+
+    const [
+        error,
+        setError
+    ] = useState(null);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Get stored Codeforces data
+    |--------------------------------------------------------------------------
+    */
+
+    const fetchCodeforces =
+        async () => {
+
+            try {
+
+                setLoading(true);
+                setError(null);
+
+
+                const response =
+                    await getCodeforcesProfile();
+
+
+                setCodeforces(
+                    response.data
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Failed to fetch Codeforces data:",
+                    error
+                );
+
+                setError(
+                    "Failed to load Codeforces data"
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+        };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Initial load
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+
+        fetchCodeforces();
+
+    }, []);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Manual Codeforces sync
+    |--------------------------------------------------------------------------
+    */
+
+    const handleSyncCodeforces =
+        async () => {
+
+            try {
+
+                setSyncing(true);
+                setError(null);
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Call backend sync
+                |--------------------------------------------------------------------------
+                */
+
+                await syncCodeforces();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Fetch freshly saved data
+                |--------------------------------------------------------------------------
+                */
+
+                const response =
+                    await getCodeforcesProfile();
+
+
+                setCodeforces(
+                    response.data
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Codeforces sync failed:",
+                    error
+                );
+
+
+                setError(
+                    error?.response?.data?.message ||
+                    "Failed to sync Codeforces data"
+                );
+
+            } finally {
+
+                setSyncing(false);
+
+            }
+        };
+
 
     return (
+
         <div className="min-h-screen bg-[#060A10] text-[#EDF2F7]">
-            <div className="mx-auto max-w-7xl px-5 py-5">
 
-                {/* Header */}
-                <div className="border-b border-[#1C2734] pb-8">
-                    <p className="font-mono text-sm text-[#556275]">
-                        cp/dsa_club
-                    </p>
+            <main className="mx-auto max-w-7xl px-4 py-5 md:px-5">
 
-                    <h1 className="mt-3 font-display text-4xl font-bold">
-                        Welcome,{" "}
-                        <span className="text-[#4AFFC4]">
-                            {user?.username}
-                        </span>
-                    </h1>
 
-                    <p className="mt-3 text-[#AEB9C7]">
-                        Track your competitive programming journey.
-                    </p>
-                </div>
+                {/* =====================================================
+                    HEADER
+                ====================================================== */}
 
-                {/* Profile */}
-                <section className="mt-10">
-                    <div className="mb-5">
-                        <p className="font-mono text-xs uppercase tracking-widest text-[#556275]">
-                            profile
-                        </p>
+                <DashboardHeader />
 
-                        <h2 className="mt-2 text-2xl font-semibold">
-                            Your Profile
-                        </h2>
-                    </div>
 
-                    <div className="rounded-lg border border-[#1C2734] bg-[#080E16]/70 p-6">
-                        <div className="grid gap-6 md:grid-cols-2">
+                <div className="space-y-3">
 
-                            <div>
-                                <p className="font-mono text-xs text-[#556275]">
-                                    USERNAME
+
+                    {/* =================================================
+                        TOP SECTION
+                    ================================================== */}
+
+                    <section className="grid gap-3 lg:grid-cols-[1fr_390px]">
+
+
+                        {/* =================================================
+                            STATS
+                        ================================================== */}
+
+                        <div className="rounded-xl border border-[#1C2734] bg-[#0A1018] p-4">
+
+                            <DashboardStats
+                                codeforces={codeforces}
+                                loading={loading}
+                                syncing={syncing}
+                                onSync={handleSyncCodeforces}
+                            />
+
+
+                            {/* Error */}
+
+                            {error && (
+
+                                <p className="mt-3 font-mono text-[9px] text-red-400">
+                                    {error}
                                 </p>
 
-                                <p className="mt-2 text-lg font-medium">
-                                    {user?.username}
-                                </p>
-                            </div>
-
-                            <div>
-                                <p className="font-mono text-xs text-[#556275]">
-                                    EMAIL
-                                </p>
-
-                                <p className="mt-2 text-lg font-medium">
-                                    {user?.email}
-                                </p>
-                            </div>
+                            )}
 
                         </div>
-                    </div>
-                </section>
 
-                {/* Stats */}
-                <section className="mt-10">
-                    <div className="mb-5">
-                        <p className="font-mono text-xs uppercase tracking-widest text-[#556275]">
-                            statistics
-                        </p>
 
-                        <h2 className="mt-2 text-2xl font-semibold">
-                            CP Stats
-                        </h2>
-                    </div>
+                        {/* =================================================
+                            TODAY'S PROBLEMS
+                        ================================================== */}
 
-                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <TodayProblems />
 
-                        <StatCard
-                            label="PROBLEMS SOLVED"
-                            value="0"
+                    </section>
+
+
+                    {/* =================================================
+                        PROGRESS SECTION
+                    ================================================== */}
+
+                    <section className="grid gap-3 lg:grid-cols-3">
+
+
+                        {/* Today's Progress */}
+
+                        <TodayProgress />
+
+
+                        {/* CP Progress */}
+
+                        <CPProgress
+                            codeforces={codeforces}
+                            loading={loading}
                         />
 
-                        <StatCard
-                            label="CONTESTS"
-                            value="0"
-                        />
 
-                        <StatCard
-                            label="RATING"
-                            value="—"
-                        />
+                        {/* DSA Progress */}
 
-                        <StatCard
-                            label="STREAK"
-                            value="0"
-                        />
+                        <DSAProgress />
 
-                    </div>
-                </section>
+                    </section>
 
-                {/* Quick Actions */}
-                <section className="mt-10">
-                    <div className="mb-5">
-                        <p className="font-mono text-xs uppercase tracking-widest text-[#556275]">
-                            actions
-                        </p>
 
-                        <h2 className="mt-2 text-2xl font-semibold">
-                            Quick Actions
-                        </h2>
-                    </div>
+                    {/* =================================================
+                        BOTTOM SECTION
+                    ================================================== */}
 
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <section className="grid gap-3 lg:grid-cols-2">
 
-                        <ActionCard
-                            title="Practice Problems"
-                            description="Improve your problem solving skills."
-                            href="/problems"
-                        />
 
-                        <ActionCard
-                            title="Browse Contests"
-                            description="Participate in upcoming contests."
-                            href="/contests"
-                        />
+                        {/* Upcoming Contests */}
 
-                    </div>
-                </section>
+                        <UpcomingContests />
 
-            </div>
+
+                        {/* Recent Activity */}
+
+                        <RecentActivity />
+
+                    </section>
+
+                </div>
+
+            </main>
+
         </div>
     );
 };
 
-const StatCard = ({ label, value }) => {
-    return (
-        <div className="rounded-lg border border-[#1C2734] bg-[#080E16]/70 p-5">
-            <p className="font-mono text-[10px] tracking-wider text-[#556275]">
-                {label}
-            </p>
-
-            <p className="mt-3 text-3xl font-bold text-[#4AFFC4]">
-                {value}
-            </p>
-        </div>
-    );
-};
-
-const ActionCard = ({
-    title,
-    description,
-    href
-}) => {
-    return (
-        <a
-            href={href}
-            className="
-                group
-                rounded-lg
-                border
-                border-[#1C2734]
-                bg-[#080E16]/70
-                p-6
-                transition
-                hover:border-[#4AFFC4]/40
-                hover:bg-[#0A111B]
-            "
-        >
-            <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">
-                    {title}
-                </h3>
-
-                <span className="font-mono text-[#4AFFC4] transition-transform group-hover:translate-x-1">
-                    →
-                </span>
-            </div>
-
-            <p className="mt-2 text-sm text-[#AEB9C7]">
-                {description}
-            </p>
-        </a>
-    );
-};
 
 export default UserDashboard;

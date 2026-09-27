@@ -4,9 +4,8 @@ import Container from "../ui/Container.jsx";
 import SectionLabel from "../ui/SectionLabel.jsx";
 
 const CONTACT_ITEMS = [
-  { icon: Mail, label: "Email", value: "cpdsa.club@college.edu" },
+  { icon: Mail, label: "Email", value: "cphubcuj@gmail.com" },
   { icon: MessageSquare, label: "Discord", value: "discord.gg/cpdsa-club" },
-  { icon: MapPin, label: "Meet us", value: "CS Dept, Room 204" },
 ];
 
 const Contact = () => (

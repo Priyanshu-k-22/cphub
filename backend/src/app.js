@@ -7,16 +7,35 @@ const userRoutes = require("./modules/user/user.routes");
 const problemRoutes = require("./modules/problem/problem.routes");
 const contestRoutes = require("./modules/contest/contest.routes");
 const cpSheetRoutes = require("./modules/cpSheet/cpSheet.routes.js");
+const codeforcesRoutes = require("./modules/codeforces/codeforces.routes");
+const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
 
 
 const cors = require("cors");
 
 const app = express();
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://your-frontend.vercel.app",
+];
 
 app.use(
     cors({
-        origin: "https://cphub-phi.vercel.app",
-        credentials: true
+        origin: (origin, callback) => {
+            if (
+                !origin ||
+                allowedOrigins.includes(origin)
+            ) {
+                callback(null, true);
+            } else {
+                callback(
+                    new Error(
+                        "Not allowed by CORS"
+                    )
+                );
+            }
+        },
+        credentials: true,
     })
 );
 
@@ -28,6 +47,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/contests",contestRoutes);
 app.use("/api/cp-sheet",cpSheetRoutes);
+app.use("/api/codeforces",codeforcesRoutes);
+app.use("/api/dashboard",dashboardRoutes);
 
 app.use(errorHandler)
 

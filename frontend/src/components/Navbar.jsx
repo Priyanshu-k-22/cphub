@@ -1,8 +1,11 @@
 import React from "react";
+
 import {
     Link,
     NavLink
 } from "react-router-dom";
+
+import { useAuth } from "../context/AuthContext.jsx";
 
 
 const Navbar = ({
@@ -10,7 +13,45 @@ const Navbar = ({
     setMenuOpen
 }) => {
 
-    const primaryLinks = [
+    const {
+        isAuthenticated,
+        loading
+    } = useAuth();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOGGED OUT NAVIGATION
+    |--------------------------------------------------------------------------
+    */
+
+    const loggedOutLinks = [
+        {
+            name: "Home",
+            path: "/",
+        },
+        {
+            name: "CP",
+            path: "/cp",
+        },
+        {
+            name: "DSA",
+            path: "/dsa",
+        },
+        {
+            name: "About",
+            path: "/about",
+        },
+    ];
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOGGED IN NAVIGATION
+    |--------------------------------------------------------------------------
+    */
+
+    const loggedInLinks = [
         {
             name: "Dashboard",
             path: "/dashboard",
@@ -28,11 +69,32 @@ const Navbar = ({
             path: "/cp",
         },
         {
+            name: "CP Sheet",
+            path: "/cp-sheet",
+        },
+        {
             name: "DSA",
             path: "/dsa",
         },
     ];
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | SELECT NAVIGATION BASED ON AUTH STATE
+    |--------------------------------------------------------------------------
+    */
+
+    const primaryLinks = isAuthenticated
+        ? loggedInLinks
+        : loggedOutLinks;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | NAV LINK STYLE
+    |--------------------------------------------------------------------------
+    */
 
     const navLinkClass = ({
         isActive
@@ -53,7 +115,14 @@ const Navbar = ({
     `;
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | COMPONENT
+    |--------------------------------------------------------------------------
+    */
+
     return (
+
         <header
             className="
                 sticky
@@ -73,9 +142,9 @@ const Navbar = ({
                 "
             >
 
-                {/* =================================================
+                {/* =========================================================
                     LOGO
-                ================================================= */}
+                ========================================================= */}
 
                 <Link
                     to="/"
@@ -90,16 +159,21 @@ const Navbar = ({
                         md:ml-7
                     "
                 >
+
                     Cp
-                    <span className="text-[#4AFFC4]">
+
+                    <span
+                        className="text-[#4AFFC4]"
+                    >
                         Hub
                     </span>
+
                 </Link>
 
 
-                {/* =================================================
+                {/* =========================================================
                     PRIMARY NAVIGATION
-                ================================================= */}
+                ========================================================= */}
 
                 <nav
                     className="
@@ -115,19 +189,11 @@ const Navbar = ({
                         (link) => (
 
                             <NavLink
-                                key={
-                                    link.path
-                                }
-                                to={
-                                    link.path
-                                }
-                                className={
-                                    navLinkClass
-                                }
+                                key={link.path}
+                                to={link.path}
+                                className={navLinkClass}
                             >
-                                {
-                                    link.name
-                                }
+                                {link.name}
                             </NavLink>
 
                         )
@@ -136,11 +202,55 @@ const Navbar = ({
                 </nav>
 
 
-                {/* =================================================
+                {/* =========================================================
                     RIGHT SIDE
-                ================================================= */}
+                ========================================================= */}
 
-                <div className="ml-auto">
+                <div
+                    className="
+                        ml-auto
+                        flex
+                        items-center
+                    "
+                >
+
+                    {/* =====================================================
+                        LOGIN BUTTON
+
+                        Only visible when user is logged out.
+                    ===================================================== */}
+
+                    {!loading && !isAuthenticated && (
+
+                        <Link
+                            to="/login"
+                            className="
+                                mr-3
+                                rounded-lg
+                                border
+                                border-[#4AFFC4]
+                                bg-[#4AFFC4]
+                                px-4
+                                py-2
+                                font-mono
+                                text-sm
+                                font-semibold
+                                text-[#060A10]
+                                transition-all
+                                duration-200
+                                hover:bg-transparent
+                                hover:text-[#4AFFC4]
+                            "
+                        >
+                            Login
+                        </Link>
+
+                    )}
+
+
+                    {/* =====================================================
+                        MENU BUTTON
+                    ===================================================== */}
 
                     <button
                         type="button"
@@ -175,13 +285,23 @@ const Navbar = ({
 
                         {menuOpen ? (
 
-                            <span className="text-2xl leading-none">
+                            <span
+                                className="
+                                    text-2xl
+                                    leading-none
+                                "
+                            >
                                 ×
                             </span>
 
                         ) : (
 
-                            <span className="text-lg leading-none">
+                            <span
+                                className="
+                                    text-lg
+                                    leading-none
+                                "
+                            >
                                 ☰
                             </span>
 
@@ -194,6 +314,7 @@ const Navbar = ({
             </div>
 
         </header>
+
     );
 };
 

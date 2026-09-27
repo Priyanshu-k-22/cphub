@@ -1,7 +1,9 @@
 const User = require("../user/user.model");
 const ApiError = require("../../utils/ApiError");
 const generateToken = require("../../utils/generateToken");
-
+const {
+    fetchUserInfo
+} = require("../codeforces/codeforces.service");
 
 const registerUser = async({username, email, password})=>{
 
@@ -13,6 +15,17 @@ const registerUser = async({username, email, password})=>{
         throw new ApiError(
             409,
             "Username or email already exists"
+        );
+    }
+
+    const cfUsers = await fetchUserInfo(username);
+
+
+    if (!cfUsers || cfUsers.length === 0) {
+
+        throw new ApiError(
+            400,
+            "Invalid Codeforces username"
         );
     }
 

@@ -155,8 +155,58 @@ const markProblemIncomplete = async ({
 };
 
 
+/* -------------------------------------------
+   Create CP Problem
+-------------------------------------------- */
+
+const createCPProblem = async ({
+    title,
+    codeforcesId,
+    rating,
+    order,
+    hint = "",
+    sheet = "beginner-cp",
+}) => {
+
+    if (!title) {
+        throw new Error("Problem title is required");
+    }
+
+    if (!codeforcesId) {
+        throw new Error(
+            "Codeforces problem ID is required"
+        );
+    }
+
+    if (!rating) {
+        throw new Error(
+            "Problem rating is required"
+        );
+    }
+
+    const url =
+        `https://codeforces.com/problemset/problem/${codeforcesId}`;
+
+
+    const problem = await CPProblem.create({
+        title,
+        codeforcesId,
+        url,
+        rating: Number(rating),
+        order: Number(order),
+        hint,
+        sheet,
+        isActive: true,
+    });
+
+
+    return problem;
+};
+
+
 module.exports = {
     getCPSheet,
+    createCPProblem,
     markProblemComplete,
     markProblemIncomplete,
 };

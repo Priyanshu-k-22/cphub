@@ -36,6 +36,11 @@ const cpProblemSchema = new mongoose.Schema(
             type: Number,
             required: true,
         },
+        hint: {
+            type: String,
+            trim: true,
+            default: "",
+        },
 
         sheet: {
             type: String,
