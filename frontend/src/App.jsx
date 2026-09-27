@@ -114,10 +114,10 @@ const AppLayout = () => {
                             element={<Gallery />}
                         />
 
-                         <Route
-                                path="/resources"
-                                element={<Resources />}
-                            />
+                        <Route
+                            path="/resources"
+                            element={<Resources />}
+                        />
 
 
                         {/* ================================
@@ -201,7 +201,7 @@ const AppLayout = () => {
                             />
 
 
-                           
+
 
                         </Route>
 
@@ -274,7 +274,15 @@ const SideMenu = ({
             path: "/miscellaneous",
         },
 
-        { path: "/dsa/roadmap", label: "DSA" },
+        {
+            name: "Resources",
+            path: "/resources",
+        },
+
+        {
+            name: "DSA",    
+            path: "/dsa",
+        },
     ];
 
 
