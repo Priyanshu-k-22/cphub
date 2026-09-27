@@ -60,20 +60,20 @@ const AppLayout = () => {
                 MAIN APPLICATION
             ================================================= */}
 
-         <div
-    className={`
+            <div
+                className={`
         min-h-screen
         overflow-x-hidden
         transition-colors
         duration-300
         ${brightMode ? "bright-mode bg-[#F4F7F6]" : "bg-[#060A10]"}
     `}
->
+            >
                 <Navbar
-    menuOpen={menuOpen}
-    setMenuOpen={setMenuOpen}
-    brightMode={brightMode}
-/>
+                    menuOpen={menuOpen}
+                    setMenuOpen={setMenuOpen}
+                    brightMode={brightMode}
+                />
                 <button
                     type="button"
                     onClick={() => setBrightMode(!brightMode)}
@@ -277,6 +277,7 @@ const AppLayout = () => {
 
             <SideMenu
                 menuOpen={menuOpen}
+                brightMode={brightMode}
             />
 
         </div>
@@ -289,7 +290,8 @@ const AppLayout = () => {
 ============================================================ */
 
 const SideMenu = ({
-    menuOpen
+    menuOpen,
+    brightMode
 }) => {
 
     const navigate = useNavigate();
@@ -379,25 +381,28 @@ const SideMenu = ({
 
         <aside
             className={`
-                fixed
-                right-0
-                top-0
-                z-[60]
-                h-screen
-                w-[280px]
-                border-l
-                border-[#1C2734]
-                bg-[#080D14]
-                shadow-[-15px_0_35px_rgba(0,0,0,0.25)]
-                transition-transform
-                duration-300
-                ease-in-out
+        fixed
+        right-0
+        top-0
+        z-[60]
+        h-screen
+        w-[280px]
+        border-l
+        shadow-[-15px_0_35px_rgba(0,0,0,0.25)]
+        transition-all
+        duration-300
+        ease-in-out
 
-                ${menuOpen
+        ${brightMode
+                    ? "border-gray-200 bg-white"
+                    : "border-[#1C2734] bg-[#080D14]"
+                }
+
+        ${menuOpen
                     ? "translate-x-0"
                     : "translate-x-full"
                 }
-            `}
+    `}
         >
 
             <div className="flex h-full flex-col">
@@ -408,12 +413,15 @@ const SideMenu = ({
                 ================================================= */}
 
                 <div
-                    className="
-                        border-b
-                        border-[#1C2734]
-                        px-5
-                        py-5
-                    "
+                    className={`
+    border-b
+    px-5
+    py-5
+    ${brightMode
+                            ? "border-gray-200"
+                            : "border-[#1C2734]"
+                        }
+`}
                 >
 
                     <p
@@ -429,12 +437,15 @@ const SideMenu = ({
                     </p>
 
                     <h2
-                        className="
-                            mt-1
-                            text-xl
-                            font-semibold
-                            text-white
-                        "
+                        className={`
+        mt-1
+        text-xl
+        font-semibold
+        ${brightMode
+                                ? "text-gray-900"
+                                : "text-white"
+                            }
+    `}
                     >
                         More
                     </h2>
@@ -463,18 +474,20 @@ const SideMenu = ({
                                 <Link
                                     key={link.path}
                                     to={link.path}
-                                    className="
-                                        block
-                                        rounded-lg
-                                        px-3
-                                        py-3
-                                        text-sm
-                                        text-[#AEB9C7]
-                                        transition
-                                        duration-200
-                                        hover:bg-[#111923]
-                                        hover:text-[#4AFFC4]
-                                    "
+                                    className={`
+    block
+    rounded-lg
+    px-3
+    py-3
+    text-sm
+    transition
+    duration-200
+
+    ${brightMode
+                                            ? "text-gray-600 hover:bg-gray-100 hover:text-[#4AFFC4]"
+                                            : "text-[#AEB9C7] hover:bg-[#111923] hover:text-[#4AFFC4]"
+                                        }
+`}
                                 >
                                     {link.name}
                                 </Link>
@@ -492,11 +505,14 @@ const SideMenu = ({
                 ================================================= */}
 
                 <div
-                    className="
-                        border-t
-                        border-[#1C2734]
-                        p-4
-                    "
+                    className={`
+    border-t
+    p-4
+    ${brightMode
+                            ? "border-gray-200"
+                            : "border-[#1C2734]"
+                        }
+`}
                 >
 
                     {/* =================================================
