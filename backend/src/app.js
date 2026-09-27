@@ -16,7 +16,7 @@ const cors = require("cors");
 const app = express();
 const allowedOrigins = [
     "http://localhost:5173",
-    "https://your-frontend.vercel.app",
+    "https://cphub-phi.vercel.app",
 ];
 
 app.use(

@@ -128,8 +128,6 @@ const AppLayout = () => {
                         />
 
                         <Route
-                            //path="/cp"
-                            //element={<CP />}
                             path="/resources"
                             element={<Resources />}
                         />
