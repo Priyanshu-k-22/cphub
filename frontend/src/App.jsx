@@ -34,6 +34,8 @@ import DSA from "./pages/DSA.jsx";
 import DSASheets from "./pages/DSASheets.jsx";
 import Resources from "./pages/Resources.jsx";
 import ResourcesDSA from "./pages/ResourcesDSA.jsx";
+import ResourcesCP from "./pages/ResourcesCP.jsx";
+import ResourcesWeb from "./pages/ResourcesWeb.jsx";
 
 const AppLayout = () => {
 
@@ -121,6 +123,15 @@ const AppLayout = () => {
                         <Route
                             path="/resources/dsa"
                             element={<ResourcesDSA />}
+                        />
+                        <Route
+                            path="/resources/cp"
+                            element={<ResourcesCP />}
+                        />
+
+                        <Route
+                            path="/resources/web-development"
+                            element={<ResourcesWeb />}
                         />
 
 
