@@ -11,13 +11,13 @@ const dsaResources = [
         link: "https://www.youtube.com/watch?v=VTLCoHnyACE&list=PLfqMhTWNBTe137I_EPQd34TsgV6IO55pt",
     },
     {
-        title: "STRIVER DSA PLAYLIST",
+        title: "STRIVER DSA PLAYLIST(C++).",
         description:
-            "Data Structures and Algorithms playlist by Striver.",
+            "Data Structures and Algorithms playlist by Striver .",
         link: "https://www.youtube.com/watch?v=0bHoB32fuj0&list=PLgUwDviBIf0oF6QL8m22w1hIDC1vJ_BHz",
     },
     {
-        title: "CODE-HELP BY BABBAR",
+        title: "CODE-HELP BY BABBAR(C++).",
         description:
             "Data Structures and Algorithms playlist by Code-Help.",
         link: "https://www.youtube.com/watch?v=WQoB2z67hvY&list=PLDzeHZWIZsTryvtXdMr6rPh4IDexB5NIA",
