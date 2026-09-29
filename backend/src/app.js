@@ -7,8 +7,11 @@ const userRoutes = require("./modules/user/user.routes");
 const problemRoutes = require("./modules/problem/problem.routes");
 const contestRoutes = require("./modules/contest/contest.routes");
 const cpSheetRoutes = require("./modules/cpSheet/cpSheet.routes.js");
+const dsaSheetRoutes = require("./modules/dsaSheet/dsaSheet.routes");
 const codeforcesRoutes = require("./modules/codeforces/codeforces.routes");
 const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
+const adminContentRoutes = require("./modules/adminContent/adminContent.routes");
+const platformSettingsRoutes = require("./modules/settings/platformSettings.routes");
 
 
 const cors = require("cors");
@@ -54,8 +57,11 @@ app.use("/api/users", userRoutes);
 app.use("/api/problems", problemRoutes);
 app.use("/api/contests",contestRoutes);
 app.use("/api/cp-sheet",cpSheetRoutes);
+app.use("/api/dsa-sheet", dsaSheetRoutes);
 app.use("/api/codeforces",codeforcesRoutes);
 app.use("/api/dashboard",dashboardRoutes);
+app.use("/api/admin/content", adminContentRoutes);
+app.use("/api/settings", platformSettingsRoutes);
 
 app.use(errorHandler)
 

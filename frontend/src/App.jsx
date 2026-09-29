@@ -5,6 +5,7 @@ import {
     Route,
     Link,
     useNavigate,
+    useLocation,
 } from "react-router-dom";
 
 import { useAuth } from "./context/AuthContext.jsx";
@@ -57,6 +58,8 @@ import CPSheetAdmin
 
 import DSASheetAdmin
     from "./pages/admin/dsaSheet/DSASheetAdmin";
+import DSAProblemsAdmin
+    from "./pages/admin/dsaSheet/DSAProblemsAdmin";
 
 import ContestsAdmin
     from "./pages/admin/contests/ContestsAdmin";
@@ -94,6 +97,8 @@ const RoleDashboard = () => {
 };
 
 const AppLayout = () => {
+    const location = useLocation();
+    const isAdminRoute = location.pathname.startsWith("/admin");
 
     const [menuOpen, setMenuOpen] =
         useState(false);
@@ -108,12 +113,23 @@ const AppLayout = () => {
     useEffect(() => {
         const theme = brightMode ? "light" : "dark";
         document.documentElement.dataset.theme = theme;
+        window.dispatchEvent(new Event("cphub-themechange"));
         try {
             window.localStorage.setItem("cphub-theme", theme);
         } catch {
             // The selected theme still applies for this session when storage is unavailable.
         }
     }, [brightMode]);
+
+    useEffect(() => {
+        const handleThemeToggle = () => setBrightMode((current) => !current);
+        window.addEventListener("cphub-themetoggle", handleThemeToggle);
+        return () => window.removeEventListener("cphub-themetoggle", handleThemeToggle);
+    }, []);
+
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [location.pathname]);
 
     const toggleTheme = () => setBrightMode((current) => !current);
 
@@ -130,12 +146,12 @@ const AppLayout = () => {
             <div
                 className="app-page min-h-screen min-w-0 flex-1 overflow-x-hidden"
             >
-                <Navbar
+                {!isAdminRoute && <Navbar
                     menuOpen={menuOpen}
                     setMenuOpen={setMenuOpen}
                     brightMode={brightMode}
                     onToggleTheme={toggleTheme}
-                />
+                />}
                 <main>
                     <Routes>
 
@@ -269,6 +285,16 @@ const AppLayout = () => {
                             />
 
                             <Route
+                                path="/dsa-sheet"
+                                element={<DSAPractice />}
+                            />
+
+                            <Route
+                                path="/dsa-sheet/:topicSlug"
+                                element={<DSAPractice />}
+                            />
+
+                            <Route
                                 path="/dsa/roadmap"
                                 element={<DSARoadmap />}
                             />
@@ -281,8 +307,8 @@ const AppLayout = () => {
                             />
 
                             <Route
-                                path="/dsa"
-                                element={<DSA />}
+                                path="/dsa/practice/:topicSlug"
+                                element={<DSAPractice />}
                             />
 
                             <Route
@@ -308,6 +334,11 @@ const AppLayout = () => {
                             <Route
                                 path="/admin/dsa-sheet"
                                 element={<DSASheetAdmin />}
+                            />
+
+                            <Route
+                                path="/admin/dsa-problems"
+                                element={<DSAProblemsAdmin />}
                             />
 
                             <Route
@@ -363,6 +394,9 @@ const AppLayout = () => {
 
                         </Route>
 
+                        <Route path="/dsa" element={<DSA />} />
+                        <Route path="*" element={<NotFound />} />
+
                     </Routes>
                 </main>
 
@@ -373,15 +407,25 @@ const AppLayout = () => {
                 RIGHT SIDE MENU
             ================================================= */}
 
-            <SideMenu
+            {!isAdminRoute && <SideMenu
                 menuOpen={menuOpen}
                 setMenuOpen={setMenuOpen}
                 brightMode={brightMode}
-            />
+            />}
 
         </div>
     );
 };
+
+
+const NotFound = () => (
+    <section className="flex min-h-[65vh] flex-col items-center justify-center px-5 text-center">
+        <p className="font-mono text-sm uppercase tracking-[0.2em] text-[#4AFFC4]">404 · Page not found</p>
+        <h1 className="mt-3 text-3xl font-semibold text-[#EDF2F7]">This page isn’t here</h1>
+        <p className="mt-2 max-w-md text-sm text-[#7F8B9C]">The address may be incorrect, or the page may have moved.</p>
+        <Link to="/" className="mt-6 rounded-lg bg-[#4AFFC4] px-4 py-2.5 text-sm font-semibold text-[#06100C]">Back to home</Link>
+    </section>
+);
 
 
 /* ============================================================
@@ -514,7 +558,7 @@ const SideMenu = ({
     `}
             aria-hidden={!menuOpen}
             inert={menuOpen ? undefined : ""}
-            style={{ width: menuOpen ? "min(280px, 42vw)" : "0px" }}
+            style={{ width: menuOpen ? "min(320px, calc(100vw - 48px))" : "0px" }}
         >
 
             <div className="flex h-full flex-col">

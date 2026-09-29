@@ -1,4 +1,5 @@
 import React, {
+    useEffect,
     useState,
 } from "react";
 
@@ -18,6 +19,7 @@ import {
 } from "../../api/auth.api";
 
 import AuthLayout from "./AuthLayout";
+import { getPublicSettings } from "../../api/adminSettings.api";
 
 
 const Register = () => {
@@ -56,6 +58,20 @@ const Register = () => {
     const [success, setSuccess] =
         useState("");
 
+    const [registrationsEnabled, setRegistrationsEnabled] = useState(true);
+    const [settingsLoading, setSettingsLoading] = useState(true);
+
+    useEffect(() => {
+        let active = true;
+        getPublicSettings()
+            .then((response) => {
+                if (active) setRegistrationsEnabled(response?.data?.registrationsEnabled ?? true);
+            })
+            .catch(() => {})
+            .finally(() => { if (active) setSettingsLoading(false); });
+        return () => { active = false; };
+    }, []);
+
 
     /*
     |--------------------------------------------------------------------------
@@ -92,12 +108,16 @@ const Register = () => {
         event.preventDefault();
 
 
-        if (loading) {
+        if (loading || settingsLoading) {
 
             return;
 
         }
 
+        if (!registrationsEnabled) {
+            setError("New registrations are currently closed.");
+            return;
+        }
 
         setError("");
 
@@ -581,7 +601,7 @@ const Register = () => {
 
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={loading || settingsLoading || !registrationsEnabled}
                             className="
                                 group
                                 flex
@@ -605,9 +625,13 @@ const Register = () => {
                             "
                         >
 
-                            {loading
-                                ? "creating_account..."
-                                : "create_account"
+                            {settingsLoading
+                                ? "checking_registration..."
+                                : !registrationsEnabled
+                                    ? "registration_closed"
+                                    : loading
+                                        ? "creating_account..."
+                                        : "create_account"
                             }
 
 

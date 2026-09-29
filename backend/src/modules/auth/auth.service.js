@@ -1,11 +1,17 @@
 const User = require("../user/user.model");
 const ApiError = require("../../utils/ApiError");
 const generateToken = require("../../utils/generateToken");
+const platformSettings = require("../settings/platformSettings.service");
 const {
     fetchUserInfo
 } = require("../codeforces/codeforces.service");
 
 const registerUser = async({username, email, password})=>{
+
+    const settings = await platformSettings.getSettings();
+    if (!settings.registrationsEnabled) {
+        throw new ApiError(403, "New registrations are currently closed");
+    }
 
     const existingUser = await User.findOne({
         $or:[{username}, {email}]

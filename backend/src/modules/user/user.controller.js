@@ -71,6 +71,11 @@ const getAllUsersAdmin = asyncHandler(async (req, res) => {
     );
 });
 
+const getAdminUserProgress = asyncHandler(async (_req, res) => {
+    const progress = await userService.getAdminUserProgress();
+    return res.status(200).json(new ApiResponse(200, progress, "User progress fetched successfully"));
+});
+
 const getUserProfileAdmin = asyncHandler(async (req, res) => {
     const profile = await userService.getUserAdminProfile(req.params.userId);
 
@@ -84,5 +89,6 @@ module.exports = {
     updateMe,
     uploadAvatar,
     getAllUsersAdmin,
+    getAdminUserProgress,
     getUserProfileAdmin,
 };

@@ -1,203 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Menu, Moon, Sun } from "lucide-react";
+import { useAuth } from "../../../context/AuthContext";
 
-import {
-    Bell,
-    Menu,
-    Search
-} from "lucide-react";
-
-
-const AdminTopbar = () => {
-
-    return (
-
-        <header
-            className="
-                flex
-                h-[60px]
-                shrink-0
-                items-center
-                border-b
-                border-[#1C2734]
-                bg-[#070B11]
-                px-4
-                sm:px-5
-                lg:px-7
-            "
-        >
-
-            {/* MOBILE MENU */}
-
-            <button
-                className="
-                    rounded-lg
-                    p-2
-                    text-[#687587]
-                    hover:bg-[#0D151F]
-                    hover:text-white
-                    lg:hidden
-                "
-            >
-
-                <Menu size={18} />
-
-            </button>
-
-
-            {/* SEARCH */}
-
-            <div
-                className="
-                    ml-2
-                    hidden
-                    w-[280px]
-                    items-center
-                    gap-2
-                    rounded-lg
-                    border
-                    border-[#1C2734]
-                    bg-[#080D14]
-                    px-3
-                    py-2
-                    md:flex
-                    lg:ml-0
-                "
-            >
-
-                <Search
-                    size={14}
-                    className="text-[#556275]"
-                />
-
-                <input
-                    type="text"
-                    placeholder="Search users, problems..."
-                    className="
-                        w-full
-                        bg-transparent
-                        text-[10px]
-                        text-[#DCE4ED]
-                        outline-none
-                        placeholder:text-[#394656]
-                    "
-                />
-
-                <span
-                    className="
-                        rounded
-                        border
-                        border-[#1C2734]
-                        px-1.5
-                        py-0.5
-                        font-mono
-                        text-[7px]
-                        text-[#465364]
-                    "
-                >
-                    /
-                </span>
-
+export default function AdminTopbar({ onOpenMenu = () => {}, mobileOpen = false }) {
+    const { user } = useAuth();
+    const [brightMode, setBrightMode] = useState(() => document.documentElement.dataset.theme === "light");
+    useEffect(() => {
+        const syncTheme = () => setBrightMode(document.documentElement.dataset.theme === "light");
+        window.addEventListener("cphub-themechange", syncTheme);
+        return () => window.removeEventListener("cphub-themechange", syncTheme);
+    }, []);
+    const name = user?.name || user?.username || "Admin";
+    const avatar = user?.profile?.avatar;
+    return <header className="flex h-[60px] shrink-0 items-center border-b border-[#1C2734] bg-[#070B11] px-4 sm:px-5 lg:px-7">
+        <button type="button" onClick={onOpenMenu} aria-label="Open admin navigation" aria-controls="admin-navigation" aria-expanded={mobileOpen} className="rounded-lg p-2 text-[#AEB9C7] hover:bg-[#0D151F] hover:text-white lg:hidden"><Menu size={20} /></button>
+        <div className="ml-auto flex items-center gap-3">
+            <button type="button" onClick={() => window.dispatchEvent(new Event("cphub-themetoggle"))} aria-label={`Switch to ${brightMode ? "dark" : "light"} theme`} className="rounded-lg border border-[#1C2734] p-2 text-[#AEB9C7] transition hover:bg-[#0D151F] hover:text-[#4AFFC4]">{brightMode ? <Moon size={17} /> : <Sun size={17} />}</button>
+            <div className="flex items-center gap-3 border-l border-[#1C2734] pl-3">
+            {avatar ? <img src={avatar} alt="" className="h-9 w-9 rounded-full object-cover" /> : <div aria-hidden="true" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#14221E] font-mono text-sm font-semibold text-[#4AFFC4]">{name.slice(0, 1).toUpperCase()}</div>}
+            <div><p className="text-sm font-medium text-[#DCE4ED]">{name}</p><p className="text-xs text-[#7F8B9C]">Administrator</p></div>
             </div>
-
-
-            <div className="ml-auto flex items-center gap-2">
-
-
-                {/* NOTIFICATIONS */}
-
-                <button
-                    className="
-                        relative
-                        rounded-lg
-                        p-2
-                        text-[#687587]
-                        transition
-                        hover:bg-[#0D151F]
-                        hover:text-[#E8EEF5]
-                    "
-                >
-
-                    <Bell size={15} />
-
-                    <span
-                        className="
-                            absolute
-                            right-1.5
-                            top-1.5
-                            h-1.5
-                            w-1.5
-                            rounded-full
-                            bg-[#4AFFC4]
-                        "
-                    />
-
-                </button>
-
-
-                {/* ADMIN */}
-
-                <div
-                    className="
-                        flex
-                        items-center
-                        gap-2.5
-                        border-l
-                        border-[#1C2734]
-                        pl-3
-                    "
-                >
-
-                    <div
-                        className="
-                            flex
-                            h-7
-                            w-7
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-[#14221E]
-                            font-mono
-                            text-[10px]
-                            font-semibold
-                            text-[#4AFFC4]
-                        "
-                    >
-                        A
-                    </div>
-
-
-                    <div className="hidden sm:block">
-
-                        <p
-                            className="
-                                text-[11px]
-                                font-medium
-                                text-[#DCE4ED]
-                            "
-                        >
-                            Admin
-                        </p>
-
-                        <p
-                            className="
-                                font-mono
-                                text-[8px]
-                                text-[#556275]
-                            "
-                        >
-                            Administrator
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </header>
-
-    );
-};
-
-
-export default AdminTopbar;
+        </div>
+    </header>;
+}

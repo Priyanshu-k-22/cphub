@@ -24,9 +24,9 @@ const actions = [
     },
     {
         label: "DSA Problem",
-        description: "Add to DSA Sheet",
+        description: "Add topic-wise DSA problems",
         icon: Brain,
-        path: "/admin/dsa-sheet"
+        path: "/admin/dsa-problems"
     },
     {
         label: "Contest",

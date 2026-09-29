@@ -20,6 +20,13 @@ router.get(
 );
 
 router.get(
+    "/admin/progress",
+    authenticate,
+    requireAdmin,
+    userController.getAdminUserProgress
+);
+
+router.get(
     "/admin/:userId",
     authenticate,
     requireAdmin,

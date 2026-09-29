@@ -11,3 +11,8 @@ export const getAdminUserProfile = async (userId) => {
     const response = await api.get(`/users/admin/${userId}`);
     return response.data;
 };
+
+export const getAdminUserProgress = async () => {
+    const response = await api.get("/users/admin/progress");
+    return response.data;
+};

@@ -18,7 +18,7 @@ const dsaSections = [
         description:
             "Practice topic-wise DSA problems with Easy, Medium and Hard difficulty levels.",
         icon: Code2,
-        link: "/dsa/practice",
+        link: "/dsa-sheet",
         label: "Start Practicing",
     },
     {

@@ -42,6 +42,42 @@ const listUsersForAdmin = async ({ page = 1, limit = 20, search = "" } = {}) => 
     };
 };
 
+const getAdminUserProgress = async () => {
+    const [users, activeProblems] = await Promise.all([
+        User.find().select("username role").sort({ username: 1 }).lean(),
+        CPProblem.find({ isActive: true }).select("_id").lean(),
+    ]);
+    const activeProblemIds = activeProblems.map((problem) => problem._id);
+    const totalActiveProblems = activeProblemIds.length;
+    const userIds = users.map((user) => user._id);
+    const [codeforcesRows, progressRows] = await Promise.all([
+        userIds.length ? Codeforces.find({ user: { $in: userIds } }).select("user rating maxRating rank solvedProblems contestCount").lean() : [],
+        totalActiveProblems ? CPProgress.aggregate([
+            { $match: { solved: true, problem: { $in: activeProblemIds } } },
+            { $group: { _id: "$user", solved: { $sum: 1 } } },
+        ]) : [],
+    ]);
+    const progressByUser = new Map(progressRows.map((row) => [String(row._id), row.solved]));
+    const codeforcesByUser = new Map(codeforcesRows.map((row) => [String(row.user), row]));
+
+    return users.map((user) => {
+        const cpSolved = progressByUser.get(String(user._id)) || 0;
+        const codeforces = codeforcesByUser.get(String(user._id));
+        return {
+            id: user._id,
+            username: user.username,
+            role: user.role || "student",
+            cpSolved,
+            cpTotal: totalActiveProblems,
+            cpPercent: totalActiveProblems ? Math.min(100, Math.round(cpSolved / totalActiveProblems * 100)) : 0,
+            codeforcesRating: codeforces?.rating ?? null,
+            codeforcesRank: codeforces?.rank || "Unrated",
+            codeforcesSolved: codeforces?.solvedProblems ?? null,
+            contestCount: codeforces?.contestCount ?? null,
+        };
+    });
+};
+
 const getUserAdminProfile = async (userId) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
         throw new ApiError(400, "Invalid user ID");
@@ -213,5 +249,6 @@ module.exports = {
     updateProfile,
     uploadAvatar,
     listUsersForAdmin,
+    getAdminUserProgress,
     getUserAdminProfile,
 };

@@ -101,16 +101,14 @@ const CPSheet = () => {
     };
 
 
-    const handleProgressUpdate = ({
-        solved,
-        total
-    }) => {
-
-        setProgress({
-            solved,
-            total
-        });
-
+    const handleProgressUpdate = ({ solvedDelta = 0 } = {}) => {
+        setProgress((current) => ({
+            ...current,
+            solved: Math.min(
+                current.total,
+                Math.max(0, current.solved + solvedDelta)
+            ),
+        }));
     };
 
 

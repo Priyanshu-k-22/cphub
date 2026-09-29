@@ -1,182 +1,42 @@
-import React from "react";
-
-import AdminLayout
-    from "../components/AdminLayout";
-
-import AdminPageHeader
-    from "../components/AdminPageHeader";
-
-
-const users = [
-    {
-        username: "student01",
-        cp: 82,
-        dsa: 64,
-        contests: 12
-    },
-    {
-        username: "student02",
-        cp: 71,
-        dsa: 48,
-        contests: 8
-    },
-    {
-        username: "student03",
-        cp: 43,
-        dsa: 91,
-        contests: 15
-    }
-];
-
+import React, { useCallback, useEffect, useState } from "react";
+import { Activity, Code2, RefreshCw, Trophy } from "lucide-react";
+import AdminLayout from "../components/AdminLayout";
+import AdminPageHeader from "../components/AdminPageHeader";
+import { getAdminUserProgress } from "../../../api/adminUsers.api";
 
 const UserProgress = () => {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const load = useCallback(async () => {
+        setLoading(true);
+        setError("");
+        try {
+            const response = await getAdminUserProgress();
+            setUsers(Array.isArray(response?.data) ? response.data : []);
+        } catch (requestError) {
+            setError(requestError?.response?.data?.message || "Could not load student progress.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+    useEffect(() => { load(); }, [load]);
 
-    return (
-
-        <AdminLayout>
-
-            <div className="px-4 py-5 sm:px-5 lg:px-7">
-
-                <AdminPageHeader
-                    title="User Progress"
-                    description="Monitor CP, DSA and contest progress."
-                />
-
-
-                <div
-                    className="
-                        grid
-                        gap-3
-                    "
-                >
-
-                    {users.map((user) => (
-
-                        <div
-                            key={user.username}
-                            className="
-                                rounded-xl
-                                border
-                                border-[#1C2734]
-                                bg-[#080D14]
-                                px-4
-                                py-4
-                            "
-                        >
-
-                            <div
-                                className="
-                                    mb-4
-                                    flex
-                                    items-center
-                                    justify-between
-                                "
-                            >
-
-                                <span
-                                    className="
-                                        text-[11px]
-                                        font-medium
-                                        text-[#DCE4ED]
-                                    "
-                                >
-                                    {user.username}
-                                </span>
-
-                                <span
-                                    className="
-                                        font-mono
-                                        text-[8px]
-                                        text-[#556275]
-                                    "
-                                >
-                                    {user.contests} contests
-                                </span>
-
-                            </div>
-
-
-                            {[
-                                ["CP Sheet", user.cp],
-                                ["DSA Sheet", user.dsa]
-                            ].map(
-                                ([label, value]) => (
-
-                                    <div
-                                        key={label}
-                                        className="mb-3 last:mb-0"
-                                    >
-
-                                        <div
-                                            className="
-                                                mb-1
-                                                flex
-                                                justify-between
-                                            "
-                                        >
-
-                                            <span
-                                                className="
-                                                    text-[8px]
-                                                    text-[#687587]
-                                                "
-                                            >
-                                                {label}
-                                            </span>
-
-                                            <span
-                                                className="
-                                                    font-mono
-                                                    text-[8px]
-                                                    text-[#556275]
-                                                "
-                                            >
-                                                {value}%
-                                            </span>
-
-                                        </div>
-
-
-                                        <div
-                                            className="
-                                                h-1
-                                                overflow-hidden
-                                                rounded-full
-                                                bg-[#151E29]
-                                            "
-                                        >
-
-                                            <div
-                                                className="
-                                                    h-full
-                                                    rounded-full
-                                                    bg-[#4AFFC4]
-                                                "
-                                                style={{
-                                                    width:
-                                                        `${value}%`
-                                                }}
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-                                )
-                            )}
-
-                        </div>
-
-                    ))}
-
-                </div>
-
-            </div>
-
-        </AdminLayout>
-
-    );
+    return <AdminLayout>
+        <div className="px-4 py-5 sm:px-5 lg:px-7">
+            <AdminPageHeader title="User Progress" description="CP sheet completion and synced Codeforces stats for registered users." action={load} actionLabel="Refresh" />
+            {error && <div role="alert" className="mb-4 flex items-center justify-between rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><span>{error}</span><button type="button" onClick={load} className="inline-flex items-center gap-1 underline"><RefreshCw size={13} /> Retry</button></div>}
+            {loading ? <div className="rounded-xl border border-[#1C2734] bg-[#080D14] p-12 text-center text-sm text-[#7F8B9C]">Loading user progress…</div> : users.length ? <div className="grid gap-3 xl:grid-cols-2">
+                {users.map((user) => <article key={user.id} className="rounded-xl border border-[#1C2734] bg-[#080D14] p-4 sm:p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold text-[#DCE4ED]">{user.username}</h2><p className="mt-1 text-xs capitalize text-[#687587]">{user.role}</p></div><span className="inline-flex items-center gap-1.5 rounded-full border border-[#1C2734] px-2.5 py-1 text-xs text-[#AEB9C7]"><Trophy size={13} className="text-[#4AFFC4]" />{user.contestCount ?? "—"} contests</span></div>
+                    <div className="mt-5 grid grid-cols-2 gap-3">
+                        <div className="rounded-lg bg-[#0D151F] p-3"><p className="flex items-center gap-2 text-xs text-[#7F8B9C]"><Code2 size={14} />CP Sheet</p><p className="mt-2 text-lg font-semibold text-[#DCE4ED]">{user.cpSolved} <span className="text-xs font-normal text-[#687587]">/ {user.cpTotal}</span></p><div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#1C2734]"><div className="h-full rounded-full bg-[#4AFFC4]" style={{ width: `${user.cpPercent}%` }} /></div><p className="mt-1 text-right text-[10px] text-[#687587]">{user.cpPercent}%</p></div>
+                        <div className="rounded-lg bg-[#0D151F] p-3"><p className="flex items-center gap-2 text-xs text-[#7F8B9C]"><Activity size={14} />Codeforces</p><p className="mt-2 text-lg font-semibold text-[#DCE4ED]">{user.codeforcesRating ?? "—"}</p><p className="mt-1 truncate text-xs text-[#687587]">{user.codeforcesRank} · {user.codeforcesSolved ?? "—"} solved</p></div>
+                    </div>
+                </article>)}
+            </div> : <div className="rounded-xl border border-dashed border-[#1C2734] bg-[#080D14] p-12 text-center text-sm text-[#7F8B9C]">No registered users yet.</div>}
+        </div>
+    </AdminLayout>;
 };
-
 
 export default UserProgress;

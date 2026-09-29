@@ -77,6 +77,10 @@ const Navbar = ({
             path: "/cp-sheet",
         },
         {
+            name: "DSA Sheet",
+            path: "/dsa-sheet",
+        },
+        {
             name: "DSA",
             path: "/dsa",
         },
@@ -203,6 +207,7 @@ const Navbar = ({
                         <NavLink
                             key={link.path}
                             to={link.path}
+                            end={link.path === "/dsa"}
                             className={navLinkClass}
                         >
                             {link.name}

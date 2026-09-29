@@ -5,6 +5,7 @@ import { getProblemHistory } from "../api/problem.api";
 import ProblemHistoryCard from "../components/problems/ProblemHistory/ProblemHistoryCard";
 import ProblemHistoryFilterPanel from "../components/problems/ProblemHistory/ProblemHistoryFilterPanel";
 import ProblemHistoryActiveFilters from "../components/problems/ProblemHistory/ProblemHistoryActiveFilters";
+import ProblemPagination from "../components/problems/ProblemHistory/ProblemPagination";
 
 const ProblemHistory = () => {
     /*
@@ -31,6 +32,7 @@ const ProblemHistory = () => {
     });
 
     const [sort, setSort] = useState("newest");
+    const [page, setPage] = useState(1);
 
     const [pagination, setPagination] = useState({
         page: 1,
@@ -46,6 +48,7 @@ const ProblemHistory = () => {
     */
 
 useEffect(() => {
+    let active = true;
     const fetchHistory = async () => {
         try {
             setLoading(true);
@@ -55,14 +58,9 @@ useEffect(() => {
                 ...filters,
                 search,
                 sort,
-                page: 1,
+                page,
                 limit: 20,
             });
-
-            console.log(
-                "Problem History Response:",
-                response
-            );
 
             // Backend response:
             // {
@@ -81,11 +79,13 @@ useEffect(() => {
                 ? response.data.problems
                 : [];
 
+            if (!active) return;
+
             setProblems(historyProblems);
 
             setPagination(
                 response?.data?.pagination || {
-                    page: 1,
+                    page,
                     limit: 20,
                     total: historyProblems.length,
                     totalPages: 1,
@@ -93,10 +93,7 @@ useEffect(() => {
             );
 
         } catch (err) {
-            console.error(
-                "Failed to fetch problem history:",
-                err
-            );
+            if (!active) return;
 
             setError(
                 err?.response?.data?.message ||
@@ -107,18 +104,19 @@ useEffect(() => {
             setProblems([]);
 
             setPagination({
-                page: 1,
+                page,
                 limit: 20,
                 total: 0,
                 totalPages: 0,
             });
         } finally {
-            setLoading(false);
+            if (active) setLoading(false);
         }
     };
 
     fetchHistory();
-}, [filters, search, sort]);
+    return () => { active = false; };
+}, [filters, search, sort, page]);
 
     /*
     |--------------------------------------------------------------------------
@@ -127,6 +125,7 @@ useEffect(() => {
     */
 
     const clearFilters = () => {
+        setPage(1);
         setFilters({
             category: "",
             topic: "",
@@ -142,6 +141,7 @@ useEffect(() => {
     */
 
     const removeFilter = (key) => {
+        setPage(1);
         setFilters((previous) => ({
             ...previous,
             [key]: "",
@@ -312,11 +312,10 @@ useEffect(() => {
                         <input
                             type="text"
                             value={search}
-                            onChange={(event) =>
-                                setSearch(
-                                    event.target.value
-                                )
-                            }
+                            onChange={(event) => {
+                                setPage(1);
+                                setSearch(event.target.value);
+                            }}
                             placeholder="Search problems..."
                             className="w-full rounded-xl border border-[#1c2734] bg-[#0a1018] py-3 pl-10 pr-4 text-sm text-[#edf2f7] outline-none placeholder:text-[#556275] focus:border-[#4affc4]/50"
                         />
@@ -326,11 +325,10 @@ useEffect(() => {
 
                     <select
                         value={sort}
-                        onChange={(event) =>
-                            setSort(
-                                event.target.value
-                            )
-                        }
+                        onChange={(event) => {
+                            setPage(1);
+                            setSort(event.target.value);
+                        }}
                         className="rounded-xl border border-[#1c2734] bg-[#0a1018] px-4 py-3 text-sm text-[#aeb9c7] outline-none focus:border-[#4affc4]/50"
                     >
                         <option value="newest">
@@ -449,6 +447,13 @@ useEffect(() => {
                             </span>
                         </div>
                     )}
+                {!loading && (
+                    <ProblemPagination
+                        page={pagination.page || page}
+                        totalPages={pagination.totalPages}
+                        onPageChange={setPage}
+                    />
+                )}
             </div>
 
             {/* =============================================================
@@ -458,7 +463,10 @@ useEffect(() => {
             <ProblemHistoryFilterPanel
                 open={isFilterOpen}
                 filters={filters}
-                onChange={setFilters}
+                onChange={(update) => {
+                    setPage(1);
+                    setFilters(update);
+                }}
                 onClose={() =>
                     setIsFilterOpen(false)
                 }
