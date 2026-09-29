@@ -34,7 +34,7 @@ const ResourcesDSA = () => {
                 <section className="max-w-3xl">
 
                     <p className="font-mono text-sm text-[#4AFFC4]">
-                        cp/dsa_club/resources/dsa
+                        cp/cphub/resources/dsa
                     </p>
 
                     <h1 className="mt-4 font-display text-4xl font-bold tracking-tight md:text-6xl">
@@ -43,7 +43,7 @@ const ResourcesDSA = () => {
 
                     <p className="mt-5 text-base leading-7 text-[#AEB9C7] md:text-lg">
                         Curated DSA playlists and learning resources
-                        for our CP/DSA club members.
+                        for CpHub members.
                     </p>
 
                 </section>

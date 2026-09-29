@@ -61,16 +61,12 @@ const Navbar = ({
             path: user?.role === "admin" ? "/admin/dashboard" : "/dashboard",
         },
         {
-            name: "Problems",
-            path: "/problems",
-        },
-        {
-            name: "Contest",
-            path: "/contests",
-        },
-        {
             name: "CP",
             path: "/cp",
+        },
+        {
+            name: "DSA",
+            path: "/dsa",
         },
         {
             name: "CP Sheet",
@@ -81,9 +77,14 @@ const Navbar = ({
             path: "/dsa-sheet",
         },
         {
-            name: "DSA",
-            path: "/dsa",
+            name: "Problems",
+            path: "/problems",
         },
+        {
+            name: "Contest",
+            path: "/contests",
+        },
+
     ];
 
 

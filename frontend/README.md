@@ -1,6 +1,6 @@
-# CP/DSA Club Website
+# CpHub Website
 
-A React + Vite + Tailwind site for the college's Competitive Programming & DSA Club.
+A React + Vite + Tailwind site for CpHub, the college's Competitive Programming and DSA community.
 
 ## Getting started
 

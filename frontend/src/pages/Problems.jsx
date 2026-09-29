@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { getDailyProblems } from "../api/problem.api";
 
 import DailyProblemCard from "../components/problems/DailyProblemCard";
+import SheetLeaderboard from "../components/leaderboard/SheetLeaderboard.jsx";
 
 
 const Problems = () => {
@@ -81,7 +82,7 @@ const Problems = () => {
                 <div className="mb-12">
 
                     <p className="font-mono text-sm text-[#4AFFC4]">
-                        cp/dsa_club/problems
+                        cp/cphub/problems
                     </p>
 
                     <h1 className="mt-3 font-display text-4xl font-bold tracking-tight md:text-5xl">
@@ -98,40 +99,41 @@ const Problems = () => {
                 </div>
 
 
-                {/* LOADING */}
+                <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+                    <div className="min-w-0">
+                        {/* LOADING */}
+                        {loading && (
+                            <div className="flex min-h-[300px] items-center justify-center">
 
-                {loading && (
-                    <div className="flex min-h-[300px] items-center justify-center">
+                                <div className="flex items-center gap-3">
 
-                        <div className="flex items-center gap-3">
+                                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#4AFFC4] border-t-transparent" />
 
-                            <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#4AFFC4] border-t-transparent" />
+                                    <span className="font-mono text-sm text-[#AEB9C7]">
+                                        loading_problems...
+                                    </span>
 
-                            <span className="font-mono text-sm text-[#AEB9C7]">
-                                loading_problems...
-                            </span>
+                                </div>
 
-                        </div>
-
-                    </div>
-                )}
-
-
-                {/* ERROR */}
-
-                {!loading && error && (
-                    <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-6">
-
-                        <p className="font-mono text-sm text-red-400">
-                            error: {error}
-                        </p>
-
-                    </div>
-                )}
+                            </div>
+                        )}
 
 
-                {!loading && !error && (
-                    <>
+                        {/* ERROR */}
+
+                        {!loading && error && (
+                            <div className="rounded-xl border border-red-500/30 bg-red-500/5 p-6">
+
+                                <p className="font-mono text-sm text-red-400">
+                                    error: {error}
+                                </p>
+
+                            </div>
+                        )}
+
+
+                        {!loading && !error && (
+                            <>
 
                         {/* DAILY PROBLEMS */}
 
@@ -221,8 +223,12 @@ const Problems = () => {
 
                         </section>
 
-                    </>
-                )}
+                            </>
+                        )}
+                    </div>
+
+                    <SheetLeaderboard type="daily-problem" label="Daily" />
+                </div>
 
             </div>
         </div>

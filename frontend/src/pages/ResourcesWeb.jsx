@@ -46,7 +46,7 @@ const ResourcesWeb = () => {
                 <section className="max-w-3xl">
 
                     <p className="font-mono text-sm text-[#4AFFC4]">
-                        cp/dsa_club/resources/web-development
+                        cp/cphub/resources/web-development
                     </p>
 
                     <h1 className="mt-4 font-display text-4xl font-bold tracking-tight md:text-6xl">

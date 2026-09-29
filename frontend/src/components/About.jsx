@@ -13,11 +13,11 @@ const PRINCIPLES = [
 const About = () => (
   <section id="about" className="border-b border-[#1C2734] bg-[#080D14]">
     <Container className="py-5 lg:py-5">
-      <SectionLabel index={8} total={10} title="About the Club" />
+      <SectionLabel index={8} total={10} title="About CpHub" />
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1fr]">
         <div className="space-y-4 font-body text-[15px] leading-relaxed text-[#AEB9C7]">
           <p>
-            The CP/DSA Club started as a handful of students meeting after class to solve
+            CpHub started as a handful of students meeting after class to solve
             Codeforces problems together. What began as a small study group turned into a
             college-wide movement — because the biggest gap in most students' preparation
             wasn't talent, it was community.
@@ -29,7 +29,7 @@ const About = () => (
             where asking "why does this TLE?" is normal.
           </p>
           <p>
-            Today the club runs regular contests, hosts workshops on everything from segment
+            Today CpHub runs regular contests, hosts workshops on everything from segment
             trees to flows, and fields teams for ICPC and inter-college competitions — all
             student-run, for students who want to get better at this together.
           </p>

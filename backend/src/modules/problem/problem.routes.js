@@ -15,7 +15,10 @@ const {
     remove,
     getDaily,
     getById,
-    getHistory
+    getHistory,
+    markDailyComplete,
+    markDailyIncomplete,
+    getDailyProgress
 } = require("./problem.controller");
 
 const router = express.Router();
@@ -64,6 +67,24 @@ router.delete(
 router.get(
     "/daily",
     getDaily
+);
+
+router.patch(
+    "/:id/complete",
+    authenticate,
+    markDailyComplete
+);
+
+router.patch(
+    "/:id/incomplete",
+    authenticate,
+    markDailyIncomplete
+);
+
+router.get(
+    "/:id/progress",
+    authenticate,
+    getDailyProgress
 );
 
 

@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Check, RefreshCw } from "lucide-react";
 
-import { getProblemById } from "../api/problem.api";
+import {
+    getProblemById,
+    getDailyProblemProgress,
+    markDailyProblemComplete,
+    markDailyProblemIncomplete,
+} from "../api/problem.api";
+import { useAuth } from "../context/AuthContext.jsx";
 
 import ProblemSection from "../components/problems/ProblemSection";
 import ProblemExamples from "../components/problems/ProblemExamples";
@@ -13,10 +20,15 @@ import CPSolution from "../components/problems/CPSolution";
 
 const ProblemDetails = () => {
     const { id } = useParams();
+    const { user } = useAuth();
 
     const [problem, setProblem] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [dailySolved, setDailySolved] = useState(false);
+    const [progressLoading, setProgressLoading] = useState(false);
+    const [progressUpdating, setProgressUpdating] = useState(false);
+    const [progressError, setProgressError] = useState("");
 
 
     useEffect(() => {
@@ -45,6 +57,40 @@ const ProblemDetails = () => {
 
         fetchProblem();
     }, [id]);
+
+    useEffect(() => {
+        if (!problem?.isPublished || !user?._id) {
+            setDailySolved(false);
+            return undefined;
+        }
+        let active = true;
+        setProgressLoading(true);
+        setProgressError("");
+        getDailyProblemProgress(id)
+            .then((response) => {
+                if (active) setDailySolved(Boolean(response?.data?.data?.solved ?? response?.data?.solved));
+            })
+            .catch((requestError) => {
+                if (active) setProgressError(requestError?.response?.data?.message || "Could not load your completion status.");
+            })
+            .finally(() => { if (active) setProgressLoading(false); });
+        return () => { active = false; };
+    }, [id, problem?._id, problem?.isPublished, user?._id]);
+
+    const toggleDailySolved = async () => {
+        if (progressUpdating) return;
+        setProgressUpdating(true);
+        setProgressError("");
+        try {
+            if (dailySolved) await markDailyProblemIncomplete(id);
+            else await markDailyProblemComplete(id);
+            setDailySolved((solved) => !solved);
+        } catch (requestError) {
+            setProgressError(requestError?.response?.data?.message || "Could not update your completion status.");
+        } finally {
+            setProgressUpdating(false);
+        }
+    };
 
 
     if (loading) {
@@ -82,6 +128,17 @@ const ProblemDetails = () => {
                 <ProblemHeader
                     problem={problem}
                 />
+
+                {problem.isPublished && user && (
+                    <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-[#1C2734] bg-[#0A1018] px-4 py-3">
+                        <button type="button" onClick={toggleDailySolved} disabled={progressLoading || progressUpdating} aria-pressed={dailySolved} className={`inline-flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-semibold transition disabled:cursor-wait disabled:opacity-60 ${dailySolved ? "border-[#4AFFC4]/40 bg-[#4AFFC4]/10 text-[#4AFFC4]" : "border-[#273342] text-[#AEB9C7] hover:border-[#4AFFC4]/40 hover:text-[#4AFFC4]"}`}>
+                            {progressLoading || progressUpdating ? <RefreshCw size={16} className="animate-spin" /> : <Check size={16} />}
+                            {dailySolved ? "Completed · Undo" : "Mark as completed"}
+                        </button>
+                        <span className="text-xs text-[#7F8B9C]">Your completion counts toward the Daily Problems leaderboard.</span>
+                        {progressError && <p role="alert" className="w-full text-xs text-red-400">{progressError}</p>}
+                    </div>
+                )}
 
 
                 {/* Main Layout */}

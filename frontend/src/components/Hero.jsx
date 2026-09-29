@@ -34,10 +34,10 @@ const HeroTerminal = () => {
         <span className="h-2.5 w-2.5 rounded-full bg-[#FF6B4A]/70" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#FFC24A]/70" />
         <span className="h-2.5 w-2.5 rounded-full bg-[#4AFFC4]/70" />
-        <span className="ml-3 font-mono text-[11px] text-[#556275]">club_culture.cpp — judge</span>
+        <span className="ml-3 font-mono text-[11px] text-[#556275]">cphub_culture.cpp — judge</span>
       </div>
       <div className="px-5 py-6 font-mono text-[13px] leading-7 sm:text-[14px]">
-        <div className="text-[#556275]">$ g++ -O2 club_culture.cpp -o run</div>
+        <div className="text-[#556275]">$ g++ -O2 cphub_culture.cpp -o run</div>
         <div className="text-[#556275]">$ ./run</div>
         <div className="mt-1 text-[#AEB9C7]">
           <TypedLine text="Compiling discipline + curiosity..." delay={300} onDone={() => setStage(1)} />
@@ -94,7 +94,7 @@ const Hero = () => {
           </p>
           <div className="mt-9 flex flex-wrap gap-3">
             <PrimaryButton onClick={() => go("join")}>
-              Join the Club <ArrowUpRight size={14} />
+              Join CpHub <ArrowUpRight size={14} />
             </PrimaryButton>
             <GhostButton onClick={() => go("contests")}>
               Explore Contests <ChevronRight size={14} />

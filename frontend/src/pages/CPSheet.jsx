@@ -4,6 +4,7 @@ import CPSheetHeader from "../components/cp/sheet/CPSheetHeader";
 import RatingTabs from "../components/cp/sheet/RatingTabs";
 import SheetProgress from "../components/cp/sheet/SheetProgress";
 import ProblemList from "../components/cp/sheet/ProblemList.jsx";
+import SheetLeaderboard from "../components/leaderboard/SheetLeaderboard.jsx";
 
 import {
     getCPSheet
@@ -38,6 +39,9 @@ const CPSheet = () => {
 
     const [error, setError] =
         useState("");
+
+    const [leaderboardRefreshKey, setLeaderboardRefreshKey] =
+        useState(0);
 
 
     const fetchSheet = async () => {
@@ -109,6 +113,7 @@ const CPSheet = () => {
                 Math.max(0, current.solved + solvedDelta)
             ),
         }));
+        setLeaderboardRefreshKey((current) => current + 1);
     };
 
 
@@ -138,57 +143,38 @@ const CPSheet = () => {
                 <CPSheetHeader />
 
 
-                {/* RATING TABS */}
+                <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+                    <div className="min-w-0">
+                        {/* RATING TABS */}
+                        <RatingTabs
+                            ratings={RATINGS}
+                            selectedRating={selectedRating}
+                            onRatingChange={handleRatingChange}
+                        />
 
-                <RatingTabs
-                    ratings={RATINGS}
-                    selectedRating={selectedRating}
-                    onRatingChange={
-                        handleRatingChange
-                    }
-                />
+                        {/* PROGRESS */}
+                        <SheetProgress
+                            solved={progress.solved}
+                            total={progress.total}
+                        />
 
+                        {/* ERROR */}
+                        {error && (
+                            <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400">
+                                {error}
+                            </div>
+                        )}
 
-                {/* PROGRESS */}
-
-                <SheetProgress
-                    solved={progress.solved}
-                    total={progress.total}
-                />
-
-
-                {/* ERROR */}
-
-                {error && (
-
-                    <div
-                        className="
-                            mb-6
-                            rounded-xl
-                            border
-                            border-red-500/20
-                            bg-red-500/5
-                            px-4
-                            py-3
-                            text-sm
-                            text-red-400
-                        "
-                    >
-                        {error}
+                        {/* PROBLEMS */}
+                        <ProblemList
+                            problems={problems}
+                            loading={loading}
+                            onProgressUpdate={handleProgressUpdate}
+                        />
                     </div>
 
-                )}
-
-
-                {/* PROBLEMS */}
-
-                <ProblemList
-                    problems={problems}
-                    loading={loading}
-                    onProgressUpdate={
-                        handleProgressUpdate
-                    }
-                />
+                    <SheetLeaderboard refreshSignal={leaderboardRefreshKey} />
+                </div>
 
             </div>
 

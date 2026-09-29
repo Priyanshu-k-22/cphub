@@ -12,6 +12,7 @@ const codeforcesRoutes = require("./modules/codeforces/codeforces.routes");
 const dashboardRoutes = require("./modules/dashboard/dashboard.routes");
 const adminContentRoutes = require("./modules/adminContent/adminContent.routes");
 const platformSettingsRoutes = require("./modules/settings/platformSettings.routes");
+const leaderboardRoutes = require("./modules/leaderboard/leaderboard.routes");
 
 
 const cors = require("cors");
@@ -62,6 +63,7 @@ app.use("/api/codeforces",codeforcesRoutes);
 app.use("/api/dashboard",dashboardRoutes);
 app.use("/api/admin/content", adminContentRoutes);
 app.use("/api/settings", platformSettingsRoutes);
+app.use("/api/leaderboard", leaderboardRoutes);
 
 app.use(errorHandler)
 

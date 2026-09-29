@@ -8,7 +8,10 @@ const {
     deleteProblem,
     getDailyProblems,
     getProblemById,
-    getProblemHistory
+    getProblemHistory,
+    markDailyProblemComplete,
+    markDailyProblemIncomplete,
+    getDailyProblemProgress
 } = require("./problem.service");
 
 
@@ -69,6 +72,21 @@ const getDaily = asyncHandler(async (req, res) => {
             "Daily problems fetched successfully"
         )
     );
+});
+
+const markDailyComplete = asyncHandler(async (req, res) => {
+    const progress = await markDailyProblemComplete({ userId: req.user._id, problemId: req.params.id });
+    return res.status(200).json(new ApiResponse(200, progress, "Daily problem marked complete"));
+});
+
+const markDailyIncomplete = asyncHandler(async (req, res) => {
+    const progress = await markDailyProblemIncomplete({ userId: req.user._id, problemId: req.params.id });
+    return res.status(200).json(new ApiResponse(200, progress, "Daily problem marked incomplete"));
+});
+
+const getDailyProgress = asyncHandler(async (req, res) => {
+    const progress = await getDailyProblemProgress({ userId: req.user._id, problemId: req.params.id });
+    return res.status(200).json(new ApiResponse(200, progress, "Daily problem progress fetched successfully"));
 });
 
 
@@ -132,5 +150,8 @@ module.exports = {
     remove,
     getDaily,
     getById,
-    getHistory
+    getHistory,
+    markDailyComplete,
+    markDailyIncomplete,
+    getDailyProgress
 };

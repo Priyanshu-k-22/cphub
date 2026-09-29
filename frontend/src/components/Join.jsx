@@ -43,7 +43,7 @@ const Join = () => (
           </p>
           <div className="mt-6 space-y-3">
             <PrimaryButton className="w-full">
-              Join the Club <ArrowUpRight size={14} />
+              Join CpHub <ArrowUpRight size={14} />
             </PrimaryButton>
             <GhostButton className="w-full">
               <MessageSquare size={14} /> Join our Discord

@@ -461,25 +461,21 @@ const SideMenu = ({
             title: "Explore",
             links: [
                 { name: "Home", path: "/" },
-                { name: "About", path: "/about" },
-                { name: "Events", path: "/events" },
+                { name: "Our Team", path: "/team" },
                 { name: "Contests", path: "/contests" },
                 { name: "Leaderboard", path: "/leaderboard" },
-                { name: "Achievements", path: "/achievements" },
-                { name: "Gallery", path: "/gallery" },
-                { name: "Our Team", path: "/team" },
-                { name: "Competitive Programming", path: "/cp" },
-                { name: "Resources", path: "/resources" },
+                { name: "CP", path: "/cp" },
+                { name: "DSA", path: "/dsa" },
             ],
         },
         ...(isAuthenticated ? [{
             title: "Learning",
             links: [
                 { name: "Dashboard", path: isAdmin ? "/admin/dashboard" : "/dashboard" },
-                { name: "Problems", path: "/problems" },
-                { name: "Problem History", path: "/problems/history" },
+                { name: "Daily Problems", path: "/problems" },
                 { name: "CP Sheet", path: "/cp-sheet" },
-                { name: "DSA Sheets", path: "/dsa/sheets" },
+                { name: "DSA Sheet", path: "/dsa-sheet" },
+
             ],
         }] : []),
     ];

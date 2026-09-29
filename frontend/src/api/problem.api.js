@@ -86,6 +86,21 @@ export const getProblemHistory = async ({
     return response.data;
 };
 
+export const getDailyProblemProgress = async (problemId) => {
+    const response = await api.get(`/problems/${problemId}/progress`);
+    return response.data;
+};
+
+export const markDailyProblemComplete = async (problemId) => {
+    const response = await api.patch(`/problems/${problemId}/complete`);
+    return response.data;
+};
+
+export const markDailyProblemIncomplete = async (problemId) => {
+    const response = await api.patch(`/problems/${problemId}/incomplete`);
+    return response.data;
+};
+
 export const updateProblem = async (problemId, problemData) => {
     const response = await api.put(`/problems/${problemId}`, problemData);
     return response.data;

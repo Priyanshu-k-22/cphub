@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const Problem = require("./problem.model");
+const DailyProblemProgress = require("./dailyProblemProgress.model");
 const ApiError = require("../../utils/ApiError");
 
 /*
@@ -129,7 +130,44 @@ const deleteProblem = async (problemId) => {
         throw new ApiError(404, "Problem not found");
     }
 
+    await DailyProblemProgress.deleteMany({ problem: problemId });
+
     return problem;
+};
+
+const markDailyProblemComplete = async ({ userId, problemId }) => {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        throw new ApiError(400, "Invalid problem ID");
+    }
+    const problem = await Problem.findOne({ _id: problemId, isPublished: true }).select("_id").lean();
+    if (!problem) throw new ApiError(404, "Published daily problem not found");
+
+    return DailyProblemProgress.findOneAndUpdate(
+        { user: userId, problem: problemId },
+        { $set: { solved: true, solvedAt: new Date() } },
+        { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+};
+
+const markDailyProblemIncomplete = async ({ userId, problemId }) => {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        throw new ApiError(400, "Invalid problem ID");
+    }
+    return DailyProblemProgress.findOneAndUpdate(
+        { user: userId, problem: problemId },
+        { $set: { solved: false, solvedAt: null } },
+        { new: true }
+    );
+};
+
+const getDailyProblemProgress = async ({ userId, problemId }) => {
+    if (!mongoose.Types.ObjectId.isValid(problemId)) {
+        throw new ApiError(400, "Invalid problem ID");
+    }
+    const progress = await DailyProblemProgress.findOne({ user: userId, problem: problemId })
+        .select("solved solvedAt")
+        .lean();
+    return { solved: Boolean(progress?.solved), solvedAt: progress?.solvedAt || null };
 };
 
 
@@ -281,5 +319,8 @@ module.exports = {
     deleteProblem,
     getDailyProblems,
     getProblemById,
-    getProblemHistory
+    getProblemHistory,
+    markDailyProblemComplete,
+    markDailyProblemIncomplete,
+    getDailyProblemProgress
 };

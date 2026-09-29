@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ArrowUpRight, RefreshCw } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import SheetLeaderboard from "../components/leaderboard/SheetLeaderboard.jsx";
 import {
     getDSATopicProblems,
     getDSATopics,
@@ -43,6 +44,7 @@ export default function DSAPractice() {
     const [problemsLoading, setProblemsLoading] = useState(false);
     const [updatingId, setUpdatingId] = useState("");
     const [error, setError] = useState("");
+    const [leaderboardRefreshKey, setLeaderboardRefreshKey] = useState(0);
 
     useEffect(() => {
         let active = true;
@@ -101,6 +103,7 @@ export default function DSAPractice() {
         try {
             if (problem.solved) await markDSAProblemIncomplete(problem._id);
             else await markDSAProblemComplete(problem._id);
+            setLeaderboardRefreshKey((current) => current + 1);
             const solved = !problem.solved;
             setSheet((current) => {
                 if (!current) return current;
@@ -153,25 +156,31 @@ export default function DSAPractice() {
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-[#7F8B9C] md:text-base">Practice curated problems topic by topic and track your progress as you go.</p>
             </section>
 
-            {error && <div role="alert" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400"><span>{error}</span><button type="button" onClick={retry} className="inline-flex shrink-0 items-center gap-2 underline"><RefreshCw size={14} />Retry</button></div>}
+            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+                <div className="min-w-0">
+                    {error && <div role="alert" className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-400"><span>{error}</span><button type="button" onClick={retry} className="inline-flex shrink-0 items-center gap-2 underline"><RefreshCw size={14} />Retry</button></div>}
 
-            <div className="mb-6 overflow-x-auto rounded-xl border border-[#1C2734] bg-[#080D14] p-1">
-                <div className="flex min-w-max gap-1">
-                    {topicsLoading ? <span className="px-5 py-2.5 text-sm text-[#7F8B9C]">Loading topics…</span> : topics.map((topic) => <button key={topic._id} type="button" onClick={() => chooseTopic(topic)} aria-pressed={topic.slug === selectedSlug} className={`rounded-lg px-4 py-2.5 text-sm transition-all duration-200 sm:px-5 ${topic.slug === selectedSlug ? "bg-[#4AFFC4] font-semibold text-[#060A10]" : "text-[#7F8B9C] hover:bg-[#111923] hover:text-white"}`}>{topic.name}</button>)}
+                    <div className="mb-6 overflow-x-auto rounded-xl border border-[#1C2734] bg-[#080D14] p-1">
+                        <div className="flex min-w-max gap-1">
+                            {topicsLoading ? <span className="px-5 py-2.5 text-sm text-[#7F8B9C]">Loading topics…</span> : topics.map((topic) => <button key={topic._id} type="button" onClick={() => chooseTopic(topic)} aria-pressed={topic.slug === selectedSlug} className={`rounded-lg px-4 py-2.5 text-sm transition-all duration-200 sm:px-5 ${topic.slug === selectedSlug ? "bg-[#4AFFC4] font-semibold text-[#060A10]" : "text-[#7F8B9C] hover:bg-[#111923] hover:text-white"}`}>{topic.name}</button>)}
+                        </div>
+                    </div>
+
+                    {!topicsLoading && topics.length === 0 ? <div className="rounded-xl border border-dashed border-[#1C2734] bg-[#080D14] px-6 py-12 text-center"><p className="font-mono text-sm text-[#7F8B9C]">No DSA topics have been published yet.</p><p className="mt-2 text-sm text-[#556275]">Topics and problems will appear here once added by an administrator.</p></div> : <>
+                        {selectedTopic && <section className="mb-8 rounded-xl border border-[#1C2734] bg-[#080D14] p-5">
+                            <div className="mb-3 flex items-center justify-between"><div><p className="font-mono text-xs uppercase tracking-wider text-[#556275]">{selectedTopic.name} progress</p><p className="mt-1 text-lg font-semibold text-white">{progress.solved}<span className="text-[#556275]"> / {progress.total}</span></p></div><span className="font-mono text-sm text-[#4AFFC4]">{progress.percentage}%</span></div>
+                            <div className="h-2 overflow-hidden rounded-full bg-[#141C26]"><div className="h-full rounded-full bg-[#4AFFC4] transition-all duration-500" style={{ width: `${progress.percentage}%` }} /></div>
+                        </section>}
+
+                        {problemsLoading ? <div className="space-y-3">{[1,2,3,4,5].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl border border-[#1C2734] bg-[#080D14]" />)}</div> : sheet?.problems?.length ? <section className="overflow-hidden rounded-xl border border-[#1C2734] bg-[#080D14]">
+                            <div className="grid grid-cols-[28px_minmax(0,1fr)_42px_36px_36px] gap-2 border-b border-[#1C2734] px-3 py-3 font-mono text-[9px] uppercase tracking-wider text-[#556275] sm:grid-cols-[50px_minmax(0,1fr)_80px_48px_48px] sm:gap-4 sm:px-5 sm:text-[10px]"><span>#</span><span>Problem</span><span className="text-center">Level</span><span className="text-center">Hint</span><span className="text-right">Status</span></div>
+                            {sheet.problems.map((problem, index) => <DSAProblemRow key={problem._id} problem={problem} index={index} onToggle={toggleSolved} updating={updatingId === problem._id} />)}
+                        </section> : <div className="rounded-xl border border-[#1C2734] bg-[#080D14] px-6 py-12 text-center"><p className="font-mono text-sm text-[#7F8B9C]">{error ? "Could not load this topic." : `No problems found for ${selectedTopic?.name || "this topic"}.`}</p></div>}
+                    </>}
                 </div>
+
+                <SheetLeaderboard type="dsa-sheet" label="DSA" refreshSignal={leaderboardRefreshKey} />
             </div>
-
-            {!topicsLoading && topics.length === 0 ? <div className="rounded-xl border border-dashed border-[#1C2734] bg-[#080D14] px-6 py-12 text-center"><p className="font-mono text-sm text-[#7F8B9C]">No DSA topics have been published yet.</p><p className="mt-2 text-sm text-[#556275]">Topics and problems will appear here once added by an administrator.</p></div> : <>
-                {selectedTopic && <section className="mb-8 rounded-xl border border-[#1C2734] bg-[#080D14] p-5">
-                    <div className="mb-3 flex items-center justify-between"><div><p className="font-mono text-xs uppercase tracking-wider text-[#556275]">{selectedTopic.name} progress</p><p className="mt-1 text-lg font-semibold text-white">{progress.solved}<span className="text-[#556275]"> / {progress.total}</span></p></div><span className="font-mono text-sm text-[#4AFFC4]">{progress.percentage}%</span></div>
-                    <div className="h-2 overflow-hidden rounded-full bg-[#141C26]"><div className="h-full rounded-full bg-[#4AFFC4] transition-all duration-500" style={{ width: `${progress.percentage}%` }} /></div>
-                </section>}
-
-                {problemsLoading ? <div className="space-y-3">{[1,2,3,4,5].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl border border-[#1C2734] bg-[#080D14]" />)}</div> : sheet?.problems?.length ? <section className="overflow-hidden rounded-xl border border-[#1C2734] bg-[#080D14]">
-                    <div className="grid grid-cols-[28px_minmax(0,1fr)_42px_36px_36px] gap-2 border-b border-[#1C2734] px-3 py-3 font-mono text-[9px] uppercase tracking-wider text-[#556275] sm:grid-cols-[50px_minmax(0,1fr)_80px_48px_48px] sm:gap-4 sm:px-5 sm:text-[10px]"><span>#</span><span>Problem</span><span className="text-center">Level</span><span className="text-center">Hint</span><span className="text-right">Status</span></div>
-                    {sheet.problems.map((problem, index) => <DSAProblemRow key={problem._id} problem={problem} index={index} onToggle={toggleSolved} updating={updatingId === problem._id} />)}
-                </section> : <div className="rounded-xl border border-[#1C2734] bg-[#080D14] px-6 py-12 text-center"><p className="font-mono text-sm text-[#7F8B9C]">{error ? "Could not load this topic." : `No problems found for ${selectedTopic?.name || "this topic"}.`}</p></div>}
-            </>}
         </div>
     </main>;
 }

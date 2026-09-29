@@ -15,7 +15,7 @@ const ClubIntro = () => {
           </h3>
           <p className="mt-5 max-w-xl font-body text-[15px] leading-relaxed text-[#AEB9C7]">
             We are a community of students passionate about Competitive Programming, Data
-            Structures, Algorithms, and problem solving. The club gives you a place to learn,
+            Structures, Algorithms, and problem solving. CpHub gives you a place to learn,
             practice, compete, collaborate, and grow — alongside people who care about the same
             thing you do.
           </p>
