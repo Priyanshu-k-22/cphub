@@ -5,7 +5,7 @@ const router =
 
 const {
     getDashboard,
-    getAdminDashboard
+    getAdminDashboard,
 } = require("./dashboard.controller");
 
 const authMiddleware =

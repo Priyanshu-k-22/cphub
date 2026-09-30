@@ -21,7 +21,8 @@ const BIWEEKLY_ANCHOR = new Date(
 
 const fetchCodeforcesContests = async () => {
     const response = await axios.get(
-        "https://codeforces.com/api/contest.list"
+        "https://codeforces.com/api/contest.list",
+        { timeout: 8000 }
     );
 
     const contests = response.data.result;

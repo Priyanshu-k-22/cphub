@@ -1,314 +1,144 @@
-import React, {
-    useEffect,
-    useRef,
-    useState
-} from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
+import DashboardHeader from "./DashboardHeader";
+import DashboardStats from "./DashboardStats";
+import TodayProblems from "./TodayProblems";
+import TodayProgress from "./TodayProgress";
+import CPProgress from "./CPProgress";
+import DSAProgress from "./DSAProgress";
+import UpcomingContests from "./UpcomingContests";
+import RecentActivity from "./RecentActivity";
+import { getDashboard } from "../../api/dashboard.api";
+import { syncCodeforces } from "../../api/codeforces.api";
 
-import DashboardHeader
-    from "./DashboardHeader";
-
-import DashboardStats
-    from "./DashboardStats";
-
-import TodayProblems
-    from "./TodayProblems";
-
-import TodayProgress
-    from "./TodayProgress";
-
-import CPProgress
-    from "./CPProgress";
-
-import DSAProgress
-    from "./DSAProgress";
-
-import UpcomingContests
-    from "./UpcomingContests";
-
-import RecentActivity
-    from "./RecentActivity";
-
-import {
-    getCodeforcesProfile,
-    syncCodeforces
-} from "../../api/codeforces.api";
-
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const UserDashboard = () => {
+    const { user: authUser } = useAuth();
+    const [dashboard, setDashboard] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+    const [syncing, setSyncing] = useState(false);
+    const [dashboardError, setDashboardError] = useState("");
+    const [codeforcesError, setCodeforcesError] = useState("");
     const initialLoadStarted = useRef(false);
+    const autoSyncStarted = useRef(false);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Codeforces state
-    |--------------------------------------------------------------------------
-    */
+    const syncProfile = useCallback(async () => {
+        setSyncing(true);
+        setCodeforcesError("");
+        try {
+            const response = await syncCodeforces();
+            const profile = response?.data;
+            if (!profile) throw new Error("Codeforces returned no profile data.");
+            setDashboard((previous) => previous ? { ...previous, codeforces: profile } : previous);
+        } catch (error) {
+            console.error("Codeforces sync failed:", error);
+            setCodeforcesError(error?.response?.data?.message || error?.message || "Could not refresh Codeforces. Try again.");
+        } finally {
+            setSyncing(false);
+        }
+    }, []);
 
-    const [
-        codeforces,
-        setCodeforces
-    ] = useState(null);
+    const loadDashboard = useCallback(async ({ initial = false } = {}) => {
+        if (initial && !dashboard) setLoading(true);
+        else setRefreshing(true);
+        setDashboardError("");
+        try {
+            const response = await getDashboard();
+            const data = response?.data ?? response;
+            setDashboard(data);
 
-
-    const [
-        loading,
-        setLoading
-    ] = useState(true);
-
-
-    const [
-        syncing,
-        setSyncing
-    ] = useState(false);
-
-
-    const [
-        error,
-        setError
-    ] = useState(null);
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Get stored Codeforces data
-    |--------------------------------------------------------------------------
-    */
-
-    const fetchCodeforces =
-        async () => {
-
-            try {
-
-                setLoading(true);
-                setError(null);
-
-                const storedResponse =
-                    await getCodeforcesProfile();
-
-                const storedProfile = storedResponse?.data || null;
-                setCodeforces(storedProfile);
-
-                const lastSyncedAt = storedProfile?.lastSyncedAt
-                    ? new Date(storedProfile.lastSyncedAt).getTime()
-                    : 0;
-                const profileIsFresh = lastSyncedAt > 0 &&
-                    Date.now() - lastSyncedAt < 24 * 60 * 60 * 1000;
-
-                if (!profileIsFresh) {
-                    setSyncing(true);
-                    try {
-                        const syncResponse = await syncCodeforces();
-                        const syncedProfile = syncResponse?.data || storedProfile;
-                        setCodeforces(syncedProfile);
-                        if (!syncResponse?.data) {
-                            setError("Codeforces returned no profile data. Please try Sync again.");
-                        }
-                    } catch (syncError) {
-                        console.error("Automatic Codeforces sync failed:", syncError);
-                        setCodeforces(storedProfile);
-                        setError(storedProfile
-                            ? "Could not refresh Codeforces. Showing the last saved profile."
-                            : syncError?.response?.data?.message || "Could not fetch your Codeforces profile. Check your registered handle and try Sync again."
-                        );
-                    } finally {
-                        setSyncing(false);
-                    }
-                }
-
-            } catch (error) {
-
-                console.error(
-                    "Failed to fetch Codeforces data:",
-                    error
-                );
-
-                setError(
-                    error?.response?.data?.message ||
-                    "Failed to load Codeforces data"
-                );
-
-            } finally {
-
-                setLoading(false);
-
+            const lastSyncedAt = data?.codeforces?.lastSyncedAt
+                ? new Date(data.codeforces.lastSyncedAt).getTime()
+                : 0;
+            if (!autoSyncStarted.current && (!lastSyncedAt || Date.now() - lastSyncedAt >= DAY_MS)) {
+                autoSyncStarted.current = true;
+                void syncProfile({ automatic: true });
             }
-        };
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Initial load
-    |--------------------------------------------------------------------------
-    */
+        } catch (error) {
+            console.error("Dashboard fetch failed:", error);
+            setDashboardError(error?.response?.data?.message || "Could not load your dashboard.");
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, [dashboard, syncProfile]);
 
     useEffect(() => {
         if (initialLoadStarted.current) return;
         initialLoadStarted.current = true;
-        fetchCodeforces();
-    }, []);
+        loadDashboard({ initial: true });
+    }, [loadDashboard]);
 
+    if (loading && !dashboard) {
+        return (
+            <div className="student-dashboard-ui min-h-screen bg-[#060A10] px-4 py-8 text-[#EDF2F7]">
+                <main className="mx-auto max-w-7xl">
+                    <div className="h-24 animate-pulse rounded-xl bg-[#0A1018]" />
+                    <div className="mt-4 grid gap-3 lg:grid-cols-3">
+                        {[1, 2, 3, 4, 5, 6].map((key) => <div key={key} className="h-40 animate-pulse rounded-xl bg-[#0A1018]" />)}
+                    </div>
+                </main>
+            </div>
+        );
+    }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Manual Codeforces sync
-    |--------------------------------------------------------------------------
-    */
+    if (!dashboard) {
+        return (
+            <div className="student-dashboard-ui min-h-screen bg-[#060A10] px-4 py-16 text-[#EDF2F7]">
+                <main className="mx-auto max-w-xl rounded-xl border border-[#1C2734] bg-[#0A1018] p-6 text-center">
+                    <h1 className="text-xl font-semibold">Dashboard unavailable</h1>
+                    <p className="mt-2 text-sm text-red-400" role="alert">{dashboardError || "We could not load your dashboard data."}</p>
+                    <button type="button" onClick={() => loadDashboard({ initial: true })} disabled={refreshing} className="mt-4 rounded-lg border border-[#4AFFC4]/40 px-4 py-2 text-sm text-[#4AFFC4] disabled:opacity-50">{refreshing ? "Retrying…" : "Retry"}</button>
+                </main>
+            </div>
+        );
+    }
 
-    const handleSyncCodeforces =
-        async () => {
-
-            try {
-
-                setSyncing(true);
-                setError(null);
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Call backend sync
-                |--------------------------------------------------------------------------
-                */
-
-                const response = await syncCodeforces();
-                if (!response?.data) {
-                    throw new Error("Codeforces did not return profile data.");
-                }
-                setCodeforces(response.data);
-
-
-            } catch (error) {
-
-                console.error(
-                    "Codeforces sync failed:",
-                    error
-                );
-
-
-                setError(
-                    error?.response?.data?.message ||
-                    error?.message ||
-                    "Failed to sync Codeforces data"
-                );
-
-            } finally {
-
-                setSyncing(false);
-
-            }
-        };
-
+    const user = dashboard.user || authUser;
+    const contestsError = dashboard.contestsUnavailable ? "Contest data is temporarily unavailable." : "";
 
     return (
-
         <div className="student-dashboard-ui min-h-screen bg-[#060A10] text-[#EDF2F7]">
-
             <main className="mx-auto max-w-7xl px-4 py-5 md:px-5">
+                <DashboardHeader user={user} />
 
-
-                {/* =====================================================
-                    HEADER
-                ====================================================== */}
-
-                <DashboardHeader />
-
+                {dashboardError && (
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400" role="alert">
+                        <span>{dashboardError} Showing the last loaded dashboard.</span>
+                        <button type="button" onClick={() => loadDashboard()} disabled={refreshing} className="underline underline-offset-2">{refreshing ? "Refreshing…" : "Retry"}</button>
+                    </div>
+                )}
 
                 <div className="space-y-3">
-
-
-                    {/* =================================================
-                        TOP SECTION
-                    ================================================== */}
-
                     <section className="grid gap-3 lg:grid-cols-[1fr_390px]">
-
-
-                        {/* =================================================
-                            STATS
-                        ================================================== */}
-
                         <div className="rounded-xl border border-[#1C2734] bg-[#0A1018] p-4">
-
-                            <DashboardStats
-                                codeforces={codeforces}
-                                loading={loading}
-                                syncing={syncing}
-                                onSync={handleSyncCodeforces}
-                            />
-
-
-                            {/* Error */}
-
-                            {error && (
-
-                                <p className="mt-3 font-mono text-[9px] text-red-400">
-                                    {error}
-                                </p>
-
+                            <DashboardStats codeforces={dashboard.codeforces} loading={false} syncing={syncing} onSync={() => syncProfile()} />
+                            {codeforcesError && (
+                                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-amber-300" role="alert">
+                                    <span>{codeforcesError}{dashboard.codeforces ? " Showing saved stats." : ""}</span>
+                                    <button type="button" onClick={() => syncProfile()} disabled={syncing} className="underline underline-offset-2">Retry sync</button>
+                                </div>
                             )}
-
                         </div>
-
-
-                        {/* =================================================
-                            TODAY'S PROBLEMS
-                        ================================================== */}
-
-                        <TodayProblems />
-
+                        <TodayProblems problems={dashboard.todayProblems} loading={false} onRetry={() => loadDashboard()} />
                     </section>
-
-
-                    {/* =================================================
-                        PROGRESS SECTION
-                    ================================================== */}
 
                     <section className="grid gap-3 lg:grid-cols-3">
-
-
-                        {/* Today's Progress */}
-
-                        <TodayProgress />
-
-
-                        {/* CP Progress */}
-
-                        <CPProgress
-                            codeforces={codeforces}
-                            loading={loading}
-                        />
-
-
-                        {/* DSA Progress */}
-
-                        <DSAProgress />
-
+                        <TodayProgress progress={dashboard.todayProgress} loading={false} />
+                        <CPProgress codeforces={dashboard.codeforces} progress={dashboard.cpProgress} loading={false} />
+                        <DSAProgress progress={dashboard.dsaProgress} loading={false} />
                     </section>
-
-
-                    {/* =================================================
-                        BOTTOM SECTION
-                    ================================================== */}
 
                     <section className="grid gap-3 lg:grid-cols-2">
-
-
-                        {/* Upcoming Contests */}
-
-                        <UpcomingContests />
-
-
-                        {/* Recent Activity */}
-
-                        <RecentActivity />
-
+                        <UpcomingContests contests={dashboard.contests} loading={false} error={contestsError} />
+                        <RecentActivity activity={dashboard.activity} loading={false} />
                     </section>
-
                 </div>
-
             </main>
-
         </div>
     );
 };
-
 
 export default UserDashboard;

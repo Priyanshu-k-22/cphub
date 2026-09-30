@@ -1,69 +1,36 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const DSAProgress = () => {
+const DSAProgress = ({ progress, loading }) => {
+    const solved = Number(progress?.solved) || 0;
+    const total = Number(progress?.total) || 0;
+    const percentage = total ? Math.min(100, Number(progress?.percentage) || 0) : 0;
+
     return (
-        <div className="rounded-xl border border-[#1C2734] bg-[#0A1018] p-4">
-
+        <section className="rounded-xl border border-[#1C2734] bg-[#0A1018] p-4">
             <div className="flex items-center justify-between">
-
-                <h2 className="text-sm font-semibold">
-                    DSA Progress
-                </h2>
-
-                <Link
-                    to="/problems"
-                    className="font-mono text-[9px] text-[#4AFFC4] hover:text-white"
-                >
-                    continue →
-                </Link>
-
+                <h2 className="text-base font-semibold">DSA Progress</h2>
+                <Link to="/dsa-sheet" className="font-mono text-sm text-[#4AFFC4] hover:text-white">Continue →</Link>
             </div>
-
 
             <div className="mt-4 grid grid-cols-2 gap-4">
-
                 <div>
-                    <p className="font-mono text-[9px] uppercase text-[#556275]">
-                        solved
-                    </p>
-
-                    <p className="mt-1 text-lg font-semibold">
-                        115
-                    </p>
+                    <p className="text-xs uppercase text-[#556275]">Solved</p>
+                    <p className="mt-1 text-lg font-semibold" aria-live="polite">{loading ? "…" : `${solved}/${total}`}</p>
                 </div>
-
                 <div>
-                    <p className="font-mono text-[9px] uppercase text-[#556275]">
-                        progress
-                    </p>
-
-                    <p className="mt-1 text-lg font-semibold">
-                        72%
-                    </p>
+                    <p className="text-xs uppercase text-[#556275]">Completion</p>
+                    <p className="mt-1 text-lg font-semibold">{loading ? "…" : `${percentage}%`}</p>
                 </div>
-
             </div>
 
-
-            <div className="mt-4 flex items-center justify-between">
-
-                <span className="font-mono text-[9px] text-[#556275]">
-                    Current: Dynamic Programming
-                </span>
-
-                <div className="h-1.5 w-20 overflow-hidden rounded-full bg-[#111923]">
-
-                    <div
-                        className="h-full rounded-full bg-[#4AFFC4]"
-                        style={{ width: "72%" }}
-                    />
-
+            <div className="mt-4 flex items-center justify-between gap-3">
+                <span className="truncate text-sm text-[#AEB9C7]">{progress?.currentTopic ? `Next: ${progress.currentTopic}` : total ? "All topics complete" : "No topics available"}</span>
+                <div className="h-1.5 w-20 shrink-0 overflow-hidden rounded-full bg-[#111923]" role="progressbar" aria-label="DSA Sheet completion" aria-valuemin={0} aria-valuemax={total} aria-valuenow={solved}>
+                    <div className="h-full rounded-full bg-[#4AFFC4] transition-[width]" style={{ width: `${percentage}%` }} />
                 </div>
-
             </div>
-
-        </div>
+        </section>
     );
 };
 
