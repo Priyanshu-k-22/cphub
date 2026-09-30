@@ -54,7 +54,7 @@ const UserDashboard = () => {
                 : 0;
             if (!autoSyncStarted.current && (!lastSyncedAt || Date.now() - lastSyncedAt >= DAY_MS)) {
                 autoSyncStarted.current = true;
-                void syncProfile({ automatic: true });
+                void syncProfile();
             }
         } catch (error) {
             console.error("Dashboard fetch failed:", error);
@@ -73,11 +73,11 @@ const UserDashboard = () => {
 
     if (loading && !dashboard) {
         return (
-            <div className="student-dashboard-ui min-h-screen bg-[#060A10] px-4 py-8 text-[#EDF2F7]">
+            <div className="student-dashboard-ui min-h-screen bg-[var(--theme-page)] px-4 py-8 text-[var(--theme-text)]">
                 <main className="mx-auto max-w-7xl">
-                    <div className="h-24 animate-pulse rounded-xl bg-[#0A1018]" />
+                    <div className="h-36 animate-pulse rounded-2xl bg-[var(--theme-surface)]" />
                     <div className="mt-4 grid gap-3 lg:grid-cols-3">
-                        {[1, 2, 3, 4, 5, 6].map((key) => <div key={key} className="h-40 animate-pulse rounded-xl bg-[#0A1018]" />)}
+                        {[1, 2, 3, 4, 5, 6].map((key) => <div key={key} className="h-44 animate-pulse rounded-2xl bg-[var(--theme-surface)]" />)}
                     </div>
                 </main>
             </div>
@@ -86,8 +86,8 @@ const UserDashboard = () => {
 
     if (!dashboard) {
         return (
-            <div className="student-dashboard-ui min-h-screen bg-[#060A10] px-4 py-16 text-[#EDF2F7]">
-                <main className="mx-auto max-w-xl rounded-xl border border-[#1C2734] bg-[#0A1018] p-6 text-center">
+            <div className="student-dashboard-ui min-h-screen bg-[var(--theme-page)] px-4 py-16 text-[var(--theme-text)]">
+                <main className="mx-auto max-w-xl rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-6 text-center">
                     <h1 className="text-xl font-semibold">Dashboard unavailable</h1>
                     <p className="mt-2 text-sm text-red-400" role="alert">{dashboardError || "We could not load your dashboard data."}</p>
                     <button type="button" onClick={() => loadDashboard({ initial: true })} disabled={refreshing} className="mt-4 rounded-lg border border-[#4AFFC4]/40 px-4 py-2 text-sm text-[#4AFFC4] disabled:opacity-50">{refreshing ? "Retrying…" : "Retry"}</button>
@@ -97,12 +97,12 @@ const UserDashboard = () => {
     }
 
     const user = dashboard.user || authUser;
-    const contestsError = dashboard.contestsUnavailable ? "Contest data is temporarily unavailable." : "";
+    const contestsError = dashboard.contestsUnavailable ? "Contest data is temporarily unavailable. Try refreshing the dashboard." : "";
 
     return (
-        <div className="student-dashboard-ui min-h-screen bg-[#060A10] text-[#EDF2F7]">
+        <div className="student-dashboard-ui min-h-screen bg-[var(--theme-page)] text-[var(--theme-text)]">
             <main className="mx-auto max-w-7xl px-4 py-5 md:px-5">
-                <DashboardHeader user={user} />
+                <DashboardHeader user={user} onRefresh={() => loadDashboard()} refreshing={refreshing} />
 
                 {dashboardError && (
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-red-400/20 bg-red-400/5 px-4 py-3 text-sm text-red-400" role="alert">
@@ -112,16 +112,8 @@ const UserDashboard = () => {
                 )}
 
                 <div className="space-y-3">
-                    <section className="grid gap-3 lg:grid-cols-[1fr_390px]">
-                        <div className="rounded-xl border border-[#1C2734] bg-[#0A1018] p-4">
-                            <DashboardStats codeforces={dashboard.codeforces} loading={false} syncing={syncing} onSync={() => syncProfile()} />
-                            {codeforcesError && (
-                                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-amber-300" role="alert">
-                                    <span>{codeforcesError}{dashboard.codeforces ? " Showing saved stats." : ""}</span>
-                                    <button type="button" onClick={() => syncProfile()} disabled={syncing} className="underline underline-offset-2">Retry sync</button>
-                                </div>
-                            )}
-                        </div>
+                    <section className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_390px]">
+                        <DashboardStats codeforces={dashboard.codeforces} username={user?.username} loading={false} syncing={syncing} onSync={() => syncProfile()} syncError={codeforcesError} />
                         <TodayProblems problems={dashboard.todayProblems} loading={false} onRetry={() => loadDashboard()} />
                     </section>
 
