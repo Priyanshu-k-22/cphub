@@ -18,7 +18,7 @@ const timeUntil = (date) => {
 
 const ContestLink = ({ contest, featured = false }) => (
     <a href={contest.externalLink} target="_blank" rel="noopener noreferrer" className={featured
-        ? "group relative block overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-[var(--theme-surface-raised)] to-[var(--theme-surface-raised)] p-4 transition hover:border-[var(--theme-accent)]/50"
+        ? "group relative block overflow-hidden rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 via-[var(--theme-surface-raised)] to-[var(--theme-surface-raised)] p-4 transition hover:border-[var(--theme-accent)]"
         : "group flex items-center justify-between gap-3 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 py-3 transition hover:border-[var(--theme-accent)] hover:bg-[var(--theme-hover)]"}>
         {featured ? (
             <>

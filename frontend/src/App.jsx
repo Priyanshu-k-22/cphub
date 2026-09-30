@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     BrowserRouter,
     Routes,
@@ -107,6 +107,7 @@ const RoleDashboard = () => {
 const AppLayout = () => {
     const location = useLocation();
     const isAdminRoute = location.pathname.startsWith("/admin");
+    const pageScrollRef = useRef(null);
 
     const [menuOpen, setMenuOpen] =
         useState(false);
@@ -139,11 +140,15 @@ const AppLayout = () => {
         setMenuOpen(false);
     }, [location.pathname]);
 
+    useEffect(() => {
+        if (!isAdminRoute) pageScrollRef.current?.scrollTo({ top: 0, left: 0 });
+    }, [location.pathname, isAdminRoute]);
+
     const toggleTheme = () => setBrightMode((current) => !current);
 
     return (
         <div
-            className="app-theme flex min-h-screen w-full overflow-x-hidden bg-[#060A10] text-[#EDF2F7]"
+            className={`app-theme flex w-full bg-[#060A10] text-[#EDF2F7] ${isAdminRoute ? "min-h-screen overflow-x-hidden" : "h-screen overflow-hidden"}`}
             data-theme={brightMode ? "light" : "dark"}
         >
 
@@ -152,7 +157,8 @@ const AppLayout = () => {
             ================================================= */}
 
             <div
-                className="app-page min-h-screen min-w-0 flex-1 overflow-x-hidden"
+                ref={pageScrollRef}
+                className={`app-page min-w-0 flex-1 overflow-x-hidden ${isAdminRoute ? "min-h-screen" : "h-screen min-h-0 overflow-y-auto overscroll-contain"}`}
             >
                 {!isAdminRoute && <Navbar
                     menuOpen={menuOpen}
@@ -562,8 +568,7 @@ const SideMenu = ({
         <aside
             id="site-navigation-drawer"
             className={`
-        sticky
-        top-0
+        self-start
         z-[60]
         h-screen
         shrink-0

@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
+import { Check, ChevronDown, Menu, X } from "lucide-react";
 
 
 const CPSidebar = ({
     activeSection,
     setActiveSection
 }) => {
+    const [mobileOpen, setMobileOpen] = useState(false);
 
     const sections = [
 
@@ -88,7 +90,64 @@ const CPSidebar = ({
     ];
 
 
+    const activeItem = sections.flatMap((group) => group.items).find((item) => item.id === activeSection);
+
     return (
+        <>
+        <div className="sticky top-16 z-40 border-b border-[#1C2734] bg-[#080D14] lg:hidden">
+            <button
+                type="button"
+                aria-expanded={mobileOpen}
+                aria-controls="cp-mobile-sections"
+                onClick={() => setMobileOpen((open) => !open)}
+                className="flex min-h-14 w-full items-center justify-between gap-3 px-4 py-2 text-left"
+            >
+                <span className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#4AFFC4]/20 bg-[#4AFFC4]/10 text-[#4AFFC4]">
+                        {mobileOpen ? <X size={17} /> : <Menu size={17} />}
+                    </span>
+                    <span className="min-w-0">
+                        <span className="block font-mono text-[9px] uppercase tracking-[0.15em] text-[#6B7788]">CP Guide · current section</span>
+                        <span className="block truncate text-sm font-semibold text-[#EDF2F7]">{activeItem?.label || "Start Here"}</span>
+                    </span>
+                </span>
+                <ChevronDown size={17} className={`shrink-0 text-[#AEB9C7] transition-transform ${mobileOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {mobileOpen && (
+                <nav id="cp-mobile-sections" aria-label="CP guide sections" className="absolute left-0 right-0 top-full max-h-[calc(100dvh-8rem)] overflow-y-auto border-b border-[#1C2734] bg-[#080D14] px-4 pb-4 shadow-xl">
+                    {sections.map((group) => (
+                        <section key={group.group} className="pt-4" aria-label={group.group}>
+                            <h2 className="mb-2 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[#667386]">{group.group}</h2>
+                            <div className="grid grid-cols-2 gap-2">
+                                {group.items.map((item) => {
+                                    const active = activeSection === item.id;
+                                    return (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            aria-current={active ? "page" : undefined}
+                                            onClick={() => {
+                                                setActiveSection(item.id);
+                                                setMobileOpen(false);
+                                            }}
+                                            className={`flex min-h-11 items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-sm transition ${active
+                                                ? "border-[#4AFFC4]/30 bg-[#4AFFC4]/10 font-semibold text-[#4AFFC4]"
+                                                : "border-[#1C2734] bg-[#0A1018] text-[#AEB9C7] hover:border-[#4AFFC4]/30 hover:text-[#EDF2F7]"
+                                                }`}
+                                        >
+                                            <span className="min-w-0 truncate">{item.label}</span>
+                                            {active && <Check size={15} className="shrink-0" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </section>
+                    ))}
+                </nav>
+            )}
+        </div>
+
         <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-[270px] shrink-0 overflow-y-auto border-r border-[#1C2734] py-8 lg:block">
 
             {/* Header */}
@@ -207,6 +266,7 @@ const CPSidebar = ({
             </div>
 
         </aside>
+        </>
     );
 };
 

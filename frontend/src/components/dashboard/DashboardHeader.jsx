@@ -45,7 +45,7 @@ const DashboardHeader = ({ user, onRefresh, refreshing }) => {
                         <RefreshCw size={16} className={refreshing ? "animate-spin" : ""} />
                     </button>
                     <div className="flex items-center gap-3">
-                        <Link to="/profile" aria-label="Open your profile" className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--theme-accent)]/50 bg-[var(--theme-accent-soft)] text-lg font-bold text-[var(--theme-accent)] transition hover:scale-105">
+                        <Link to="/profile" aria-label="Open your profile" className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 border-[var(--theme-accent)] bg-[var(--theme-accent-soft)] text-lg font-bold text-[var(--theme-accent)] transition hover:scale-105">
                             {avatar && !avatarFailed
                                 ? <img src={avatar} alt={`${username} profile`} className="h-full w-full object-cover" onError={() => setAvatarFailed(true)} />
                                 : username.slice(0, 1).toUpperCase()}

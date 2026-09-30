@@ -46,7 +46,7 @@ const DashboardStats = ({ codeforces, username, loading, syncing, onSync, syncEr
                             </a>
                         </div>
                     </div>
-                    <button type="button" onClick={onSync} disabled={syncing} className="inline-flex items-center gap-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 py-2 text-sm font-semibold text-[var(--theme-accent)] transition hover:border-[var(--theme-accent)]/50 hover:bg-[var(--theme-hover)] disabled:cursor-not-allowed disabled:opacity-60">
+                    <button type="button" onClick={onSync} disabled={syncing} className="inline-flex items-center gap-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 py-2 text-sm font-semibold text-[var(--theme-accent)] transition hover:border-[var(--theme-accent)] hover:bg-[var(--theme-hover)] disabled:cursor-not-allowed disabled:opacity-60">
                         <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
                         {syncing ? "Syncing" : syncError ? "Retry sync" : "Sync"}
                     </button>
