@@ -91,6 +91,14 @@ import UserProfile
 import AdminSettings
     from "./pages/admin/settings/AdminSettings";
 
+
+import SystemDesign from "./pages/SystemDesign.jsx";
+
+
+import SystemDesignIntroduction from "./pages/SystemDesignIntroduction.jsx";
+import SystemDesignWhy from "./pages/SystemDesignWhy.jsx";
+import SystemDesignResources from "./pages/SystemDesignResources.jsx";
+
 const RoleDashboard = () => {
     const { user } = useAuth();
     return user?.role === "admin" ? <AdminDashboard /> : <UserDashboard />;
@@ -222,6 +230,26 @@ const AppLayout = () => {
                             element={<ResourcesWeb />}
                         />
 
+                        <Route
+                            path="/system-design"
+                            element={<SystemDesign />}
+                        />
+
+                        <Route
+                            path="/system-design/introduction"
+                            element={<SystemDesignIntroduction />}
+                        />
+
+                        <Route
+                            path="/system-design/why-system-design"
+                            element={<SystemDesignWhy />}
+                        />
+
+                        <Route
+                            path="/system-design/resources"
+                            element={<SystemDesignResources />}
+                        />
+
 
                         {/* ================================
                             AUTHENTICATION
@@ -316,80 +344,80 @@ const AppLayout = () => {
                                 element={<DSASheets />}
                             />
                             <Route element={<ProtectedRoute requireAdmin />}>
-                            <Route
-                                path="/admin/dashboard"
-                                element={<AdminDashboard />}
-                            />
+                                <Route
+                                    path="/admin/dashboard"
+                                    element={<AdminDashboard />}
+                                />
 
-                            <Route
-                                path="/admin/daily-problems"
-                                element={<DailyProblems />}
-                            />
+                                <Route
+                                    path="/admin/daily-problems"
+                                    element={<DailyProblems />}
+                                />
 
-                            <Route
-                                path="/admin/cp-sheet"
-                                element={<CPSheetAdmin />}
-                            />
+                                <Route
+                                    path="/admin/cp-sheet"
+                                    element={<CPSheetAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/dsa-sheet"
-                                element={<DSASheetAdmin />}
-                            />
+                                <Route
+                                    path="/admin/dsa-sheet"
+                                    element={<DSASheetAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/dsa-problems"
-                                element={<DSAProblemsAdmin />}
-                            />
+                                <Route
+                                    path="/admin/dsa-problems"
+                                    element={<DSAProblemsAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/contests"
-                                element={<ContestsAdmin />}
-                            />
+                                <Route
+                                    path="/admin/contests"
+                                    element={<ContestsAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/ctc"
-                                element={<CTCAdmin />}
-                            />
+                                <Route
+                                    path="/admin/ctc"
+                                    element={<CTCAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/interview"
-                                element={<InterviewAdmin />}
-                            />
+                                <Route
+                                    path="/admin/interview"
+                                    element={<InterviewAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/system-design"
-                                element={<SystemDesignAdmin />}
-                            />
+                                <Route
+                                    path="/admin/system-design"
+                                    element={<SystemDesignAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/miscellaneous"
-                                element={<MiscellaneousAdmin />}
-                            />
+                                <Route
+                                    path="/admin/miscellaneous"
+                                    element={<MiscellaneousAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/users"
-                                element={<UsersAdmin />}
-                            />
+                                <Route
+                                    path="/admin/users"
+                                    element={<UsersAdmin />}
+                                />
 
-                            <Route
-                                path="/admin/users/:userId"
-                                element={<UserProfile />}
-                            />
+                                <Route
+                                    path="/admin/users/:userId"
+                                    element={<UserProfile />}
+                                />
 
-                            <Route
-                                path="/admin/activity"
-                                element={<UserActivity />}
-                            />
+                                <Route
+                                    path="/admin/activity"
+                                    element={<UserActivity />}
+                                />
 
-                            <Route
-                                path="/admin/progress"
-                                element={<UserProgress />}
-                            />
+                                <Route
+                                    path="/admin/progress"
+                                    element={<UserProgress />}
+                                />
 
-                            <Route
-                                path="/admin/settings"
-                                element={<AdminSettings />}
-                            />
+                                <Route
+                                    path="/admin/settings"
+                                    element={<AdminSettings />}
+                                />
                             </Route>
 
                         </Route>
@@ -598,9 +626,9 @@ const SideMenu = ({
         text-xl
         font-semibold
         ${brightMode
-                                ? "text-gray-900"
-                                : "text-white"
-                            }
+                                    ? "text-gray-900"
+                                    : "text-white"
+                                }
     `}
                         >
                             More
@@ -684,44 +712,44 @@ const SideMenu = ({
 
                     {!loading && isAuthenticated && (
                         <>
-                                <Link
-                                    to="/profile"
-                            onClick={closeMenu}
-                            className={`mb-3 flex items-center gap-3 rounded-xl border p-3 transition ${brightMode
-                                ? "border-gray-200 bg-gray-50 hover:border-emerald-300 hover:bg-emerald-50"
-                                : "border-[#1C2734] bg-[#0A1018] hover:border-[#4AFFC4]/40 hover:bg-[#111923]"
-                                }`}
-                        >
-                            <span className={`flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border font-display text-sm font-semibold ${brightMode
-                                ? "border-emerald-200 bg-emerald-100 text-emerald-800"
-                                : "border-[#1C2734] bg-[#10201B] text-[#4AFFC4]"
-                                }`}>
-                                {avatarUrl && !avatarFailed ? (
-                                    <img
-                                        src={avatarUrl}
-                                        alt=""
-                                        className="h-full w-full object-cover"
-                                        onError={() => setAvatarFailed(true)}
-                                    />
-                                ) : (
-                                    user?.username?.charAt(0)?.toUpperCase() || "U"
-                                )}
-                            </span>
-                            <span className="min-w-0 flex-1">
-                                <span className={`block truncate text-sm font-semibold ${brightMode ? "text-gray-900" : "text-[#EDF2F7]"}`}>
-                                    {user?.username || "Your profile"}
+                            <Link
+                                to="/profile"
+                                onClick={closeMenu}
+                                className={`mb-3 flex items-center gap-3 rounded-xl border p-3 transition ${brightMode
+                                    ? "border-gray-200 bg-gray-50 hover:border-emerald-300 hover:bg-emerald-50"
+                                    : "border-[#1C2734] bg-[#0A1018] hover:border-[#4AFFC4]/40 hover:bg-[#111923]"
+                                    }`}
+                            >
+                                <span className={`flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border font-display text-sm font-semibold ${brightMode
+                                    ? "border-emerald-200 bg-emerald-100 text-emerald-800"
+                                    : "border-[#1C2734] bg-[#10201B] text-[#4AFFC4]"
+                                    }`}>
+                                    {avatarUrl && !avatarFailed ? (
+                                        <img
+                                            src={avatarUrl}
+                                            alt=""
+                                            className="h-full w-full object-cover"
+                                            onError={() => setAvatarFailed(true)}
+                                        />
+                                    ) : (
+                                        user?.username?.charAt(0)?.toUpperCase() || "U"
+                                    )}
                                 </span>
-                                <span className={`mt-0.5 block text-xs ${brightMode ? "text-gray-600" : "text-[#7F8B9C]"}`}>
-                                    View and edit profile
+                                <span className="min-w-0 flex-1">
+                                    <span className={`block truncate text-sm font-semibold ${brightMode ? "text-gray-900" : "text-[#EDF2F7]"}`}>
+                                        {user?.username || "Your profile"}
+                                    </span>
+                                    <span className={`mt-0.5 block text-xs ${brightMode ? "text-gray-600" : "text-[#7F8B9C]"}`}>
+                                        View and edit profile
+                                    </span>
                                 </span>
-                            </span>
-                            <span aria-hidden="true" className={brightMode ? "text-gray-500" : "text-[#556275]"}>›</span>
-                        </Link>
+                                <span aria-hidden="true" className={brightMode ? "text-gray-500" : "text-[#556275]"}>›</span>
+                            </Link>
 
-                        <button
-                            type="button"
-                            onClick={handleLogout}
-                            className="
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="
                                 w-full
                                 rounded-lg
                                 border
@@ -739,9 +767,9 @@ const SideMenu = ({
                                 hover:bg-red-500/10
                                 hover:text-red-300
                             "
-                        >
-                            Logout
-                        </button>
+                            >
+                                Logout
+                            </button>
                         </>
                     )}
 
@@ -752,10 +780,10 @@ const SideMenu = ({
 
                     {!loading && !isAuthenticated && (
                         <>
-                        <Link
-                            to="/login"
-                            onClick={closeMenu}
-                            className="
+                            <Link
+                                to="/login"
+                                onClick={closeMenu}
+                                className="
                                 block
                                 w-full
                                 rounded-lg
@@ -774,20 +802,20 @@ const SideMenu = ({
                                 hover:border-[#4AFFC4]
                                 hover:bg-[#4AFFC4]/10
                             "
-                        >
-                            Login
-                        </Link>
+                            >
+                                Login
+                            </Link>
 
-                        <Link
-                            to="/register"
-                            onClick={closeMenu}
-                            className={`mt-2 block w-full rounded-lg border px-4 py-3 text-left font-mono text-sm transition ${brightMode
-                                ? "border-gray-200 text-gray-700 hover:bg-gray-100"
-                                : "border-[#1C2734] text-[#AEB9C7] hover:bg-[#111923] hover:text-white"
-                                }`}
-                        >
-                            Create account
-                        </Link>
+                            <Link
+                                to="/register"
+                                onClick={closeMenu}
+                                className={`mt-2 block w-full rounded-lg border px-4 py-3 text-left font-mono text-sm transition ${brightMode
+                                    ? "border-gray-200 text-gray-700 hover:bg-gray-100"
+                                    : "border-[#1C2734] text-[#AEB9C7] hover:bg-[#111923] hover:text-white"
+                                    }`}
+                            >
+                                Create account
+                            </Link>
                         </>
                     )}
 
