@@ -10,8 +10,8 @@ const deleteTopic = asyncHandler(async (req, res) => {
     const topic = await service.deleteTopic(req.params.topicId);
     return res.status(200).json(new ApiResponse(200, { _id: topic._id }, "DSA topic deleted successfully"));
 });
-const getTopicProblems = asyncHandler(async (req, res) => res.status(200).json(new ApiResponse(200, await service.getProblemsForTopic({ userId: req.user._id, slug: req.params.slug }), "DSA problems fetched successfully")));
-const listProblemsAdmin = asyncHandler(async (req, res) => res.status(200).json(new ApiResponse(200, await service.listProblemsAdmin(req.query.topicId), "DSA problems fetched successfully")));
+const getTopicProblems = asyncHandler(async (req, res) => res.status(200).json(new ApiResponse(200, await service.getProblemsForTopic({ userId: req.user._id, slug: req.params.slug, page: req.query.page, limit: req.query.limit }), "DSA problems fetched successfully")));
+const listProblemsAdmin = asyncHandler(async (req, res) => res.status(200).json(new ApiResponse(200, await service.listProblemsAdmin(req.query.topicId, { page: req.query.page, limit: req.query.limit }), "DSA problems fetched successfully")));
 const createProblem = asyncHandler(async (req, res) => res.status(201).json(new ApiResponse(201, await service.createProblem(req.body), "DSA problem created successfully")));
 const updateProblem = asyncHandler(async (req, res) => res.status(200).json(new ApiResponse(200, await service.updateProblem(req.params.problemId, req.body), "DSA problem updated successfully")));
 const deleteProblem = asyncHandler(async (req, res) => {

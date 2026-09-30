@@ -12,7 +12,7 @@ export const getAdminUserProfile = async (userId) => {
     return response.data;
 };
 
-export const getAdminUserProgress = async () => {
-    const response = await api.get("/users/admin/progress");
+export const getAdminUserProgress = async ({ page = 1, limit = 20 } = {}) => {
+    const response = await api.get("/users/admin/progress", { params: { page, limit } });
     return response.data;
 };

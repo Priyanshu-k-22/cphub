@@ -35,11 +35,13 @@ const DSAProblemRow = ({ problem, index, onToggle, updating }) => {
 };
 
 export default function DSAPractice() {
+    const PAGE_SIZE = 20;
     const { topicSlug } = useParams();
     const navigate = useNavigate();
     const [topics, setTopics] = useState([]);
     const [selectedSlug, setSelectedSlug] = useState(topicSlug || "");
     const [sheet, setSheet] = useState(null);
+    const [page, setPage] = useState(1);
     const [topicsLoading, setTopicsLoading] = useState(true);
     const [problemsLoading, setProblemsLoading] = useState(false);
     const [updatingId, setUpdatingId] = useState("");
@@ -66,8 +68,8 @@ export default function DSAPractice() {
     useEffect(() => {
         if (topicsLoading) return;
         const routeTopic = topics.find((topic) => topic.slug === topicSlug);
-        if (topicSlug && routeTopic) setSelectedSlug(routeTopic.slug);
-        else if (!topicSlug && !selectedSlug && topics.length) setSelectedSlug(topics[0].slug);
+        if (topicSlug && routeTopic && routeTopic.slug !== selectedSlug) { setSelectedSlug(routeTopic.slug); setPage(1); }
+        else if (!topicSlug && !selectedSlug && topics.length) { setSelectedSlug(topics[0].slug); setPage(1); }
     }, [topicSlug, topics, topicsLoading, selectedSlug]);
 
     useEffect(() => {
@@ -79,7 +81,7 @@ export default function DSAPractice() {
         let active = true;
         setProblemsLoading(true);
         setError("");
-        getDSATopicProblems(selectedSlug)
+        getDSATopicProblems(selectedSlug, { page, limit: PAGE_SIZE })
             .then((response) => { if (active) setSheet(response?.data || null); })
             .catch((requestError) => {
                 if (!active) return;
@@ -88,10 +90,11 @@ export default function DSAPractice() {
             })
             .finally(() => { if (active) setProblemsLoading(false); });
         return () => { active = false; };
-    }, [selectedSlug]);
+    }, [selectedSlug, page]);
 
     const chooseTopic = (topic) => {
         setSelectedSlug(topic.slug);
+        setPage(1);
         setError("");
         navigate(`/dsa-sheet/${topic.slug}`);
     };
@@ -108,8 +111,9 @@ export default function DSAPractice() {
             setSheet((current) => {
                 if (!current) return current;
                 const problems = current.problems.map((item) => item._id === problem._id ? { ...item, solved } : item);
-                const solvedCount = problems.filter((item) => item.solved).length;
-                return { ...current, problems, progress: { solved: solvedCount, total: problems.length, percentage: problems.length ? Math.round(solvedCount / problems.length * 100) : 0 } };
+                const solvedCount = Math.max(0, current.progress.solved + (solved ? 1 : -1));
+                const total = current.progress.total;
+                return { ...current, problems, progress: { solved: solvedCount, total, percentage: total ? Math.round(solvedCount / total * 100) : 0 } };
             });
             setTopics((current) => current.map((topic) => {
                 if (topic.slug !== selectedSlug) return topic;
@@ -126,7 +130,7 @@ export default function DSAPractice() {
         if (selectedSlug) {
             setProblemsLoading(true);
             try {
-                const response = await getDSATopicProblems(selectedSlug);
+                const response = await getDSATopicProblems(selectedSlug, { page, limit: PAGE_SIZE });
                 setSheet(response?.data || null);
             } catch (requestError) {
                 setError(requestError?.response?.data?.message || "Could not load problems for this topic.");
@@ -174,8 +178,9 @@ export default function DSAPractice() {
 
                         {problemsLoading ? <div className="space-y-3">{[1,2,3,4,5].map((item) => <div key={item} className="h-16 animate-pulse rounded-xl border border-[#1C2734] bg-[#080D14]" />)}</div> : sheet?.problems?.length ? <section className="overflow-hidden rounded-xl border border-[#1C2734] bg-[#080D14]">
                             <div className="grid grid-cols-[28px_minmax(0,1fr)_42px_36px_36px] gap-2 border-b border-[#1C2734] px-3 py-3 font-mono text-[9px] uppercase tracking-wider text-[#556275] sm:grid-cols-[50px_minmax(0,1fr)_80px_48px_48px] sm:gap-4 sm:px-5 sm:text-[10px]"><span>#</span><span>Problem</span><span className="text-center">Level</span><span className="text-center">Hint</span><span className="text-right">Status</span></div>
-                            {sheet.problems.map((problem, index) => <DSAProblemRow key={problem._id} problem={problem} index={index} onToggle={toggleSolved} updating={updatingId === problem._id} />)}
+                            {sheet.problems.map((problem, index) => <DSAProblemRow key={problem._id} problem={problem} index={(page - 1) * PAGE_SIZE + index} onToggle={toggleSolved} updating={updatingId === problem._id} />)}
                         </section> : <div className="rounded-xl border border-[#1C2734] bg-[#080D14] px-6 py-12 text-center"><p className="font-mono text-sm text-[#7F8B9C]">{error ? "Could not load this topic." : `No problems found for ${selectedTopic?.name || "this topic"}.`}</p></div>}
+                        {sheet?.pagination?.total > 0 && <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1C2734] bg-[#080D14] px-4 py-3 text-sm text-[#7F8B9C]"><span>{(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, sheet.pagination.total)} of {sheet.pagination.total} problems</span><div className="flex items-center gap-2"><button type="button" disabled={problemsLoading || page <= 1} onClick={() => setPage((value) => value - 1)} className="rounded-lg border border-[#1C2734] px-3 py-2 disabled:opacity-40">Previous</button><span>{page} / {sheet.pagination.totalPages}</span><button type="button" disabled={problemsLoading || page >= sheet.pagination.totalPages} onClick={() => setPage((value) => value + 1)} className="rounded-lg border border-[#1C2734] px-3 py-2 disabled:opacity-40">Next</button></div></div>}
                     </>}
                 </div>
 

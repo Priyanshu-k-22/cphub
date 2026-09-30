@@ -111,7 +111,9 @@ export const deleteProblem = async (problemId) => {
     return response.data;
 };
 
-export const getAdminProblems = async () => {
-    const response = await api.get("/problems/admin");
+export const getAdminProblems = async ({ category, page = 1, limit = 20 } = {}) => {
+    const params = { page, limit };
+    if (category && category !== "ALL") params.category = category;
+    const response = await api.get("/problems/admin", { params });
     return response.data;
 };

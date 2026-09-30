@@ -69,10 +69,15 @@ const createProblem = async (data) => {
     return problem;
 };
 
-const getAllProblems = async () => {
-    return Problem.find()
-        .sort({ dailyDate: -1, createdAt: -1 })
-        .lean();
+const getAllProblems = async ({ category, page = 1, limit = 20 } = {}) => {
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.min(100, Math.max(1, Number(limit) || 20));
+    const query = category && ["DSA", "CP"].includes(category) ? { category } : {};
+    const [problems, total] = await Promise.all([
+        Problem.find(query).sort({ dailyDate: -1, createdAt: -1, _id: -1 }).skip((safePage - 1) * safeLimit).limit(safeLimit).lean(),
+        Problem.countDocuments(query),
+    ]);
+    return { problems, pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) } };
 };
 
 const updateProblem = async (problemId, data) => {

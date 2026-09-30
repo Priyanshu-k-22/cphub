@@ -42,9 +42,12 @@ const listUsersForAdmin = async ({ page = 1, limit = 20, search = "" } = {}) => 
     };
 };
 
-const getAdminUserProgress = async () => {
-    const [users, activeProblems] = await Promise.all([
-        User.find().select("username role").sort({ username: 1 }).lean(),
+const getAdminUserProgress = async ({ page = 1, limit = 20 } = {}) => {
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.min(50, Math.max(1, Number(limit) || 20));
+    const [users, total, activeProblems] = await Promise.all([
+        User.find().select("username role").sort({ username: 1, _id: 1 }).skip((safePage - 1) * safeLimit).limit(safeLimit).lean(),
+        User.countDocuments(),
         CPProblem.find({ isActive: true }).select("_id").lean(),
     ]);
     const activeProblemIds = activeProblems.map((problem) => problem._id);
@@ -52,15 +55,16 @@ const getAdminUserProgress = async () => {
     const userIds = users.map((user) => user._id);
     const [codeforcesRows, progressRows] = await Promise.all([
         userIds.length ? Codeforces.find({ user: { $in: userIds } }).select("user rating maxRating rank solvedProblems contestCount").lean() : [],
-        totalActiveProblems ? CPProgress.aggregate([
-            { $match: { solved: true, problem: { $in: activeProblemIds } } },
+        totalActiveProblems && userIds.length ? CPProgress.aggregate([
+            { $match: { solved: true, user: { $in: userIds }, problem: { $in: activeProblemIds } } },
             { $group: { _id: "$user", solved: { $sum: 1 } } },
         ]) : [],
     ]);
     const progressByUser = new Map(progressRows.map((row) => [String(row._id), row.solved]));
     const codeforcesByUser = new Map(codeforcesRows.map((row) => [String(row.user), row]));
 
-    return users.map((user) => {
+    return {
+      users: users.map((user) => {
         const cpSolved = progressByUser.get(String(user._id)) || 0;
         const codeforces = codeforcesByUser.get(String(user._id));
         return {
@@ -75,7 +79,9 @@ const getAdminUserProgress = async () => {
             codeforcesSolved: codeforces?.solvedProblems ?? null,
             contestCount: codeforces?.contestCount ?? null,
         };
-    });
+      }),
+      pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) },
+    };
 };
 
 const getUserAdminProfile = async (userId) => {

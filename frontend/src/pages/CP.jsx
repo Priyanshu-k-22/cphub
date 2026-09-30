@@ -23,7 +23,7 @@ import CPResources from "../components/cp/sections/CPResources";
 const CP = () => {
 
     const [activeSection, setActiveSection] =
-        useState("start");
+        useState("why");
 
 
     const renderSection = () => {

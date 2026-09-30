@@ -31,7 +31,7 @@ const create = asyncHandler(async (req, res) => {
 });
 
 const getAll = asyncHandler(async (req, res) => {
-    const problems = await getAllProblems();
+    const problems = await getAllProblems({ category: req.query.category, page: req.query.page, limit: req.query.limit });
 
     return res.status(200).json(
         new ApiResponse(200, problems, "Problems fetched successfully")

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import {
     Edit3,
@@ -24,6 +24,7 @@ import {
 
 
 const DailyProblems = () => {
+    const PAGE_SIZE = 20;
 
     const [showModal, setShowModal] =
         useState(false);
@@ -33,17 +34,20 @@ const DailyProblems = () => {
 
     const [category, setCategory] =
         useState("ALL");
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState({ total: 0, totalPages: 0 });
     const [problems, setProblems] = useState([]);
     const [loadError, setLoadError] = useState("");
     const [submitError, setSubmitError] = useState("");
     const [selectedProblem, setSelectedProblem] = useState(null);
 
-    const fetchProblems = async () => {
+    const fetchProblems = useCallback(async () => {
         try {
             setLoading(true);
             setLoadError("");
-            const response = await getAdminProblems();
-            setProblems(response?.data || []);
+            const response = await getAdminProblems({ category, page, limit: PAGE_SIZE });
+            setProblems(response?.data?.problems || []);
+            setPagination(response?.data?.pagination || { total: 0, totalPages: 0 });
         } catch (error) {
             setLoadError(
                 error?.response?.data?.message ||
@@ -52,11 +56,11 @@ const DailyProblems = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [category, page]);
 
     useEffect(() => {
         fetchProblems();
-    }, []);
+    }, [fetchProblems]);
 
 
     /*
@@ -80,10 +84,8 @@ const DailyProblems = () => {
             if (!savedProblem?._id) {
                 throw new Error("The server did not return the saved problem.");
             }
-            setProblems((prev) => selectedProblem
-                ? prev.map((item) => item._id === savedProblem._id ? savedProblem : item)
-                : [savedProblem, ...prev]
-            );
+            if (!selectedProblem && page !== 1) setPage(1);
+            else await fetchProblems();
             setShowModal(false);
             setSelectedProblem(null);
 
@@ -124,7 +126,8 @@ const DailyProblems = () => {
 
         try {
             await deleteProblem(problem._id);
-            setProblems((prev) => prev.filter((item) => item._id !== problem._id));
+            if (problems.length === 1 && page > 1) setPage((current) => current - 1);
+            else await fetchProblems();
         } catch (error) {
             console.error("Failed to delete daily problem:", error);
             alert(error?.response?.data?.message || "Failed to delete daily problem.");
@@ -139,13 +142,7 @@ const DailyProblems = () => {
     |--------------------------------------------------------------------------
     */
 
-    const filteredProblems =
-        category === "ALL"
-            ? problems
-            : problems.filter(
-                (problem) =>
-                    problem.category === category
-            );
+    const filteredProblems = problems;
 
 
     return (
@@ -218,9 +215,7 @@ const DailyProblems = () => {
 
                                 <button
                                     key={item}
-                                    onClick={() =>
-                                        setCategory(item)
-                                    }
+                                    onClick={() => { setCategory(item); setPage(1); }}
                                     className={`
                                         rounded-lg
                                         border
@@ -271,7 +266,7 @@ const DailyProblems = () => {
                             size={13}
                         />
 
-                        {filteredProblems.length}
+                        {pagination.total}
                         {" "}
                         problems
 
@@ -460,7 +455,7 @@ const DailyProblems = () => {
                                                     "
                                                 >
                                                     {String(
-                                                        index + 1
+                                                    (page - 1) * PAGE_SIZE + index + 1
                                                     ).padStart(
                                                         2,
                                                         "0"
@@ -725,6 +720,11 @@ const DailyProblems = () => {
 
                     </div>
 
+                </div>
+
+                <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1C2734] bg-[#080D14] px-4 py-3 text-sm text-[#7F8B9C]">
+                    <span>{pagination.total ? `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, pagination.total)} of ${pagination.total} problems` : "No problems"}</span>
+                    <div className="flex items-center gap-2"><button type="button" disabled={loading || page <= 1} onClick={() => setPage((value) => value - 1)} className="rounded-lg border border-[#1C2734] px-3 py-2 disabled:opacity-40">Previous</button><span className="px-1">{page} / {Math.max(1, pagination.totalPages)}</span><button type="button" disabled={loading || page >= pagination.totalPages} onClick={() => setPage((value) => value + 1)} className="rounded-lg border border-[#1C2734] px-3 py-2 disabled:opacity-40">Next</button></div>
                 </div>
 
             </div>

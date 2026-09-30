@@ -71,8 +71,8 @@ const getAllUsersAdmin = asyncHandler(async (req, res) => {
     );
 });
 
-const getAdminUserProgress = asyncHandler(async (_req, res) => {
-    const progress = await userService.getAdminUserProgress();
+const getAdminUserProgress = asyncHandler(async (req, res) => {
+    const progress = await userService.getAdminUserProgress({ page: req.query.page, limit: req.query.limit });
     return res.status(200).json(new ApiResponse(200, progress, "User progress fetched successfully"));
 });
 

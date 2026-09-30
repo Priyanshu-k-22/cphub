@@ -91,21 +91,41 @@ const deleteTopic = async (id) => {
     await topic.deleteOne();
     return topic;
 };
-const getProblemsForTopic = async ({ userId, slug }) => {
+const getProblemsForTopic = async ({ userId, slug, page = 1, limit = 20 }) => {
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.min(100, Math.max(1, Number(limit) || 20));
     const topic = await DSATopic.findOne({ slug, isActive: true }).lean();
     if (!topic) throw new ApiError(404, "DSA topic not found");
-    const problems = await DSAProblem.find({ topic: topic._id }).sort({ order: 1, _id: 1 }).lean();
+    const query = { topic: topic._id };
+    const [problems, total, solvedRows] = await Promise.all([
+        DSAProblem.find(query).sort({ order: 1, _id: 1 }).skip((safePage - 1) * safeLimit).limit(safeLimit).lean(),
+        DSAProblem.countDocuments(query),
+        DSAProgress.aggregate([
+            { $match: { user: new mongoose.Types.ObjectId(userId), solved: true } },
+            { $lookup: { from: DSAProblem.collection.name, localField: "problem", foreignField: "_id", as: "problem" } },
+            { $unwind: "$problem" },
+            { $match: { "problem.topic": topic._id } },
+            { $count: "solved" },
+        ]),
+    ]);
     const ids = problems.map((problem) => problem._id);
     const completed = ids.length ? await DSAProgress.find({ user: userId, problem: { $in: ids }, solved: true }).select("problem").lean() : [];
     const solvedSet = new Set(completed.map((row) => String(row.problem)));
     const rows = problems.map((problem) => ({ ...problem, solved: solvedSet.has(String(problem._id)) }));
-    const solved = completed.length;
-    return { topic, problems: rows, progress: { solved, total: rows.length, percentage: rows.length ? Math.round((solved / rows.length) * 100) : 0 } };
+    const solved = solvedRows[0]?.solved || 0;
+    return { topic, problems: rows, progress: { solved, total, percentage: total ? Math.round((solved / total) * 100) : 0 }, pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) } };
 };
-const listProblemsAdmin = async (topicId) => {
+const listProblemsAdmin = async (topicId, { page = 1, limit = 20 } = {}) => {
+    const safePage = Math.max(1, Number(page) || 1);
+    const safeLimit = Math.min(100, Math.max(1, Number(limit) || 20));
     assertId(topicId, "topic");
     if (!await DSATopic.exists({ _id: topicId })) throw new ApiError(404, "DSA topic not found");
-    return DSAProblem.find({ topic: topicId }).sort({ order: 1, _id: 1 }).lean();
+    const query = { topic: topicId };
+    const [problems, total] = await Promise.all([
+        DSAProblem.find(query).sort({ order: 1, _id: 1 }).skip((safePage - 1) * safeLimit).limit(safeLimit).lean(),
+        DSAProblem.countDocuments(query),
+    ]);
+    return { problems, pagination: { page: safePage, limit: safeLimit, total, totalPages: Math.ceil(total / safeLimit) } };
 };
 const createProblem = async (data) => {
     const normalized = normalizeProblem(data);
