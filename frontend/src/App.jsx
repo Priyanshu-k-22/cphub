@@ -503,6 +503,10 @@ const SideMenu = ({
                 { name: "Daily Problems", path: "/problems" },
                 { name: "CP Sheet", path: "/cp-sheet" },
                 { name: "DSA Sheet", path: "/dsa-sheet" },
+                {
+                    name: "System Design",
+                    path: "/system-design",
+                },
 
             ],
         }] : []),
