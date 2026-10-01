@@ -17,6 +17,7 @@ import ListEditor
 
 import SolutionEditor
     from "./SolutionEditor";
+import AdminFeedback from "../../components/AdminFeedback";
 
 
 /*
@@ -452,11 +453,7 @@ const AddDailyProblemModal = ({
                     "
                 >
 
-                    {error && (
-                        <div className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                            {error}
-                        </div>
-                    )}
+                    {error && <AdminFeedback className="mb-5">{error}</AdminFeedback>}
 
                     {/* =====================================================
                         BASIC INFORMATION

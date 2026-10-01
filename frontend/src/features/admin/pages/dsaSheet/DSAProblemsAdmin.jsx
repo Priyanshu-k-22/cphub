@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { BookOpen, ExternalLink, Pencil, Plus, RefreshCw, Save, Trash2, X } from "lucide-react";
 import AdminLayout from "../../components/AdminLayout";
 import AdminPageHeader from "../../components/AdminPageHeader";
+import AdminFeedback from "../../components/AdminFeedback";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import { createDSAProblem, createDSATopic, deleteDSAProblem, deleteDSATopic, getAdminDSAProblems, getDSATopics, updateDSAProblem, updateDSATopic } from "../../../dsa/api/dsaSheet.api";
 
 const topicBlank = { name: "", description: "", order: 0 };
@@ -20,6 +22,8 @@ export default function DSAProblemsAdmin() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [notice, setNotice] = useState("");
+    const [pendingDelete, setPendingDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
     const [topicEditor, setTopicEditor] = useState(null);
     const [topicForm, setTopicForm] = useState(topicBlank);
     const [problemEditor, setProblemEditor] = useState(null);
@@ -79,13 +83,14 @@ export default function DSAProblemsAdmin() {
         } finally { setSaving(false); }
     };
     const removeTopic = async (topic) => {
-        if (!window.confirm(`Delete topic “${topic.name}”? Topics with problems cannot be deleted.`)) return;
         setError(""); setNotice("");
+        setDeleting(true);
         try {
             await deleteDSATopic(topic._id);
             const remaining = topics.filter((item) => item._id !== topic._id);
             setTopics(remaining); setSelectedTopicId(remaining[0]?._id || ""); setNotice("Topic deleted.");
         } catch (requestError) { setError(requestError?.response?.data?.message || "Could not delete this topic."); }
+        finally { setDeleting(false); setPendingDelete(null); }
     };
     const openProblemCreate = () => {
         setProblemEditor("new");
@@ -113,19 +118,20 @@ export default function DSAProblemsAdmin() {
         finally { setSaving(false); }
     };
     const removeProblem = async (problem) => {
-        if (!window.confirm(`Delete “${problem.title}”? Its saved progress will also be removed.`)) return;
         setError(""); setNotice("");
+        setDeleting(true);
         try { await deleteDSAProblem(problem._id); setNotice("Problem deleted.");
             if (problems.length === 1 && problemPage > 1) setProblemPage((current) => current - 1);
             else await loadProblems();
             await loadTopics(); }
         catch (requestError) { setError(requestError?.response?.data?.message || "Could not delete this problem."); }
+        finally { setDeleting(false); setPendingDelete(null); }
     };
 
     return <AdminLayout><div className="px-4 py-5 sm:px-5 lg:px-7">
         <AdminPageHeader title="DSA Sheet Problems" description="Organize practice problems by topic and manage their order, difficulty, hints, and links." action={openTopicCreate} actionLabel="Add Topic" />
-        {error && <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error"><X size={16} /></button></div>}
-        {notice && <div role="status" className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">{notice}</div>}
+        {error && <AdminFeedback onDismiss={() => setError("")}>{error}</AdminFeedback>}
+        {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}>{notice}</AdminFeedback>}
 
         {topicEditor && <form onSubmit={saveTopic} className="mb-5 rounded-xl border border-[#1C2734] bg-[#080D14] p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between"><h2 className="font-semibold text-[#DCE4ED]">{topicEditor === "new" ? "Add topic" : "Edit topic"}</h2><button type="button" onClick={() => setTopicEditor(null)} aria-label="Close topic editor" className="rounded-lg p-2 text-[#AEB9C7] hover:bg-[#111923]"><X size={17} /></button></div>
@@ -135,7 +141,7 @@ export default function DSAProblemsAdmin() {
 
         <section className="mb-5 rounded-xl border border-[#1C2734] bg-[#080D14] p-4 sm:p-5">
             <div className="mb-3 flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-semibold text-[#DCE4ED]">Topics</h2><p className="mt-1 text-sm text-[#7F8B9C]">Select a topic to manage its problems. Topics with problems are protected from deletion.</p></div><button type="button" onClick={loadTopics} disabled={loadingTopics} aria-label="Refresh topics" className="rounded-lg border border-[#1C2734] p-2 text-[#AEB9C7] hover:text-[#4AFFC4] disabled:opacity-50"><RefreshCw size={15} className={loadingTopics ? "animate-spin" : ""} /></button></div>
-            {loadingTopics ? <p className="py-6 text-sm text-[#7F8B9C]">Loading topics…</p> : topics.length ? <div className="flex flex-wrap gap-2">{topics.map((topic) => <div key={topic._id} className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 ${selectedTopicId === topic._id ? "border-[#4AFFC4]/40 bg-[#4AFFC4]/10" : "border-[#1C2734] bg-[#070B11]"}`}><button type="button" onClick={() => { setSelectedTopicId(topic._id); setProblemPage(1); setProblemEditor(null); }} className={`rounded px-2 py-1 text-sm ${selectedTopicId === topic._id ? "text-[#4AFFC4]" : "text-[#AEB9C7] hover:text-white"}`}>{topic.name}<span className="ml-2 text-xs opacity-70">{topic.total ?? 0}</span></button><button type="button" onClick={() => openTopicEdit(topic)} aria-label={`Edit ${topic.name}`} className="rounded p-1 text-[#7F8B9C] hover:text-[#4AFFC4]"><Pencil size={13} /></button><button type="button" onClick={() => removeTopic(topic)} aria-label={`Delete ${topic.name}`} className="rounded p-1 text-[#7F8B9C] hover:text-red-400"><Trash2 size={13} /></button></div>)}</div> : <div className="rounded-lg border border-dashed border-[#1C2734] p-8 text-center"><BookOpen className="mx-auto text-[#4AFFC4]" /><p className="mt-3 text-sm text-[#AEB9C7]">No topics created yet.</p><button type="button" onClick={openTopicCreate} className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2 text-sm font-semibold text-[#06120D]"><Plus size={15} />Create first topic</button></div>}
+            {loadingTopics ? <p className="py-6 text-sm text-[#7F8B9C]">Loading topics…</p> : topics.length ? <div className="flex flex-wrap gap-2">{topics.map((topic) => <div key={topic._id} className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 ${selectedTopicId === topic._id ? "border-[#4AFFC4]/40 bg-[#4AFFC4]/10" : "border-[#1C2734] bg-[#070B11]"}`}><button type="button" onClick={() => { setSelectedTopicId(topic._id); setProblemPage(1); setProblemEditor(null); }} className={`rounded px-2 py-1 text-sm ${selectedTopicId === topic._id ? "text-[#4AFFC4]" : "text-[#AEB9C7] hover:text-white"}`}>{topic.name}<span className="ml-2 text-xs opacity-70">{topic.total ?? 0}</span></button><button type="button" onClick={() => openTopicEdit(topic)} aria-label={`Edit ${topic.name}`} className="rounded p-1 text-[#7F8B9C] hover:text-[#4AFFC4]"><Pencil size={13} /></button><button type="button" onClick={() => setPendingDelete({ type: "topic", item: topic })} aria-label={`Delete ${topic.name}`} className="rounded p-1 text-[#7F8B9C] hover:text-red-400"><Trash2 size={13} /></button></div>)}</div> : <div className="rounded-lg border border-dashed border-[#1C2734] p-8 text-center"><BookOpen className="mx-auto text-[#4AFFC4]" /><p className="mt-3 text-sm text-[#AEB9C7]">No topics created yet.</p><button type="button" onClick={openTopicCreate} className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2 text-sm font-semibold text-[#06120D]"><Plus size={15} />Create first topic</button></div>}
         </section>
 
         {selectedTopic && <>
@@ -146,9 +152,10 @@ export default function DSAProblemsAdmin() {
                 <div className="mt-4 flex justify-end gap-2"><button type="button" onClick={() => setProblemEditor(null)} className="rounded-lg border border-[#1C2734] px-4 py-2 text-sm text-[#AEB9C7]">Cancel</button><button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2 text-sm font-semibold text-[#06120D] disabled:opacity-50"><Save size={14} />{saving ? "Saving…" : "Save problem"}</button></div>
             </form>}
             <section className="overflow-hidden rounded-xl border border-[#1C2734] bg-[#080D14]">
-                {loadingProblems ? <p className="p-10 text-center text-sm text-[#7F8B9C]">Loading problems…</p> : problemPagination.total ? <div className="divide-y divide-[#1C2734]"><div className="hidden grid-cols-[3rem_minmax(0,1fr)_7rem_7rem_6rem] gap-3 px-4 py-3 font-mono text-xs uppercase tracking-wide text-[#7F8B9C] sm:grid"><span>#</span><span>Problem</span><span>Platform</span><span>Difficulty</span><span className="text-right">Actions</span></div>{problems.map((problem) => <article key={problem._id} className="flex flex-wrap items-center gap-3 px-4 py-3 sm:grid sm:grid-cols-[3rem_minmax(0,1fr)_7rem_7rem_6rem]"><span className="font-mono text-sm text-[#7F8B9C]">{problem.order}</span><div className="min-w-[10rem] flex-1 sm:min-w-0"><a href={problem.url} target="_blank" rel="noreferrer" className="font-medium text-[#DCE4ED] hover:text-[#4AFFC4]">{problem.title}</a>{problem.hint && <p className="mt-1 line-clamp-1 text-xs text-[#7F8B9C]">{problem.hint}</p>}</div><span className="text-sm text-[#AEB9C7]">{problem.platform}</span><span className={`rounded-full px-2 py-1 text-center text-xs ${problem.difficulty === "Easy" ? "bg-emerald-500/10 text-emerald-400" : problem.difficulty === "Medium" ? "bg-amber-500/10 text-amber-400" : "bg-red-500/10 text-red-400"}`}>{problem.difficulty}</span><div className="ml-auto flex items-center justify-end gap-1 sm:ml-0"><a href={problem.url} target="_blank" rel="noreferrer" aria-label={`Open ${problem.title}`} className="rounded p-2 text-[#7F8B9C] hover:text-[#4AFFC4]"><ExternalLink size={15} /></a><button type="button" onClick={() => openProblemEdit(problem)} aria-label={`Edit ${problem.title}`} className="rounded p-2 text-[#7F8B9C] hover:text-[#4AFFC4]"><Pencil size={15} /></button><button type="button" onClick={() => removeProblem(problem)} aria-label={`Delete ${problem.title}`} className="rounded p-2 text-[#7F8B9C] hover:text-red-400"><Trash2 size={15} /></button></div></article>)}</div> : <div className="p-12 text-center"><p className="font-medium text-[#DCE4ED]">No problems in {selectedTopic.name} yet.</p><p className="mt-1 text-sm text-[#7F8B9C]">Add a problem to this topic to start building the sheet.</p><button type="button" onClick={openProblemCreate} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2 text-sm font-semibold text-[#06120D]"><Plus size={15} />Add problem</button></div>}
+                {loadingProblems ? <p className="p-10 text-center text-sm text-[#7F8B9C]">Loading problems…</p> : problemPagination.total ? <div className="divide-y divide-[#1C2734]"><div className="hidden grid-cols-[3rem_minmax(0,1fr)_7rem_7rem_6rem] gap-3 px-4 py-3 font-mono text-xs uppercase tracking-wide text-[#7F8B9C] sm:grid"><span>#</span><span>Problem</span><span>Platform</span><span>Difficulty</span><span className="text-right">Actions</span></div>{problems.map((problem) => <article key={problem._id} className="flex flex-wrap items-center gap-3 px-4 py-3 sm:grid sm:grid-cols-[3rem_minmax(0,1fr)_7rem_7rem_6rem]"><span className="font-mono text-sm text-[#7F8B9C]">{problem.order}</span><div className="min-w-[10rem] flex-1 sm:min-w-0"><a href={problem.url} target="_blank" rel="noreferrer" className="font-medium text-[#DCE4ED] hover:text-[#4AFFC4]">{problem.title}</a>{problem.hint && <p className="mt-1 line-clamp-1 text-xs text-[#7F8B9C]">{problem.hint}</p>}</div><span className="text-sm text-[#AEB9C7]">{problem.platform}</span><span className={`rounded-full px-2 py-1 text-center text-xs ${problem.difficulty === "Easy" ? "bg-emerald-500/10 text-emerald-400" : problem.difficulty === "Medium" ? "bg-amber-500/10 text-amber-400" : "bg-red-500/10 text-red-400"}`}>{problem.difficulty}</span><div className="ml-auto flex items-center justify-end gap-1 sm:ml-0"><a href={problem.url} target="_blank" rel="noreferrer" aria-label={`Open ${problem.title}`} className="rounded p-2 text-[#7F8B9C] hover:text-[#4AFFC4]"><ExternalLink size={15} /></a><button type="button" onClick={() => openProblemEdit(problem)} aria-label={`Edit ${problem.title}`} className="rounded p-2 text-[#7F8B9C] hover:text-[#4AFFC4]"><Pencil size={15} /></button><button type="button" onClick={() => setPendingDelete({ type: "problem", item: problem })} aria-label={`Delete ${problem.title}`} className="rounded p-2 text-[#7F8B9C] hover:text-red-400"><Trash2 size={15} /></button></div></article>)}</div> : <div className="p-12 text-center"><p className="font-medium text-[#DCE4ED]">No problems in {selectedTopic.name} yet.</p><p className="mt-1 text-sm text-[#7F8B9C]">Add a problem to this topic to start building the sheet.</p><button type="button" onClick={openProblemCreate} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2 text-sm font-semibold text-[#06120D]"><Plus size={15} />Add problem</button></div>}
             </section>
             {problemPagination.total > 0 && <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1C2734] bg-[#080D14] px-4 py-3 text-sm text-[#7F8B9C]"><span>{(problemPage - 1) * PAGE_SIZE + 1}–{Math.min(problemPage * PAGE_SIZE, problemPagination.total)} of {problemPagination.total} problems</span><div className="flex items-center gap-2"><button type="button" disabled={loadingProblems || problemPage <= 1} onClick={() => setProblemPage((value) => value - 1)} className="rounded-lg border border-[#1C2734] px-3 py-2 disabled:opacity-40">Previous</button><span>{problemPage} / {problemPagination.totalPages}</span><button type="button" disabled={loadingProblems || problemPage >= problemPagination.totalPages} onClick={() => setProblemPage((value) => value + 1)} className="rounded-lg border border-[#1C2734] px-3 py-2 disabled:opacity-40">Next</button></div></div>}
         </>}
+        <ConfirmDialog isOpen={Boolean(pendingDelete)} title={pendingDelete?.type === "topic" ? "Delete topic?" : "Delete DSA problem?"} description={pendingDelete?.type === "topic" ? `Delete topic “${pendingDelete.item.name}”? Topics with problems cannot be deleted.` : pendingDelete ? `Delete “${pendingDelete.item.title}”? Saved progress for this problem will also be removed.` : "This action cannot be undone."} loading={deleting} onClose={() => !deleting && setPendingDelete(null)} onConfirm={() => pendingDelete && (pendingDelete.type === "topic" ? removeTopic(pendingDelete.item) : removeProblem(pendingDelete.item))} />
     </div></AdminLayout>;
 }

@@ -6,6 +6,7 @@ import React, {
 import {
     X
 } from "lucide-react";
+import AdminFeedback from "../../components/AdminFeedback";
 
 
 const ratings = [
@@ -23,7 +24,9 @@ const AddProblemModal = ({
     onSubmit,
     loading = false,
     initialProblem = null,
-    isEditing = false
+    isEditing = false,
+    error = "",
+    onErrorDismiss
 }) => {
 
     const [form, setForm] = useState({
@@ -33,6 +36,7 @@ const AddProblemModal = ({
         order: "",
         hint: ""
     });
+    const [validationError, setValidationError] = useState("");
 
 
     /*
@@ -84,6 +88,7 @@ const AddProblemModal = ({
                 [name]: value
             })
         );
+        setValidationError("");
 
     };
 
@@ -107,9 +112,7 @@ const AddProblemModal = ({
             !form.order
         ) {
 
-            alert(
-                "Please fill all required fields."
-            );
+            setValidationError("Add a title, Codeforces problem ID, and order before saving.");
 
             return;
 
@@ -247,6 +250,8 @@ const AddProblemModal = ({
                         py-5
                     "
                 >
+
+                    {(error || validationError) && <AdminFeedback className="mb-0" onDismiss={() => { setValidationError(""); onErrorDismiss?.(); }}>{error || validationError}</AdminFeedback>}
 
                     {/* TITLE */}
 

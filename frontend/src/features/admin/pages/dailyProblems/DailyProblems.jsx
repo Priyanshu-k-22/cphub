@@ -11,6 +11,8 @@ import AddDailyProblemModal
 import DailyProblemFilters from "./DailyProblemFilters";
 import DailyProblemTable from "./DailyProblemTable";
 import AdminPagination from "../../components/AdminPagination";
+import AdminFeedback from "../../components/AdminFeedback";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import {
     createProblem,
     getAdminProblems,
@@ -34,8 +36,12 @@ const DailyProblems = () => {
     const [pagination, setPagination] = useState({ total: 0, totalPages: 0 });
     const [problems, setProblems] = useState([]);
     const [loadError, setLoadError] = useState("");
+    const [actionError, setActionError] = useState("");
     const [submitError, setSubmitError] = useState("");
     const [selectedProblem, setSelectedProblem] = useState(null);
+    const [pendingDelete, setPendingDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
+    const [notice, setNotice] = useState("");
 
     const fetchProblems = useCallback(async () => {
         try {
@@ -110,23 +116,20 @@ const DailyProblems = () => {
     */
 
     const handleDelete = async (problem) => {
-
-        const confirmed =
-            window.confirm(
-                `Delete "${problem.title}" from daily problems?`
-            );
-
-        if (!confirmed) {
-            return;
-        }
-
         try {
+            setDeleting(true);
+            setActionError("");
+            setNotice("");
             await deleteProblem(problem._id);
             if (problems.length === 1 && page > 1) setPage((current) => current - 1);
             else await fetchProblems();
+            setNotice(`“${problem.title}” was deleted from daily problems.`);
         } catch (error) {
             console.error("Failed to delete daily problem:", error);
-            alert(error?.response?.data?.message || "Failed to delete daily problem.");
+            setActionError(error?.response?.data?.message || "Failed to delete daily problem.");
+        } finally {
+            setDeleting(false);
+            setPendingDelete(null);
         }
 
     };
@@ -167,32 +170,20 @@ const DailyProblems = () => {
                     actionLabel="Add Problem"
                 />
 
-                {loadError && (
-                    <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                        {loadError}
-                        <button type="button" onClick={fetchProblems} className="ml-3 underline">
-                            Retry
-                        </button>
-                    </div>
-                )}
+                {loadError && <AdminFeedback onDismiss={() => setLoadError("")}>{loadError}<button type="button" onClick={fetchProblems} className="ml-3 font-semibold underline">Retry</button></AdminFeedback>}
+                {actionError && <AdminFeedback onDismiss={() => setActionError("")}>{actionError}</AdminFeedback>}
 
-                {submitError && (
-                    <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                        {submitError}
-                    </div>
-                )}
+                {!showModal && submitError && <AdminFeedback onDismiss={() => setSubmitError("")}>{submitError}</AdminFeedback>}
+                {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}>{notice}</AdminFeedback>}
 
 
                 <DailyProblemFilters value={category} onChange={(value) => { setCategory(value); setPage(1); }} total={pagination.total} />
 
                 {/* TABLE */}
 
-                <DailyProblemTable filteredProblems={filteredProblems} loading={loading} page={page} pageSize={PAGE_SIZE} onEdit={(problem) => { setSelectedProblem(problem); setShowModal(true); }} onDelete={handleDeleteProblem} />
+                <DailyProblemTable filteredProblems={filteredProblems} loading={loading} page={page} pageSize={PAGE_SIZE} onEdit={(problem) => { setSubmitError(""); setSelectedProblem(problem); setShowModal(true); }} onDelete={setPendingDelete} />
 
-                <div className="mt-4 flex items-center justify-between rounded-xl border border-[#1C2734] bg-[#080D14] px-4 py-3 text-sm text-[#7F8B9C]">
-                    <span>{pagination.total ? `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, pagination.total)} of ${pagination.total} problems` : "No problems"}</span>
-                    <AdminPagination page={page} pageSize={PAGE_SIZE} total={pagination.total} totalPages={pagination.totalPages} loading={loading} onPageChange={setPage} noun="problems" />
-                </div>
+                <AdminPagination page={page} pageSize={PAGE_SIZE} total={pagination.total} totalPages={pagination.totalPages} loading={loading} onPageChange={setPage} noun="problems" />
 
             </div>
 
@@ -218,6 +209,15 @@ const DailyProblems = () => {
                 loading={
                     loading
                 }
+            />
+
+            <ConfirmDialog
+                isOpen={Boolean(pendingDelete)}
+                title="Delete daily problem?"
+                description={pendingDelete ? `Delete “${pendingDelete.title}” from daily problems? This cannot be undone.` : "This action cannot be undone."}
+                loading={deleting}
+                onClose={() => !deleting && setPendingDelete(null)}
+                onConfirm={() => pendingDelete && handleDelete(pendingDelete)}
             />
 
         </AdminLayout>

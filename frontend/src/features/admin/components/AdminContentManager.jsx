@@ -3,6 +3,8 @@ import { ExternalLink, Pencil, Plus, RefreshCw, Save, Trash2, X } from "lucide-r
 import AdminLayout from "./AdminLayout";
 import AdminPageHeader from "./AdminPageHeader";
 import AdminSearch from "./AdminSearch";
+import AdminFeedback from "./AdminFeedback";
+import ConfirmDialog from "./ConfirmDialog";
 import { createAdminContent, deleteAdminContent, getAdminContent, updateAdminContent } from "../api/adminContent.api";
 
 const blank = { title: "", category: "", description: "", url: "", author: "", difficulty: "", status: "published" };
@@ -18,6 +20,8 @@ const AdminContentManager = ({ kind, title, description, categoryLabel = "Catego
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [notice, setNotice] = useState("");
+    const [pendingDelete, setPendingDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -68,15 +72,18 @@ const AdminContentManager = ({ kind, title, description, categoryLabel = "Catego
     };
 
     const remove = async (item) => {
-        if (!window.confirm(`Delete “${item.title}”? This cannot be undone.`)) return;
         setError("");
         setNotice("");
+        setDeleting(true);
         try {
             await deleteAdminContent(kind, item._id);
             setItems((current) => current.filter((entry) => entry._id !== item._id));
             setNotice("Content deleted.");
         } catch (requestError) {
             setError(requestError?.response?.data?.message || "Could not delete this item.");
+        } finally {
+            setDeleting(false);
+            setPendingDelete(null);
         }
     };
 
@@ -86,8 +93,8 @@ const AdminContentManager = ({ kind, title, description, categoryLabel = "Catego
     return <AdminLayout>
         <div className="px-4 py-5 sm:px-5 lg:px-7">
             <AdminPageHeader title={title} description={description} action={openCreate} actionLabel="Add item" />
-            {error && <div role="alert" className="mb-4 flex items-center justify-between rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error"><X size={15} /></button></div>}
-            {notice && <div role="status" className="mb-4 flex items-center justify-between rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500"><span>{notice}</span><button type="button" onClick={() => setNotice("")} aria-label="Dismiss notice"><X size={15} /></button></div>}
+            {error && <AdminFeedback onDismiss={() => setError("")}>{error}</AdminFeedback>}
+            {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}>{notice}</AdminFeedback>}
 
             {formOpen && <form onSubmit={save} className="mb-5 rounded-xl border border-[#1C2734] bg-[#080D14] p-4 sm:p-5">
                 <div className="mb-4 flex items-center justify-between"><h2 className="font-semibold text-[#DCE4ED]">{editingId ? "Edit item" : "New item"}</h2><button type="button" onClick={() => setFormOpen(false)} aria-label="Close editor" className="rounded-lg p-1.5 text-[#7F8B9C] hover:bg-[#111923]"><X size={17} /></button></div>
@@ -107,9 +114,10 @@ const AdminContentManager = ({ kind, title, description, categoryLabel = "Catego
             <section className="overflow-hidden rounded-xl border border-[#1C2734] bg-[#080D14]">
                 {loading ? <p className="p-10 text-center text-sm text-[#7F8B9C]">Loading items…</p> : visibleItems.length ? visibleItems.map((item) => <article key={item._id} className="flex flex-wrap items-start gap-3 border-b border-[#1C2734]/60 p-4 last:border-0 sm:items-center sm:px-5">
                     <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium text-[#DCE4ED]">{item.title}</h3><span className={`rounded-full px-2 py-0.5 text-[10px] capitalize ${item.status === "published" ? "bg-[#4AFFC4]/10 text-[#4AFFC4]" : "bg-[#556275]/10 text-[#AEB9C7]"}`}>{item.status}</span></div><p className="mt-1 text-xs text-[#7F8B9C]">{[item.category, item.difficulty, item.author].filter(Boolean).join(" · ")}</p>{item.description && <p className="mt-2 line-clamp-2 text-sm text-[#AEB9C7]">{item.description}</p>}</div>
-                    <div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => openEdit(item)} aria-label={`Edit ${item.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><Pencil size={15} /></button><button type="button" onClick={() => remove(item)} aria-label={`Delete ${item.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-red-500/10 hover:text-red-400"><Trash2 size={15} /></button>{item.url && <a href={item.url} target="_blank" rel="noreferrer" aria-label={`Open ${item.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><ExternalLink size={15} /></a>}</div>
+                    <div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => openEdit(item)} aria-label={`Edit ${item.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><Pencil size={15} /></button><button type="button" onClick={() => setPendingDelete(item)} aria-label={`Delete ${item.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-red-500/10 hover:text-red-400"><Trash2 size={15} /></button>{item.url && <a href={item.url} target="_blank" rel="noreferrer" aria-label={`Open ${item.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><ExternalLink size={15} /></a>}</div>
                 </article>) : <div className="p-12 text-center"><p className="text-sm font-medium text-[#DCE4ED]">{error ? "Content could not be loaded" : search ? "No matching items" : "No items added yet"}</p><p className="mt-1 text-xs text-[#7F8B9C]">{error ? "Check the connection and retry." : search ? "Try another search phrase." : "Add an item to get this collection started."}</p>{error ? <button type="button" onClick={load} className="mt-4 rounded-lg border border-[#1C2734] px-4 py-2 text-sm text-[#AEB9C7] hover:text-[#4AFFC4]">Retry</button> : <button type="button" onClick={openCreate} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2 text-sm font-semibold text-[#06120D]"><Plus size={15} />Add item</button>}</div>}
             </section>
+            <ConfirmDialog isOpen={Boolean(pendingDelete)} title="Delete this item?" description={pendingDelete ? `Delete “${pendingDelete.title}”? This action cannot be undone.` : "This action cannot be undone."} loading={deleting} onClose={() => !deleting && setPendingDelete(null)} onConfirm={() => pendingDelete && remove(pendingDelete)} />
         </div>
     </AdminLayout>;
 };

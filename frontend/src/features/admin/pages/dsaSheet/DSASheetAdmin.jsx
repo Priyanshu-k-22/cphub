@@ -3,6 +3,8 @@ import { ExternalLink, Pencil, Plus, RefreshCw, Save, Trash2, X } from "lucide-r
 import AdminLayout from "../../components/AdminLayout";
 import AdminPageHeader from "../../components/AdminPageHeader";
 import AdminSearch from "../../components/AdminSearch";
+import AdminFeedback from "../../components/AdminFeedback";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import { createDSASheet, deleteDSASheet, getDSASheets, updateDSASheet } from "../../../dsa/api/dsaSheet.api";
 
 const emptyForm = { title: "", description: "", source: "", url: "", order: 0 };
@@ -18,6 +20,8 @@ export default function DSASheetAdmin() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState("");
     const [notice, setNotice] = useState("");
+    const [pendingDelete, setPendingDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -55,22 +59,25 @@ export default function DSASheetAdmin() {
         } finally { setSaving(false); }
     };
     const remove = async (sheet) => {
-        if (!window.confirm(`Delete “${sheet.title}”?`)) return;
         setError(""); setNotice("");
+        setDeleting(true);
         try {
             await deleteDSASheet(sheet._id);
             setSheets((current) => current.filter((item) => item._id !== sheet._id));
             setNotice("DSA sheet deleted.");
         } catch (requestError) {
             setError(requestError?.response?.data?.message || "Could not delete this DSA sheet.");
+        } finally {
+            setDeleting(false);
+            setPendingDelete(null);
         }
     };
     const visibleSheets = sheets.filter((sheet) => `${sheet.title} ${sheet.source} ${sheet.description}`.toLowerCase().includes(search.toLowerCase()));
 
     return <AdminLayout><div className="px-4 py-5 sm:px-5 lg:px-7">
         <AdminPageHeader title="DSA Sheet" description="Manage the DSA sheet resources shown to students." action={openCreate} actionLabel="Add Sheet" />
-        {error && <div role="alert" className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><span>{error}</span><button type="button" onClick={() => setError("")} aria-label="Dismiss error"><X size={16} /></button></div>}
-        {notice && <div role="status" className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">{notice}</div>}
+        {error && <AdminFeedback onDismiss={() => setError("")}>{error}</AdminFeedback>}
+        {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}>{notice}</AdminFeedback>}
         {formOpen && <form onSubmit={save} className="mb-5 rounded-xl border border-[#1C2734] bg-[#080D14] p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between"><h2 className="font-semibold text-[#DCE4ED]">{editingId ? "Edit DSA sheet" : "Add DSA sheet"}</h2><button type="button" onClick={() => setFormOpen(false)} aria-label="Close form" className="rounded-lg p-2 text-[#AEB9C7] hover:bg-[#111923]"><X size={17} /></button></div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -86,8 +93,9 @@ export default function DSASheetAdmin() {
         <section className="overflow-hidden rounded-xl border border-[#1C2734] bg-[#080D14]">
             {loading ? <p className="p-10 text-center text-sm text-[#7F8B9C]">Loading DSA sheets…</p> : visibleSheets.length ? visibleSheets.map((sheet) => <article key={sheet._id} className="flex flex-wrap items-start gap-3 border-b border-[#1C2734]/60 p-4 last:border-0 sm:items-center sm:px-5">
                 <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-medium text-[#DCE4ED]">{sheet.title}</h3><span className="rounded-full bg-[#4AFFC4]/10 px-2 py-0.5 text-xs text-[#4AFFC4]">{sheet.source}</span></div><p className="mt-1 text-xs text-[#7F8B9C]">Order {sheet.order ?? 0}</p>{sheet.description && <p className="mt-2 text-sm text-[#AEB9C7]">{sheet.description}</p>}</div>
-                <div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => openEdit(sheet)} aria-label={`Edit ${sheet.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><Pencil size={15} /></button><button type="button" onClick={() => remove(sheet)} aria-label={`Delete ${sheet.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-red-500/10 hover:text-red-400"><Trash2 size={15} /></button><a href={sheet.url} target="_blank" rel="noreferrer" aria-label={`Open ${sheet.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><ExternalLink size={15} /></a></div>
+                <div className="flex shrink-0 items-center gap-1"><button type="button" onClick={() => openEdit(sheet)} aria-label={`Edit ${sheet.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><Pencil size={15} /></button><button type="button" onClick={() => setPendingDelete(sheet)} aria-label={`Delete ${sheet.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-red-500/10 hover:text-red-400"><Trash2 size={15} /></button><a href={sheet.url} target="_blank" rel="noreferrer" aria-label={`Open ${sheet.title}`} className="rounded-lg p-2 text-[#7F8B9C] hover:bg-[#111923] hover:text-[#4AFFC4]"><ExternalLink size={15} /></a></div>
             </article>) : <div className="p-12 text-center"><p className="text-sm font-medium text-[#DCE4ED]">{error ? "DSA sheets could not be loaded" : search ? "No matching sheets" : "No DSA sheets yet"}</p><p className="mt-1 text-xs text-[#7F8B9C]">{error ? "Check the connection and retry." : search ? "Try another search phrase." : "Add a sheet to publish it on the student page."}</p>{error ? <button type="button" onClick={load} className="mt-4 rounded-lg border border-[#1C2734] px-4 py-2 text-sm text-[#AEB9C7]">Retry</button> : <button type="button" onClick={openCreate} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2 text-sm font-semibold text-[#06120D]"><Plus size={15} />Add sheet</button>}</div>}
         </section>
+        <ConfirmDialog isOpen={Boolean(pendingDelete)} title="Delete DSA sheet?" description={pendingDelete ? `Delete “${pendingDelete.title}”? Students will no longer see this resource.` : "This action cannot be undone."} loading={deleting} onClose={() => !deleting && setPendingDelete(null)} onConfirm={() => pendingDelete && remove(pendingDelete)} />
     </div></AdminLayout>;
 }

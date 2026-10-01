@@ -13,6 +13,8 @@ import AddProblemModal
     from "./AddProblemModal";
 import RatingFilter from "../../components/RatingFilter";
 import CPSheetProblemTable from "./CPSheetProblemTable";
+import AdminFeedback from "../../components/AdminFeedback";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 import {
     getCPSheet,
@@ -50,6 +52,11 @@ const CPSheetAdmin = () => {
 
     const [selectedProblem, setSelectedProblem] =
         useState(null);
+    const [modalError, setModalError] = useState("");
+    const [error, setError] = useState("");
+    const [notice, setNotice] = useState("");
+    const [pendingDelete, setPendingDelete] = useState(null);
+    const [deleting, setDeleting] = useState(false);
 
 
     /*
@@ -127,6 +134,7 @@ const CPSheetAdmin = () => {
         try {
 
             setCreating(true);
+            setModalError("");
 
             /*
              * formData:
@@ -159,6 +167,7 @@ const CPSheetAdmin = () => {
 
             setShowModal(false);
             setSelectedProblem(null);
+            setNotice(selectedProblem ? "CP sheet problem updated." : "CP sheet problem added.");
 
 
             /*
@@ -182,7 +191,7 @@ const CPSheetAdmin = () => {
                 error?.response?.data?.message ||
                 "Failed to save problem";
 
-            alert(message);
+            setModalError(message);
 
         } finally {
 
@@ -193,17 +202,19 @@ const CPSheetAdmin = () => {
     };
 
     const handleDeleteProblem = async (problem) => {
-        const confirmed = window.confirm(
-            `Delete "${problem.title}" from the CP sheet? Its saved progress will also be removed.`
-        );
-        if (!confirmed) return;
-
         try {
+            setDeleting(true);
+            setError("");
+            setNotice("");
             await deleteCPProblem(problem._id);
             setProblems((current) => current.filter((item) => item._id !== problem._id));
+            setNotice(`“${problem.title}” was deleted from the CP sheet.`);
         } catch (error) {
             console.error("Failed to delete CP problem:", error);
-            alert(error?.response?.data?.message || "Failed to delete problem");
+            setError(error?.response?.data?.message || "Failed to delete problem.");
+        } finally {
+            setDeleting(false);
+            setPendingDelete(null);
         }
     };
 
@@ -227,6 +238,7 @@ const CPSheetAdmin = () => {
                     title="CP Sheet"
                     description="Manage Codeforces problems across every rating."
                     action={() => {
+                        setModalError("");
                         setSelectedProblem(null);
                         setShowModal(true)
                     }}
@@ -236,9 +248,12 @@ const CPSheetAdmin = () => {
 
                 <RatingFilter ratings={ratings} value={rating} onChange={setRating} />
 
+                {error && <AdminFeedback onDismiss={() => setError("")}>{error}</AdminFeedback>}
+                {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}>{notice}</AdminFeedback>}
+
                 {/* TABLE */}
 
-                <CPSheetProblemTable loading={loading} problems={problems} rating={rating} onEdit={(problem) => { setSelectedProblem(problem); setShowModal(true); }} onDelete={handleDeleteProblem} />
+                <CPSheetProblemTable loading={loading} problems={problems} rating={rating} onEdit={(problem) => { setModalError(""); setSelectedProblem(problem); setShowModal(true); }} onDelete={setPendingDelete} />
 
             </div>
 
@@ -250,16 +265,27 @@ const CPSheetAdmin = () => {
                     showModal
                 }
                 onClose={() =>
-                    setShowModal(false)
+                    { setShowModal(false); setModalError(""); }
                 }
                 onSubmit={
                     handleSaveProblem
                 }
                 initialProblem={selectedProblem}
                 isEditing={Boolean(selectedProblem)}
+                error={modalError}
+                onErrorDismiss={() => setModalError("")}
                 loading={
                     creating
                 }
+            />
+
+            <ConfirmDialog
+                isOpen={Boolean(pendingDelete)}
+                title="Delete CP sheet problem?"
+                description={pendingDelete ? `Delete “${pendingDelete.title}”? Saved progress for this problem will also be removed.` : "This action cannot be undone."}
+                loading={deleting}
+                onClose={() => !deleting && setPendingDelete(null)}
+                onConfirm={() => pendingDelete && handleDeleteProblem(pendingDelete)}
             />
 
         </AdminLayout>
