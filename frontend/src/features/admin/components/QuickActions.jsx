@@ -1,158 +1,28 @@
 import React from "react";
+import { ArrowUpRight, Brain, CalendarPlus, Code2, Trophy, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import {
-    CalendarPlus,
-    Code2,
-    Brain,
-    Trophy
-} from "lucide-react";
-
-
 const actions = [
-    {
-        label: "Daily Problem",
-        description: "Add today's problem",
-        icon: CalendarPlus,
-        path: "/admin/daily-problems"
-    },
-    {
-        label: "CP Problem",
-        description: "Add to CP Sheet",
-        icon: Code2,
-        path: "/admin/cp-sheet"
-    },
-    {
-        label: "DSA Problem",
-        description: "Add topic-wise DSA problems",
-        icon: Brain,
-        path: "/admin/dsa-problems"
-    },
-    {
-        label: "Contest",
-        description: "Manage contests",
-        icon: Trophy,
-        path: "/admin/contests"
-    }
+    { label: "Daily problem", description: "Publish today's challenge", icon: CalendarPlus, path: "/admin/daily-problems", tint: "text-amber-500 bg-amber-500/10" },
+    { label: "CP Sheet", description: "Manage rating-wise problems", icon: Code2, path: "/admin/cp-sheet", tint: "text-blue-500 bg-blue-500/10" },
+    { label: "DSA Sheet", description: "Organize topic-wise practice", icon: Brain, path: "/admin/dsa-problems", tint: "text-violet-500 bg-violet-500/10" },
+    { label: "Contests", description: "Update contest listings", icon: Trophy, path: "/admin/contests", tint: "text-emerald-500 bg-emerald-500/10" }
 ];
 
-
-const QuickActions = () => {
-
-    return (
-
-        <section
-            className="
-                overflow-hidden
-                rounded-xl
-                border
-                border-[#1C2734]
-                bg-[#080D14]
-            "
-        >
-
-            <div
-                className="
-                    border-b
-                    border-[#1C2734]
-                    px-4
-                    py-3
-                "
-            >
-
-                <h2
-                    className="
-                        text-xs
-                        font-semibold
-                        text-[#DCE4ED]
-                    "
-                >
-                    Quick Actions
-                </h2>
-
-                <p
-                    className="
-                        mt-0.5
-                        text-[9px]
-                        text-[#556275]
-                    "
-                >
-                    Common management tasks
-                </p>
-
-            </div>
-
-
-            <div
-                className="
-                    grid
-                    grid-cols-2
-                    gap-2
-                    p-3
-                "
-            >
-
-                {actions.map((action) => {
-
-                    const Icon = action.icon;
-
-                    return (
-
-                        <Link
-                            key={action.label}
-                            href={action.path}
-                            className="
-                                group
-                                rounded-lg
-                                border
-                                border-[#1C2734]
-                                bg-[#070B11]
-                                p-3
-                                transition
-                                hover:border-[#4AFFC4]/20
-                                hover:bg-[#0C1518]
-                            "
-                        >
-
-                            <Icon
-                                size={15}
-                                className="
-                                    mb-2
-                                    text-[#4AFFC4]
-                                "
-                            />
-
-                            <p
-                                className="
-                                    text-[10px]
-                                    font-medium
-                                    text-[#DCE4ED]
-                                "
-                            >
-                                {action.label}
-                            </p>
-
-                            <p
-                                className="
-                                    mt-0.5
-                                    text-[8px]
-                                    text-[#556275]
-                                "
-                            >
-                                {action.description}
-                            </p>
-
-                        </Link>
-
-                    );
-
-                })}
-
-            </div>
-
-        </section>
-    );
-};
-
+const QuickActions = () => (
+    <section className="overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)]" aria-labelledby="admin-actions-title">
+        <div className="flex items-center gap-3 border-b border-[var(--theme-border)] px-4 py-4 sm:px-5">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]"><Zap size={18} /></span>
+            <div><h2 id="admin-actions-title" className="text-base font-bold text-[var(--theme-text)]">Quick actions</h2><p className="mt-0.5 text-xs text-[var(--theme-text-muted)]">Jump into a common task</p></div>
+        </div>
+        <div className="grid gap-2.5 p-3 sm:grid-cols-2 sm:p-4">
+            {actions.map(({ label, description, icon: Icon, path, tint }) => <Link key={label} to={path} className="group flex min-h-[88px] items-center gap-3 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] p-3.5 transition duration-200 hover:-translate-y-0.5 hover:border-[var(--theme-accent)]/40 hover:shadow-md">
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${tint}`}><Icon size={19} /></span>
+                <span className="min-w-0 flex-1"><span className="block text-sm font-bold text-[var(--theme-text)]">{label}</span><span className="mt-1 block text-xs leading-5 text-[var(--theme-text-muted)]">{description}</span></span>
+                <ArrowUpRight size={16} className="shrink-0 text-[var(--theme-text-muted)] transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--theme-accent)]" />
+            </Link>)}
+        </div>
+    </section>
+);
 
 export default QuickActions;

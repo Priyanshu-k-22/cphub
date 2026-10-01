@@ -3,9 +3,7 @@ import React, {
     useState
 } from "react";
 
-import {
-    X
-} from "lucide-react";
+import { CalendarDays, X } from "lucide-react";
 
 import ExampleEditor
     from "./ExampleEditor";
@@ -365,7 +363,7 @@ const AddDailyProblemModal = ({
                     rounded-2xl
                     border
                     border-[#1C2734]
-                    bg-[#080D14]
+                    bg-[var(--theme-surface)]
                     shadow-2xl
                 "
                 onClick={(e) =>
@@ -390,14 +388,15 @@ const AddDailyProblemModal = ({
                     "
                 >
 
-                    <div>
+                    <div className="flex items-center gap-3">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]"><CalendarDays size={18} /></span>
+                        <div>
 
                         <h2
                             className="
-                                font-mono
-                                text-sm
-                                font-semibold
-                                text-white
+                                text-lg
+                                font-bold
+                                text-[var(--theme-text)]
                             "
                         >
                             {isEditing ? "Edit Daily Problem" : "Add Daily Problem"}
@@ -406,14 +405,14 @@ const AddDailyProblemModal = ({
                         <p
                             className="
                                 mt-1
-                                font-mono
-                                text-[9px]
-                                text-[#556275]
+                                text-sm
+                                text-[var(--theme-text-muted)]
                             "
                         >
                             {isEditing ? "Update this daily problem" : "Create and publish a daily problem"}
                         </p>
 
+                        </div>
                     </div>
 
 

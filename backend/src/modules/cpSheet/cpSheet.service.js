@@ -167,6 +167,8 @@ const createCPProblem = async ({
     rating,
     order,
     hint = "",
+    solution = "",
+    code = "",
     sheet = "beginner-cp",
 }) => {
 
@@ -197,6 +199,8 @@ const createCPProblem = async ({
         rating: Number(rating),
         order: Number(order),
         hint,
+        solution,
+        code,
         sheet,
         isActive: true,
     });
@@ -223,6 +227,8 @@ const updateCPProblem = async (problemId, data) => {
     const rating = Number(data.rating);
     const order = Number(data.order);
     const hint = typeof data.hint === "string" ? data.hint.trim() : "";
+    const solution = typeof data.solution === "string" ? data.solution.trim() : undefined;
+    const code = typeof data.code === "string" ? data.code : undefined;
 
     if (!title || !codeforcesId) {
         throw new ApiError(400, "Title and Codeforces ID are required");
@@ -252,6 +258,8 @@ const updateCPProblem = async (problemId, data) => {
     existingProblem.rating = rating;
     existingProblem.order = order;
     existingProblem.hint = hint;
+    if (solution !== undefined) existingProblem.solution = solution;
+    if (code !== undefined) existingProblem.code = code;
     existingProblem.url = `https://codeforces.com/problemset/problem/${codeforcesId}`;
 
     await existingProblem.save();

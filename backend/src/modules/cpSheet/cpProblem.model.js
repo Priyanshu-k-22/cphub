@@ -42,6 +42,17 @@ const cpProblemSchema = new mongoose.Schema(
             default: "",
         },
 
+        solution: {
+            type: String,
+            trim: true,
+            default: "",
+        },
+
+        code: {
+            type: String,
+            default: "",
+        },
+
         sheet: {
             type: String,
             default: "beginner-cp",
