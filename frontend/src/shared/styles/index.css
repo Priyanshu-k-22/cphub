@@ -1,0 +1,380 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+    background: #060a10;
+    transition: background-color 0.3s ease;
+}
+
+::selection {
+  background: #4affc4;
+  color: #06120d;
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(var(--r, 0deg));
+  }
+  50% {
+    transform: translateY(-14px) rotate(var(--r, 0deg));
+  }
+}
+.float-card {
+  animation: floaty 6s ease-in-out infinite;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+.scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent, rgba(74, 255, 196, 0.05), transparent);
+  animation: scanline 4s linear infinite;
+  pointer-events: none;
+}
+
+.grid-bg {
+  background-image: linear-gradient(rgba(74, 255, 196, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 255, 196, 0.06) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #24303f;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-blink,
+  .float-card,
+  .scanline::after {
+    animation: none !important;
+  }
+}
+
+@keyframes floatCode {
+    0% {
+        transform: translate3d(0, 0, 0) rotate(var(--rotate));
+    }
+
+    25% {
+        transform: translate3d(12px, -8px, 0) rotate(var(--rotate));
+    }
+
+    50% {
+        transform: translate3d(20px, 4px, 0) rotate(var(--rotate));
+    }
+
+    75% {
+        transform: translate3d(8px, 14px, 0) rotate(var(--rotate));
+    }
+
+    100% {
+        transform: translate3d(-10px, 6px, 0) rotate(var(--rotate));
+    }
+}
+
+@keyframes fragmentFloat {
+    0% {
+        transform: translate3d(0, 0, 0) rotate(var(--rotate));
+    }
+
+    50% {
+        transform: translate3d(-8px, 12px, 0) rotate(var(--rotate));
+    }
+
+    100% {
+        transform: translate3d(10px, -8px, 0) rotate(var(--rotate));
+    }
+}
+
+@keyframes terminalFloat {
+    0% {
+        transform: translate3d(0, 0, 0);
+    }
+
+    50% {
+        transform: translate3d(8px, -6px, 0);
+    }
+
+    100% {
+        transform: translate3d(-6px, 8px, 0);
+    }
+}
+
+.filter-select {
+    width: 100%;
+    border: 1px solid #1c2734;
+    border-radius: 0.5rem;
+    background-color: #0d141d;
+    color: #edf2f7;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    outline: none;
+}
+
+.filter-select:focus {
+    border-color: rgba(74, 255, 196, 0.5);
+}
+
+.filter-select option {
+    background-color: #0d141d;
+    color: #edf2f7;
+}
+
+/* =========================================================
+   CP HUB THEME SYSTEM
+   Dark preserves the original black and neon-green identity.
+   Light uses quiet mint surfaces and deep, readable green accents.
+========================================================= */
+.app-theme {
+    --theme-page: #060A10;
+    --theme-surface: #080D14;
+    --theme-surface-raised: #0D151F;
+    --theme-surface-high: #111923;
+    --theme-text: #EDF2F7;
+    --theme-text-secondary: #AEB9C7;
+    --theme-text-muted: #687587;
+    --theme-border: #1C2734;
+    --theme-accent: #4AFFC4;
+    --theme-accent-soft: #0E1D18;
+    --theme-hover: #0C131C;
+    min-height: 100vh;
+    background-color: var(--theme-page);
+    color: var(--theme-text);
+}
+
+.app-theme[data-theme="light"] {
+    --theme-page: #F4F8F6;
+    --theme-surface: #FFFFFF;
+    --theme-surface-raised: #F7FAF8;
+    --theme-surface-high: #EAF1ED;
+    --theme-text: #14251E;
+    --theme-text-secondary: #3F554B;
+    --theme-text-muted: #62756B;
+    --theme-border: #D7E3DC;
+    --theme-accent: #087C5B;
+    --theme-accent-soft: #E3F4EC;
+    --theme-hover: #EDF5F0;
+    background-color: var(--theme-page) !important;
+    color: var(--theme-text) !important;
+    color-scheme: light;
+}
+
+.app-theme[data-theme="light"] :is(
+    [class~="bg-[#060A0F]"], [class~="bg-[#060A10]"], [class~="bg-[#060a10]"],
+    [class~="bg-[#070B11]"], [class~="bg-[#080D14]"], [class~="bg-[#080E16]"],
+    [class~="bg-[#0A1018]"], [class~="bg-[#0B1119]"], [class~="bg-[#0c131c]"],
+    [class~="bg-[#0C131C]"], [class~="bg-[#0C1420]"], [class~="bg-[#0d141d]"],
+    [class~="bg-[#0D151F]"]
+) { background-color: var(--theme-surface) !important; }
+.app-theme[data-theme="light"] :is(
+    [class~="bg-[#060a10]/60"], [class~="bg-[#080E16]/60"], [class~="bg-[#080E16]/95"],
+    [class~="bg-[#0C1420]/90"], [class~="bg-[#0d141d]/90"]
+) { background-color: var(--theme-surface) !important; }
+
+.app-theme[data-theme="light"] :is(
+    [class~="bg-[#0E161D]"], [class~="bg-[#111923]"], [class~="bg-[#131A22]"],
+    [class~="bg-[#141A22]"], [class~="bg-[#141C26]"], [class~="bg-[#151E29]"],
+    [class~="bg-[#1C2734]"], [class~="bg-[#26313E]"], [class~="bg-[#273443]"],
+    [class~="bg-[#181818]"], [class~="bg-[#1E1E1E]"], [class~="bg-[#2A2A2A]"]
+) { background-color: var(--theme-surface-high) !important; }
+.app-theme[data-theme="light"] :is([class~="bg-[#4AFFC4]/5"], [class~="bg-[#4AFFC4]/10"]) { background-color: var(--theme-accent-soft) !important; }
+.app-theme[data-theme="light"] [class~="bg-[#556275]/10"] { background-color: #EAF1ED !important; }
+.app-theme[data-theme="light"] :is([class~="bg-[#F5C542]/5"], [class~="bg-[#F5C542]/10"]) { background-color: #FFF4D6 !important; }
+
+.app-theme[data-theme="light"] :is(
+    [class~="bg-[#0E1D18]"], [class~="bg-[#10201B]"], [class~="bg-[#14221E]"]
+) { background-color: var(--theme-accent-soft) !important; }
+.app-theme[data-theme="light"] :is(
+    [class~="bg-[#1D120E]"], [class~="bg-[#1D160E]"], [class~="bg-[#1D170E]"], [class~="bg-[#1D1A0E]"]
+) { background-color: #FFF4E5 !important; }
+
+.app-theme[data-theme="light"] :is(
+    [class~="text-white"], [class~="text-[#EDF2F7]"], [class~="text-[#DCE4ED]"],
+    [class~="text-[#edf2f7]"],
+    [class~="text-[#E8EEF5]"], [class~="text-[#D4DEEA]"], [class~="text-[#D5DCE5]"],
+    [class~="text-[#B7BFCA]"], [class~="text-[#B7C0CC]"], [class~="text-[#AEB9C7]"],
+    [class~="text-[#cbd5e1]"], [class~="text-[#f1f5f9]"], [class~="text-[#94a3b8]"]
+) { color: var(--theme-text) !important; }
+.app-theme[data-theme="light"] :is(
+    [class~="text-[#7F8B9C]"], [class~="text-[#778396]"], [class~="text-[#718096]"],
+    [class~="text-[#687587]"], [class~="text-[#6B7788]"], [class~="text-[#66758A]"],
+    [class~="text-[#556275]"], [class~="text-[#8B95A7]"], [class~="text-[#8B98A9]"],
+    [class~="text-[#8D9AAF]"], [class~="text-[#465364]"], [class~="text-[#465365]"],
+    [class~="text-[#455264]"], [class~="text-[#3E4A5B]"], [class~="text-[#3e4a59]"],
+    [class~="text-[#394656]"], [class~="text-[#303B49]"], [class~="text-[#273442]"]
+) { color: var(--theme-text-muted) !important; }
+
+.app-theme[data-theme="light"] :is([class~="text-[#4AFFC4]"], [class~="text-[#4affc4]"], [class~="text-emerald-400"], [class~="text-green-400"]) { color: var(--theme-accent) !important; }
+.app-theme[data-theme="light"] :is([class~="text-[#F5C542]"], [class~="text-[#FFC24A]"], [class~="text-[#FFD84A]"], [class~="text-yellow-400"], [class~="text-yellow-500"]) { color: #805900 !important; }
+.app-theme[data-theme="light"] :is([class~="text-[#FF6B4A]"], [class~="text-[#E0A672]"], [class~="text-orange-400"]) { color: #A34516 !important; }
+.app-theme[data-theme="light"] :is([class~="text-[#D4A6FF]"]) { color: #7040A0 !important; }
+.app-theme[data-theme="light"] :is([class~="text-[#7FB3FF]"], [class~="text-blue-400"]) { color: #245B9E !important; }
+.app-theme[data-theme="light"] :is([class~="text-red-300"], [class~="text-red-400"]) { color: #B42318 !important; }
+.app-theme[data-theme="light"] :is([class~="text-[#060a10]"], [class~="text-[#06100C]"], [class~="text-[#06100D]"], [class~="text-[#06120D]"], [class~="text-[#07110E]"]) { color: #06120D !important; }
+
+.app-theme[data-theme="light"] :is(
+    [class~="border-[#1C2734]"], [class~="border-[#1c2734]"], [class~="border-[#151E29]"],
+    [class~="border-[#17212D]"], [class~="border-[#263342]"], [class~="border-[#263445]"],
+    [class~="border-[#273544]"], [class~="border-[#2A3341]"], [class~="border-[#2C3D50]"],
+    [class~="border-[#303030]"], [class~="border-[#3A4250]"],
+    [class~="border-[#1C2734]/60"], [class~="border-[#1C2734]/70"],
+    [class~="divide-[#1C2734]"]
+) { border-color: var(--theme-border) !important; }
+.app-theme[data-theme="light"] [class~="divide-[#1C2734]"] > :not([hidden]) ~ :not([hidden]) { border-color: var(--theme-border) !important; }
+.app-theme[data-theme="light"] :is([class~="border-[#1E3A5A]"], [class~="border-[#1E5A46]"], [class~="border-[#1E5A46]/60"]) { border-color: #B8D7CA !important; }
+.app-theme[data-theme="light"] :is([class~="border-[#5A2A1E]"], [class~="border-[#5A3A1E]"], [class~="border-[#5A461E]"], [class~="border-[#5A4E1E]"]) { border-color: #E8CDA8 !important; }
+.app-theme[data-theme="light"] :is([class~="border-[#4AFFC4]"], [class~="border-[#4AFFC4]/20"], [class~="border-[#4AFFC4]/30"], [class~="border-[#4AFFC4]/40"], [class~="border-[#4AFFC4]/50"], [class~="border-[#4AFFC4]/60"]) { border-color: #A9D9C7 !important; }
+.app-theme[data-theme="light"] :is([class~="border-[#F5C542]/15"], [class~="border-[#F5C542]/40"], [class~="border-[#FFC24A]/40"]) { border-color: #E9D49B !important; }
+
+.app-theme[data-theme="light"] :is(
+    [class~="hover:bg-[#0B1119]"], [class~="hover:bg-[#0C131C]"], [class~="hover:bg-[#0C1420]"],
+    [class~="hover:bg-[#0C1518]"], [class~="hover:bg-[#0D151F]"], [class~="hover:bg-[#111923]"],
+    [class~="hover:bg-[#111b25]"], [class~="hover:bg-[#2A2A2A]"]
+):hover { background-color: var(--theme-hover) !important; }
+.app-theme[data-theme="light"] :is([class~="hover:bg-[#4AFFC4]/5"], [class~="hover:bg-[#4AFFC4]/10"]):hover { background-color: #D7F0E5 !important; }
+.app-theme[data-theme="light"] [class~="hover:bg-[#F5C542]/5"]:hover { background-color: #F8EBC3 !important; }
+.app-theme[data-theme="light"] :is([class~="hover:text-[#DCE4ED]"], [class~="hover:text-[#E8EEF5]"], [class~="hover:text-[#EDF2F7]"], [class~="hover:text-[#AEB9C7]"]):hover { color: var(--theme-text) !important; }
+.app-theme[data-theme="light"] :is([class~="hover:text-[#4affc4]"], [class~="hover:text-[#4AFFC4]"]):hover { color: var(--theme-accent) !important; }
+.app-theme[data-theme="light"] :is([class~="hover:text-[#F5C542]"], [class~="hover:text-[#FFC24A]"]):hover { color: #805900 !important; }
+
+.app-theme[data-theme="light"] [class~="from-[#0E161D]"],
+.app-theme[data-theme="light"] [class~="from-[#0E1D18]"],
+.app-theme[data-theme="light"] [class~="from-[#1D120E]"],
+.app-theme[data-theme="light"] [class~="from-[#1D170E]"] {
+    --tw-gradient-from: #EAF1ED var(--tw-gradient-from-position) !important;
+    --tw-gradient-to: rgb(234 241 237 / 0) var(--tw-gradient-to-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important;
+}
+.app-theme[data-theme="light"] :is([class~="to-[#0C1420]"], [class~="to-[#123024]"], [class~="to-[#132638]"], [class~="to-[#381e13]"], [class~="to-[#382b13]"]) {
+    --tw-gradient-to: #DFE9E3 var(--tw-gradient-to-position) !important;
+}
+
+.app-theme[data-theme="light"] :is(input, textarea, select) { color-scheme: light; }
+.app-theme[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.app-theme[data-theme="light"] textarea,
+.app-theme[data-theme="light"] select,
+.app-theme[data-theme="light"] .filter-select {
+    border-color: var(--theme-border);
+}
+.app-theme[data-theme="light"] :is(input, textarea)::placeholder { color: #718078 !important; opacity: 1; }
+.app-theme[data-theme="light"] :is(input, textarea, select):focus { outline-color: var(--theme-accent); }
+.app-theme[data-theme="light"] .filter-select,
+.app-theme[data-theme="light"] .filter-select option { background-color: var(--theme-surface); color: var(--theme-text); }
+.app-theme[data-theme="light"] ::selection { background: #B8EBD7; color: #10231B; }
+
+html[data-theme="dark"] { color-scheme: dark; }
+html[data-theme="light"] { color-scheme: light; }
+html[data-theme="dark"] body { background: #060A10; color: #EDF2F7; }
+html[data-theme="light"] body { background: #F4F8F6; color: #14251E; }
+html[data-theme="light"] .scrollbar-thin::-webkit-scrollbar-thumb { background: #B8C8BF; }
+
+/* Problem history uses lowercase palette literals and had retained dark
+   surfaces in its stats, filters, empty state, and problem rows. */
+.app-theme[data-theme="light"] .problem-history-page :is(
+    [class~="bg-[#0a1018]"], [class~="bg-[#080d14]"]
+) { background-color: var(--theme-surface) !important; }
+.app-theme[data-theme="light"] .problem-history-page :is(
+    [class~="bg-[#0c131c]"], [class~="bg-[#111923]"]
+) { background-color: var(--theme-surface-high) !important; }
+.app-theme[data-theme="light"] .problem-history-page [class~="hover:bg-[#0c131c]"]:hover { background-color: var(--theme-hover) !important; }
+.app-theme[data-theme="light"] .problem-history-page [class~="text-[#aeb9c7]"] { color: var(--theme-text-secondary) !important; }
+
+@media (prefers-reduced-motion: no-preference) {
+    .app-theme { transition: background-color 180ms ease, color 180ms ease; }
+}
+
+/* Admin screens were designed with undersized 8–11px utility text. Keep the
+   compact layout while bringing labels and data to a readable minimum. */
+:is(.admin-ui, .student-dashboard-ui) [class~="text-[7px]"] { font-size: 0.6875rem !important; line-height: 1rem !important; }
+:is(.admin-ui, .student-dashboard-ui) [class~="text-[8px]"] { font-size: 0.6875rem !important; line-height: 1rem !important; }
+:is(.admin-ui, .student-dashboard-ui) [class~="text-[9px]"] { font-size: 0.75rem !important; line-height: 1.125rem !important; }
+:is(.admin-ui, .student-dashboard-ui) [class~="text-[10px]"] { font-size: 0.8125rem !important; line-height: 1.25rem !important; }
+:is(.admin-ui, .student-dashboard-ui) [class~="text-[11px]"] { font-size: 0.875rem !important; line-height: 1.25rem !important; }
+
+/* The contest calendar uses lowercase color literals that differ from the
+   shared dashboard palette. Replace its dark-only cells and event tiles too. */
+.app-theme[data-theme="light"] .contest-calendar [class~="bg-[#060a10]/60"] { background-color: #E9F0EC !important; }
+.app-theme[data-theme="light"] .contest-calendar :is([class~="bg-[#080d14]"], [class~="bg-[#0a1018]"], [class~="bg-[#111923]"]) { background-color: var(--theme-surface-high) !important; }
+.app-theme[data-theme="light"] .contest-calendar [class~="bg-[#0d141d]/90"] { background-color: #FFFFFF !important; }
+.app-theme[data-theme="light"] .contest-calendar [class~="hover:bg-[#111b25]"]:hover { background-color: #E7F1EB !important; }
+.app-theme[data-theme="light"] .contest-calendar [class~="text-[#aeb9c7]"] { color: var(--theme-text-secondary) !important; }
+.app-theme[data-theme="light"] .contest-calendar [class~="text-[#3e4a59]"] { color: #89978F !important; }
+.app-theme[data-theme="light"] .contest-calendar [class~="via-[#0b1119]"] {
+    --tw-gradient-via: #F1F6F3 var(--tw-gradient-via-position) !important;
+    --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-via), var(--tw-gradient-to) !important;
+}
+
+/* CP guide reading layout: give each section a clearer heading rhythm and
+   gently lift its content cards on hover without changing the prose. */
+.cp-guide-content > section { width: 100%; max-width: 68rem; margin-inline: auto; }
+.cp-guide-content > section > p:first-child {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid color-mix(in srgb, var(--theme-accent) 24%, var(--theme-border));
+    border-radius: 999px;
+    background: var(--theme-accent-soft);
+    padding: 0.4rem 0.75rem;
+    color: var(--theme-accent);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.cp-guide-content > section > h1 {
+    margin-top: 1rem;
+    color: var(--theme-text);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+}
+.cp-guide-content > section > p:nth-of-type(2) {
+    max-width: 54rem;
+    color: var(--theme-text-secondary);
+    font-size: 1rem;
+    line-height: 1.75;
+}
+.cp-guide-content .grid > div[class*="rounded-"] {
+    transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+.cp-guide-content .grid > div[class*="rounded-"]:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in srgb, var(--theme-accent) 34%, var(--theme-border));
+    box-shadow: 0 12px 28px rgb(0 0 0 / 0.07);
+}
+@media (max-width: 640px) {
+    .cp-guide-content > section > p:nth-of-type(2) { font-size: 0.9375rem; }
+}
