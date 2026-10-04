@@ -91,6 +91,23 @@ import UserProfile
 import AdminSettings
     from "../features/admin/pages/settings/AdminSettings";
 
+    import AdminSettingsGeneral
+    from "../features/admin/pages/settings/AdminSettingsGeneral";
+
+import AdminSettingsAuthentication
+    from "../features/admin/pages/settings/AdminSettingsAuthentication";
+
+import AdminSettingsContent
+    from "../features/admin/pages/settings/AdminSettingsContent";
+
+import AdminSettingsContests
+    from "../features/admin/pages/settings/AdminSettingsContests";
+
+import AdminSettingsNotifications
+    from "../features/admin/pages/settings/AdminSettingsNotifications";
+
+import AdminSettingsSecurity
+    from "../features/admin/pages/settings/AdminSettingsSecurity";
 
 import SystemDesign from "../features/system-design/pages/SystemDesign.jsx";
 
@@ -423,6 +440,36 @@ const AppLayout = () => {
                                 <Route
                                     path="/admin/settings"
                                     element={<AdminSettings />}
+                                />
+
+                                <Route
+                                    path="/admin/settings/general"
+                                    element={<AdminSettingsGeneral />}
+                                />
+
+                                <Route
+                                    path="/admin/settings/authentication"
+                                    element={<AdminSettingsAuthentication />}
+                                />
+
+                                <Route
+                                    path="/admin/settings/content"
+                                    element={<AdminSettingsContent />}
+                                />
+
+                                <Route
+                                    path="/admin/settings/contests"
+                                    element={<AdminSettingsContests />}
+                                />
+
+                                <Route
+                                    path="/admin/settings/notifications"
+                                    element={<AdminSettingsNotifications />}
+                                />
+
+                                <Route
+                                    path="/admin/settings/security"
+                                    element={<AdminSettingsSecurity />}
                                 />
                             </Route>
 

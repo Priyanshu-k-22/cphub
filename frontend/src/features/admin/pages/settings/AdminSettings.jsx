@@ -1,58 +1,138 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Check, RefreshCw, Save } from "lucide-react";
+import React from "react";
+import {
+    Bell,
+    ChevronRight,
+    FileCog,
+    Globe2,
+    Layers3,
+    LockKeyhole,
+    ShieldCheck,
+    Trophy,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 import AdminLayout from "../../components/AdminLayout";
 import AdminPageHeader from "../../components/AdminPageHeader";
-import { getAdminSettings, updateAdminSettings } from "../../api/adminSettings.api";
+
+const settingGroups = [
+    {
+        id: "general",
+        title: "General",
+        description: "Platform identity, maintenance and general controls.",
+        icon: Globe2,
+        path: "/admin/settings/general",
+    },
+    {
+        id: "authentication",
+        title: "Authentication",
+        description: "Registration, verification and session controls.",
+        icon: LockKeyhole,
+        path: "/admin/settings/authentication",
+    },
+    {
+        id: "content",
+        title: "Content",
+        description: "CP, DSA, Daily Problems and learning resources.",
+        icon: Layers3,
+        path: "/admin/settings/content",
+    },
+    {
+        id: "contests",
+        title: "Contests & Codeforces",
+        description: "Integrations, contest visibility and synchronization.",
+        icon: Trophy,
+        path: "/admin/settings/contests",
+    },
+    {
+        id: "notifications",
+        title: "Notifications",
+        description: "Announcements, reminders and student alerts.",
+        icon: Bell,
+        path: "/admin/settings/notifications",
+    },
+    {
+        id: "security",
+        title: "Security & Admin",
+        description: "Sessions, audit logs and sensitive admin actions.",
+        icon: ShieldCheck,
+        path: "/admin/settings/security",
+    },
+];
 
 const AdminSettings = () => {
-    const [registrationsEnabled, setRegistrationsEnabled] = useState(true);
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState("");
-    const [notice, setNotice] = useState("");
-    const load = useCallback(async () => {
-        setLoading(true);
-        setError("");
-        try {
-            const response = await getAdminSettings();
-            setRegistrationsEnabled(response?.data?.registrationsEnabled ?? true);
-        } catch (requestError) {
-            setError(requestError?.response?.data?.message || "Could not load platform settings.");
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-    useEffect(() => { load(); }, [load]);
+    const navigate = useNavigate();
 
-    const save = async () => {
-        setSaving(true);
-        setError("");
-        setNotice("");
-        try {
-            const response = await updateAdminSettings({ registrationsEnabled });
-            setRegistrationsEnabled(response?.data?.registrationsEnabled ?? registrationsEnabled);
-            setNotice("Registration setting saved.");
-        } catch (requestError) {
-            setError(requestError?.response?.data?.message || "Could not save platform settings.");
-        } finally {
-            setSaving(false);
-        }
-    };
+    return (
+        <AdminLayout>
+            <div className="max-w-4xl px-4 py-5 sm:px-5 lg:px-7">
+                <AdminPageHeader
+                    title="Settings"
+                    description="Platform controls and configuration."
+                />
 
-    return <AdminLayout>
-        <div className="max-w-3xl px-4 py-5 sm:px-5 lg:px-7">
-            <AdminPageHeader title="Settings" description="Platform controls are saved and enforced by the server." action={load} actionLabel="Reload" />
-            {error && <div role="alert" className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>}
-            {notice && <div role="status" className="mb-4 flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-500"><Check size={15} />{notice}</div>}
-            <section className="rounded-xl border border-[#1C2734] bg-[#080D14] p-5">
-                <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                    <div><h2 className="font-semibold text-[#DCE4ED]">Student registrations</h2><p className="mt-1 max-w-xl text-sm leading-6 text-[#7F8B9C]">When disabled, new accounts are blocked on both the registration page and the API.</p></div>
-                    <button type="button" role="switch" aria-checked={registrationsEnabled} disabled={loading || saving} onClick={() => setRegistrationsEnabled((current) => !current)} className={`relative h-7 w-12 shrink-0 rounded-full transition disabled:opacity-50 ${registrationsEnabled ? "bg-[#4AFFC4]" : "bg-[#26313E]"}`} aria-label="Allow new student registrations"><span className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${registrationsEnabled ? "left-6" : "left-1"}`} /></button>
+                <div className="mt-5 overflow-hidden rounded-2xl border border-[#1C2734] bg-[#080D14]">
+                    <div className="border-b border-[#1C2734] px-5 py-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C2734] bg-[#0B1119] text-[#4AFFC4]">
+                                <FileCog size={17} />
+                            </div>
+
+                            <div>
+                                <h2 className="text-sm font-semibold text-[#DCE4ED]">
+                                    Platform configuration
+                                </h2>
+
+                                <p className="mt-0.5 text-xs text-[#667384]">
+                                    Choose a settings category to manage.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="divide-y divide-[#1C2734]">
+                        {settingGroups.map(
+                            ({
+                                id,
+                                title,
+                                description,
+                                icon: Icon,
+                                path,
+                            }) => (
+                                <button
+                                    key={id}
+                                    type="button"
+                                    onClick={() => navigate(path)}
+                                    className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all duration-150 hover:bg-[#0B1119]"
+                                >
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#1C2734] bg-[#0B1119] text-[#7F8B9C] transition-colors group-hover:border-[#4AFFC4]/20 group-hover:bg-[#4AFFC4]/[0.06] group-hover:text-[#4AFFC4]">
+                                        <Icon
+                                            size={17}
+                                            strokeWidth={1.8}
+                                        />
+                                    </div>
+
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="text-sm font-semibold text-[#DCE4ED] transition-colors group-hover:text-[#4AFFC4]">
+                                            {title}
+                                        </h3>
+
+                                        <p className="mt-1 text-xs leading-5 text-[#667384]">
+                                            {description}
+                                        </p>
+                                    </div>
+
+                                    <ChevronRight
+                                        size={17}
+                                        className="shrink-0 text-[#4A5665] transition-all duration-150 group-hover:translate-x-0.5 group-hover:text-[#4AFFC4]"
+                                    />
+                                </button>
+                            )
+                        )}
+                    </div>
                 </div>
-                <div className="mt-5 flex items-center justify-between border-t border-[#1C2734] pt-4"><span className={`text-xs font-medium ${registrationsEnabled ? "text-[#4AFFC4]" : "text-[#F5C542]"}`}>{loading ? "Loading…" : registrationsEnabled ? "Registrations open" : "Registrations closed"}</span><button type="button" disabled={loading || saving} onClick={save} className="inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2.5 text-sm font-semibold text-[#06120D] disabled:opacity-50">{saving ? <RefreshCw size={14} className="animate-spin" /> : <Save size={14} />}{saving ? "Saving…" : "Save setting"}</button></div>
-            </section>
-        </div>
-    </AdminLayout>;
+            </div>
+        </AdminLayout>
+    );
 };
 
 export default AdminSettings;

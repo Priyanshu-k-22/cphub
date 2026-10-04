@@ -9,7 +9,7 @@ const {
 const registerUser = async({username, email, password})=>{
 
     const settings = await platformSettings.getSettings();
-    if (!settings.registrationsEnabled) {
+    if (!settings.authentication.registrationsEnabled) {
         throw new ApiError(403, "New registrations are currently closed");
     }
 
