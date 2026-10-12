@@ -10,7 +10,6 @@ import {
     Pencil,
     Plus,
     RefreshCw,
-    Save,
     Sparkles,
     Trash2,
     X
@@ -162,11 +161,13 @@ export default function DSAProblemsAdmin() {
             {error && !problemEditor && <AdminFeedback onDismiss={() => setError("")}>{error}<button type="button" onClick={selectedTopicId ? loadProblems : loadTopics} className="ml-3 font-semibold underline">Retry</button></AdminFeedback>}
             {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}>{notice}</AdminFeedback>}
 
-            {topicEditor && <form onSubmit={saveTopic} className="mb-5 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4 sm:p-5">
-                <div className="mb-4 flex items-center justify-between"><div><h2 className="text-base font-bold text-[var(--theme-text)]">{topicEditor === "new" ? "Create a topic" : "Edit topic"}</h2><p className="mt-1 text-xs text-[var(--theme-text-muted)]">Topics organize the DSA practice path students browse.</p></div><button type="button" onClick={() => setTopicEditor(null)} aria-label="Close topic editor" className="rounded-xl p-2 text-[var(--theme-text-muted)] transition hover:bg-[var(--theme-surface-high)]"><X size={17} /></button></div>
-                <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold text-[var(--theme-text-secondary)]">Topic name *<input required maxLength={80} value={topicForm.name} onChange={(event) => setTopicForm((current) => ({ ...current, name: event.target.value }))} className={fieldClass} placeholder="Arrays" /></label><label className="text-sm font-semibold text-[var(--theme-text-secondary)]">Display order<input required type="number" min="0" step="1" value={topicForm.order} onChange={(event) => setTopicForm((current) => ({ ...current, order: event.target.value }))} className={fieldClass} /></label><label className="text-sm font-semibold text-[var(--theme-text-secondary)] sm:col-span-2">Description<textarea maxLength={1000} rows={3} value={topicForm.description} onChange={(event) => setTopicForm((current) => ({ ...current, description: event.target.value }))} className={fieldClass} placeholder="A short introduction to this topic" /></label></div>
-                <div className="mt-5 flex justify-end gap-2 border-t border-[var(--theme-border)] pt-4"><button type="button" onClick={() => setTopicEditor(null)} className="min-h-10 rounded-xl border border-[var(--theme-border)] px-4 text-sm font-semibold text-[var(--theme-text-secondary)]">Cancel</button><button type="submit" disabled={saving} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-300 to-lime-300 px-4 text-sm font-bold text-emerald-950 disabled:opacity-50"><Save size={15} />{saving ? "Saving…" : "Save topic"}</button></div>
-            </form>}
+            {topicEditor && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-3 py-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget && !saving) setTopicEditor(null); }}>
+                <form onSubmit={saveTopic} className="flex max-h-[94vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-2xl">
+                    <div className="flex shrink-0 items-center justify-between border-b border-[var(--theme-border)] px-5 py-4 sm:px-7"><div className="flex items-center gap-3"><span className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/10 text-violet-500"><Layers3 size={20} /></span><div><h2 className="text-lg font-bold text-[var(--theme-text)]">{topicEditor === "new" ? "Add DSA topic" : "Edit DSA topic"}</h2><p className="mt-1 text-sm text-[var(--theme-text-muted)]">Organize related practice problems in one topic.</p></div></div><button type="button" disabled={saving} onClick={() => setTopicEditor(null)} aria-label="Close topic editor" className="rounded-xl p-2 text-[var(--theme-text-muted)] transition hover:bg-[var(--theme-surface-high)] disabled:opacity-50"><X size={17} /></button></div>
+                    <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-5 py-5 sm:px-7">{error && <AdminFeedback className="mb-0" onDismiss={() => setError("")}>{error}</AdminFeedback>}<section className="space-y-4 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4 sm:p-5"><div><h3 className="text-sm font-bold text-[var(--theme-text)]">Topic details</h3><p className="mt-1 text-xs text-[var(--theme-text-muted)]">Give students a clear name and optional overview.</p></div><div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold text-[var(--theme-text-secondary)]">Topic name *<input required maxLength={80} value={topicForm.name} onChange={(event) => setTopicForm((current) => ({ ...current, name: event.target.value }))} className={fieldClass} placeholder="Arrays" /></label><label className="text-sm font-semibold text-[var(--theme-text-secondary)]">Display order<input required type="number" min="0" step="1" value={topicForm.order} onChange={(event) => setTopicForm((current) => ({ ...current, order: event.target.value }))} className={fieldClass} /></label><label className="text-sm font-semibold text-[var(--theme-text-secondary)] sm:col-span-2">Description<textarea maxLength={1000} rows={4} value={topicForm.description} onChange={(event) => setTopicForm((current) => ({ ...current, description: event.target.value }))} className={`${fieldClass} resize-y`} placeholder="A short introduction to this topic" /></label></div></section></div>
+                    <div className="flex shrink-0 justify-end gap-2 border-t border-[var(--theme-border)] bg-[var(--theme-surface)] px-5 py-3 sm:px-7"><button type="button" onClick={() => setTopicEditor(null)} disabled={saving} className="min-h-10 rounded-xl border border-[var(--theme-border)] px-4 text-sm font-semibold text-[var(--theme-text-secondary)] transition hover:bg-[var(--theme-surface-high)] disabled:opacity-50">Cancel</button><button type="submit" disabled={saving} className="min-h-10 rounded-xl bg-gradient-to-r from-emerald-300 via-emerald-400 to-lime-300 px-5 text-sm font-bold text-emerald-950 shadow-md shadow-emerald-500/15 transition hover:brightness-105 disabled:opacity-50">{saving ? "Saving…" : topicEditor === "new" ? "Add topic" : "Save changes"}</button></div>
+                </form>
+            </div>}
 
             <section className="mb-5 overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)]">
                 {/* Topic Library Header */}
@@ -215,213 +216,31 @@ export default function DSAProblemsAdmin() {
                     </button>
                 </div>
 
-                {/* Topic Grid */}
+                {/* Compact topic selector */}
                 {loadingTopics ? (
-                    <div className="grid grid-cols-1 gap-2.5 p-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="flex flex-wrap gap-2 p-4">
                         {[1, 2, 3].map((key) => (
-                            <div
-                                key={key}
-                                className="h-[58px] animate-pulse rounded-xl bg-[var(--theme-surface-high)]"
-                            />
+                            <div key={key} className="h-9 w-32 animate-pulse rounded-full bg-[var(--theme-surface-high)]" />
                         ))}
                     </div>
                 ) : topics.length ? (
-                    <div className="grid grid-cols-1 gap-2.5 p-3 sm:grid-cols-2 lg:grid-cols-3">
-                        {topics.map((topic, index) => {
+                    <div className="flex flex-wrap gap-2 p-4">
+                        {(topicLibraryOpen ? topics : topics.slice(0, 3)).map((topic) => {
                             const active = selectedTopicId === topic._id;
 
-                            /*
-                             * Collapsed state:
-                             * - mobile   -> first topic
-                             * - sm       -> first 2 topics
-                             * - lg+      -> first 3 topics
-                             *
-                             * This keeps exactly one visible grid row.
-                             */
-                            const visibilityClass = topicLibraryOpen
-                                ? ""
-                                : index === 0
-                                    ? ""
-                                    : index === 1
-                                        ? "hidden sm:block"
-                                        : index === 2
-                                            ? "hidden lg:block"
-                                            : "hidden";
-
                             return (
-                                <article
+                                <div
                                     key={topic._id}
-                                    className={`
-        ${visibilityClass}
-        group relative overflow-hidden rounded-xl border
-        transition-all duration-200 ease-out
-        ${active
-                                            ? `
-                    border-[var(--theme-accent)]/50
-                    bg-[var(--theme-accent-soft)]
-                    shadow-[0_0_0_1px_rgba(74,255,196,0.08),0_8px_24px_rgba(74,255,196,0.06)]
-                  `
-                                            : `
-                    border-[var(--theme-border)]
-                    bg-[var(--theme-surface-raised)]
-                    hover:-translate-y-[1px]
-                    hover:border-[var(--theme-accent)]/25
-                    hover:bg-[var(--theme-surface-high)]
-                  `
-                                        }
-    `}
+                                    className={`group inline-flex max-w-full items-center gap-1 rounded-full border pl-1.5 pr-1 py-1 transition ${active ? "border-[var(--theme-accent)]/45 bg-[var(--theme-accent-soft)] shadow-sm" : "border-[var(--theme-border)] bg-[var(--theme-surface-raised)] hover:border-[var(--theme-accent)]/30 hover:bg-[var(--theme-surface-high)]"}`}
                                 >
-                                    {/* Active accent line */}
-                                    {active && (
-                                        <span className="absolute inset-y-0 left-0 w-[2px] bg-[var(--theme-accent)]" />
-                                    )}
-
-                                    <div className="p-3">
-                                        {/* Topic header */}
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setSelectedTopicId(topic._id);
-                                                setProblemPage(1);
-                                                setProblemEditor(null);
-                                            }}
-                                            aria-pressed={active}
-                                            className="flex w-full items-center justify-between gap-3 text-left"
-                                        >
-                                            <div className="flex min-w-0 items-center gap-2.5">
-                                                {/* Topic indicator */}
-                                                <span
-                                                    className={`
-                        flex h-7 w-7 shrink-0 items-center justify-center
-                        rounded-lg border text-[10px] font-black
-                        transition-colors
-                        ${active
-                                                            ? `
-                                    border-[var(--theme-accent)]/30
-                                    bg-[var(--theme-accent)]/10
-                                    text-[var(--theme-accent)]
-                                  `
-                                                            : `
-                                    border-[var(--theme-border)]
-                                    bg-[var(--theme-surface)]
-                                    text-[var(--theme-text-muted)]
-                                    group-hover:border-[var(--theme-accent)]/20
-                                    group-hover:text-[var(--theme-accent)]
-                                  `
-                                                        }
-                    `}
-                                                >
-                                                    {String(topic.name || "?")
-                                                        .trim()
-                                                        .charAt(0)
-                                                        .toUpperCase()}
-                                                </span>
-
-                                                {/* Topic name */}
-                                                <span
-                                                    className={`
-                        min-w-0 truncate text-sm font-semibold
-                        ${active
-                                                            ? "text-[var(--theme-accent)]"
-                                                            : "text-[var(--theme-text)]"
-                                                        }
-                    `}
-                                                >
-                                                    {topic.name}
-                                                </span>
-                                            </div>
-
-                                            {/* Problem count */}
-                                            <span
-                                                className={`
-                    shrink-0 rounded-md border px-1.5 py-0.5
-                    text-[10px] font-bold tabular-nums
-                    ${active
-                                                        ? `
-                                border-[var(--theme-accent)]/20
-                                bg-[var(--theme-accent)]/10
-                                text-[var(--theme-accent)]
-                              `
-                                                        : `
-                                border-[var(--theme-border)]
-                                bg-[var(--theme-surface)]
-                                text-[var(--theme-text-muted)]
-                              `
-                                                    }
-                `}
-                                            >
-                                                {topic.total ?? 0}
-                                            </span>
-                                        </button>
-
-                                        {/* Bottom row */}
-                                        <div
-                                            className={`
-                mt-2.5 flex items-center justify-between
-                border-t pt-2
-                ${active
-                                                    ? "border-[var(--theme-accent)]/10"
-                                                    : "border-[var(--theme-border)]/70"
-                                                }
-            `}
-                                        >
-                                            <span
-                                                className={`
-                    text-[9px] font-medium uppercase tracking-[0.12em]
-                    ${active
-                                                        ? "text-[var(--theme-accent)]/60"
-                                                        : "text-[var(--theme-text-muted)]"
-                                                    }
-                `}
-                                            >
-                                                Topic
-                                            </span>
-
-                                            <div className="flex items-center gap-0.5">
-                                                {/* Edit */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() => openTopicEdit(topic)}
-                                                    aria-label={`Edit ${topic.name}`}
-                                                    title="Edit topic"
-                                                    className="
-                        rounded-lg p-1.5
-                        text-[var(--theme-text-muted)]
-                        transition-all duration-150
-                        hover:bg-[var(--theme-accent)]/10
-                        hover:text-[var(--theme-accent)]
-                    "
-                                                >
-                                                    <Pencil size={12} strokeWidth={2} />
-                                                </button>
-
-                                                {/* Delete */}
-                                                <button
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setPendingDelete({
-                                                            type: "topic",
-                                                            item: topic,
-                                                        })
-                                                    }
-                                                    aria-label={`Delete ${topic.name}`}
-                                                    title="Delete topic"
-                                                    className="
-                        rounded-lg p-1.5
-                        text-[var(--theme-text-muted)]
-                        transition-all duration-150
-                        hover:bg-rose-500/10
-                        hover:text-rose-400
-                    "
-                                                >
-                                                    <Trash2 size={12} strokeWidth={2} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </article>
+                                    <button type="button" onClick={() => { setSelectedTopicId(topic._id); setProblemPage(1); setProblemEditor(null); }} aria-pressed={active} className={`max-w-[220px] truncate py-1 pl-2 text-left text-xs font-semibold ${active ? "text-[var(--theme-accent)]" : "text-[var(--theme-text)]"}`} title={topic.name}>{topic.name}</button>
+                                    <span className={`min-w-6 rounded-full px-1.5 py-0.5 text-center text-[10px] font-bold tabular-nums ${active ? "bg-[var(--theme-accent)]/15 text-[var(--theme-accent)]" : "bg-[var(--theme-surface-high)] text-[var(--theme-text-muted)]"}`}>{topic.total ?? 0}</span>
+                                    <button type="button" onClick={() => openTopicEdit(topic)} aria-label={`Edit ${topic.name}`} title="Edit topic" className="rounded-full p-1.5 text-[var(--theme-text-muted)] transition hover:bg-[var(--theme-accent)]/10 hover:text-[var(--theme-accent)]"><Pencil size={12} /></button>
+                                    <button type="button" onClick={() => setPendingDelete({ type: "topic", item: topic })} aria-label={`Delete ${topic.name}`} title="Delete topic" className="rounded-full p-1.5 text-[var(--theme-text-muted)] transition hover:bg-rose-500/10 hover:text-rose-400"><Trash2 size={12} /></button>
+                                </div>
                             );
                         })}
+                        {!topicLibraryOpen && topics.length > 3 && <button type="button" onClick={() => setTopicLibraryOpen(true)} className="inline-flex items-center gap-1 rounded-full border border-dashed border-[var(--theme-border)] px-3 py-2 text-xs font-semibold text-[var(--theme-text-secondary)] transition hover:border-[var(--theme-accent)]/40 hover:text-[var(--theme-accent)]">+{topics.length - 3} more topics</button>}
                     </div>
                 ) : (
                     <div className="p-10 text-center">
@@ -502,7 +321,7 @@ export default function DSAProblemsAdmin() {
             <thead>
                 <tr className="border-b border-[var(--theme-border)] bg-[var(--theme-surface-raised)]">
                     {[
-                        "Order",
+                        "#",
                         "Problem",
                         "Platform",
                         "Difficulty",
@@ -510,7 +329,7 @@ export default function DSAProblemsAdmin() {
                     ].map((label) => (
                         <th
                             key={label}
-                            className={`px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-[var(--theme-text-muted)] ${
+                            className={`px-3 py-2.5 text-[10px] font-bold uppercase tracking-wider text-[var(--theme-text-muted)] ${
                                 label === "Actions" ? "text-right" : ""
                             }`}
                         >
@@ -527,17 +346,17 @@ export default function DSAProblemsAdmin() {
                         className="group border-b border-[var(--theme-border)] last:border-0 transition-colors hover:bg-[var(--theme-hover)]"
                     >
                         {/* Order */}
-                        <td className="w-20 px-4 py-3">
-                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--theme-surface-high)] text-xs font-bold tabular-nums text-[var(--theme-text-muted)]">
+                        <td className="w-16 px-3 py-2">
+                            <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--theme-surface-high)] text-[11px] font-bold tabular-nums text-[var(--theme-text-muted)]">
                                 {String(problem.order || 0).padStart(2, "0")}
                             </span>
                         </td>
 
                         {/* Problem */}
-                        <td className="max-w-[360px] px-4 py-3">
-                            <div className="flex min-w-0 items-center gap-3">
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]">
-                                    <BookOpen size={16} />
+                        <td className="max-w-[360px] px-3 py-2">
+                            <div className="flex min-w-0 items-center gap-2.5">
+                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]">
+                                    <BookOpen size={14} />
                                 </span>
 
                                 <a
@@ -560,16 +379,16 @@ export default function DSAProblemsAdmin() {
                         </td>
 
                         {/* Platform */}
-                        <td className="px-4 py-3">
-                            <span className="inline-flex items-center rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-2.5 py-1.5 text-xs font-semibold text-[var(--theme-text-secondary)]">
+                        <td className="px-3 py-2">
+                            <span className="inline-flex items-center rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-2 py-1 text-[11px] font-semibold text-[var(--theme-text-secondary)]">
                                 {problem.platform || "—"}
                             </span>
                         </td>
 
                         {/* Difficulty */}
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-2">
                             <span
-                                className={`inline-flex min-w-[64px] items-center justify-center rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+                                className={`inline-flex min-w-[58px] items-center justify-center rounded-full border px-2 py-0.5 text-[10px] font-bold ${
                                     difficultyStyle[problem.difficulty] ||
                                     "border-[var(--theme-border)] bg-[var(--theme-surface-high)] text-[var(--theme-text-secondary)]"
                                 }`}
@@ -579,8 +398,8 @@ export default function DSAProblemsAdmin() {
                         </td>
 
                         {/* Actions */}
-                        <td className="px-4 py-3">
-                            <div className="flex justify-end gap-1.5">
+                        <td className="px-3 py-2">
+                            <div className="flex justify-end gap-1">
                                 {/* Open */}
                                 <a
                                     href={problem.url}
@@ -588,7 +407,7 @@ export default function DSAProblemsAdmin() {
                                     rel="noopener noreferrer"
                                     aria-label={`Open ${problem.title}`}
                                     title="Open problem"
-                                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-[var(--theme-text-muted)] transition hover:border-[var(--theme-border)] hover:bg-[var(--theme-surface-high)] hover:text-[var(--theme-accent)]"
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-[var(--theme-text-muted)] transition hover:border-[var(--theme-border)] hover:bg-[var(--theme-surface-high)] hover:text-[var(--theme-accent)]"
                                 >
                                     <ExternalLink size={15} />
                                 </a>
@@ -599,7 +418,7 @@ export default function DSAProblemsAdmin() {
                                     onClick={() => openProblemEdit(problem)}
                                     aria-label={`Edit ${problem.title}`}
                                     title="Edit problem"
-                                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-[var(--theme-text-muted)] transition hover:border-[var(--theme-accent)]/25 hover:bg-[var(--theme-accent-soft)] hover:text-[var(--theme-accent)]"
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-[var(--theme-text-muted)] transition hover:border-[var(--theme-accent)]/25 hover:bg-[var(--theme-accent-soft)] hover:text-[var(--theme-accent)]"
                                 >
                                     <Pencil size={15} />
                                 </button>
@@ -615,7 +434,7 @@ export default function DSAProblemsAdmin() {
                                     }
                                     aria-label={`Delete ${problem.title}`}
                                     title="Delete problem"
-                                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-[var(--theme-text-muted)] transition hover:border-rose-500/20 hover:bg-rose-500/10 hover:text-rose-500"
+                                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-transparent text-[var(--theme-text-muted)] transition hover:border-rose-500/20 hover:bg-rose-500/10 hover:text-rose-500"
                                 >
                                     <Trash2 size={15} />
                                 </button>

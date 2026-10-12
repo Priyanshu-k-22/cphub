@@ -325,7 +325,7 @@ const AddProblemModal = ({
                                 text-sm
                                 text-[var(--theme-text)]
                                 outline-none
-                                placeholder:text-[#465364]
+                                placeholder:text-[var(--theme-text-muted)]
                                 focus:border-[#4AFFC4]/40
                             "
                         />
@@ -369,7 +369,7 @@ const AddProblemModal = ({
                                 text-sm
                                 text-[var(--theme-accent)]
                                 outline-none
-                                placeholder:text-[#465364]
+                                placeholder:text-[var(--theme-text-muted)]
                                 focus:border-[#4AFFC4]/40
                             "
                         />
@@ -379,7 +379,7 @@ const AddProblemModal = ({
                                 mt-1
                                 font-mono
                                 text-[8px]
-                                text-[#465364]
+                                text-[var(--theme-text-muted)]
                             "
                         >
                             Example: 71/A
@@ -498,7 +498,7 @@ const AddProblemModal = ({
                                     text-[10px]
                                     text-[var(--theme-text)]
                                     outline-none
-                                    placeholder:text-[#465364]
+                                    placeholder:text-[var(--theme-text-muted)]
                                     focus:border-[#4AFFC4]/40
                                 "
                             />
@@ -548,7 +548,7 @@ const AddProblemModal = ({
                                 leading-relaxed
                                 text-[var(--theme-text)]
                                 outline-none
-                                placeholder:text-[#465364]
+                                placeholder:text-[var(--theme-text-muted)]
                                 focus:border-[#4AFFC4]/40
                             "
                         />
@@ -570,10 +570,10 @@ const AddProblemModal = ({
 
                         <label className="block overflow-hidden rounded-xl border border-[#303030] bg-[#1E1E1E]">
                             <span className="flex items-center justify-between border-b border-[#303030] bg-[#181818] px-4 py-2.5">
-                                <span className="flex items-center gap-2 text-xs font-semibold text-[#AEB9C7]"><Terminal size={14} className="text-emerald-400" />solution.cpp</span>
-                                <span className="rounded-md bg-white/5 px-2 py-1 font-mono text-[10px] text-[#AEB9C7]">C++</span>
+                                <span className="flex items-center gap-2 text-xs font-semibold text-[var(--theme-text-secondary)]"><Terminal size={14} className="text-emerald-400" />solution.cpp</span>
+                                <span className="rounded-md bg-white/5 px-2 py-1 font-mono text-[10px] text-[var(--theme-text-secondary)]">C++</span>
                             </span>
-                            <textarea name="code" value={form.code} onChange={handleChange} placeholder={'#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // Write the solution here\n}'} rows={12} spellCheck={false} disabled={loading} aria-label="C++ solution code" className="block w-full resize-y overflow-x-auto bg-[#1E1E1E] px-4 py-4 font-mono text-sm font-medium leading-6 text-[#000] caret-emerald-300 outline-none placeholder:text-[#AAB4C0] selection:bg-emerald-400/30 focus:ring-2 focus:ring-inset focus:ring-emerald-400/30" />
+                            <textarea name="code" value={form.code} onChange={handleChange} placeholder={'#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    // Write the solution here\n}'} rows={12} spellCheck={false} disabled={loading} aria-label="C++ solution code" className="block w-full resize-y overflow-x-auto bg-[#1E1E1E] px-4 py-4 font-mono text-sm font-medium leading-6 text-white caret-emerald-300 outline-none placeholder:text-[#AAB4C0] selection:bg-emerald-400/30 focus:ring-2 focus:ring-inset focus:ring-emerald-400/30" />
                         </label>
                     </section>
 

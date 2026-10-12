@@ -70,7 +70,7 @@ const ExampleEditor = ({
                         text-[10px]
                         uppercase
                         tracking-wide
-                        text-[#8D9AAF]
+                        text-[var(--theme-text-secondary)]
                     "
                 >
                     Examples
@@ -85,8 +85,8 @@ const ExampleEditor = ({
                         gap-1
                         font-mono
                         text-[9px]
-                        text-[#4AFFC4]
-                        hover:text-white
+                        text-[var(--theme-accent)]
+                        hover:text-[var(--theme-text)]
                     "
                 >
                     <Plus size={12} />
@@ -106,8 +106,8 @@ const ExampleEditor = ({
                             className="
                                 rounded-xl
                                 border
-                                border-[#1C2734]
-                                bg-[#0A1018]
+                                border-[var(--theme-border)]
+                                bg-[var(--theme-surface-raised)]
                                 p-3
                             "
                         >
@@ -125,7 +125,7 @@ const ExampleEditor = ({
                                     className="
                                         font-mono
                                         text-[9px]
-                                        text-[#556275]
+                                        text-[var(--theme-text-muted)]
                                     "
                                 >
                                     Example {index + 1}
@@ -137,7 +137,7 @@ const ExampleEditor = ({
                                         removeExample(index)
                                     }
                                     className="
-                                        text-[#556275]
+                                        text-[var(--theme-text-muted)]
                                         hover:text-red-400
                                     "
                                 >
@@ -187,15 +187,15 @@ const ExampleEditor = ({
                                             resize-none
                                             rounded-lg
                                             border
-                                            border-[#1C2734]
-                                            bg-[#0C131C]
+                                            border-[var(--theme-border)]
+                                            bg-[var(--theme-surface-raised)]
                                             px-3
                                             py-2
                                             font-mono
                                             text-[10px]
-                                            text-white
+                                            text-[var(--theme-text)]
                                             outline-none
-                                            placeholder:text-[#455264]
+                                            placeholder:text-[var(--theme-text-muted)]
                                             focus:border-[#4AFFC4]/40
                                         "
                                     />
@@ -235,15 +235,15 @@ const ExampleEditor = ({
                                             resize-none
                                             rounded-lg
                                             border
-                                            border-[#1C2734]
-                                            bg-[#0C131C]
+                                            border-[var(--theme-border)]
+                                            bg-[var(--theme-surface-raised)]
                                             px-3
                                             py-2
                                             font-mono
                                             text-[10px]
-                                            text-white
+                                            text-[var(--theme-text)]
                                             outline-none
-                                            placeholder:text-[#455264]
+                                            placeholder:text-[var(--theme-text-muted)]
                                             focus:border-[#4AFFC4]/40
                                         "
                                     />
@@ -285,15 +285,15 @@ const ExampleEditor = ({
                                         resize-none
                                         rounded-lg
                                         border
-                                        border-[#1C2734]
-                                        bg-[#0C131C]
+                                        border-[var(--theme-border)]
+                                        bg-[var(--theme-surface-raised)]
                                         px-3
                                         py-2
                                         font-mono
                                         text-[10px]
-                                        text-white
+                                        text-[var(--theme-text)]
                                         outline-none
-                                        placeholder:text-[#455264]
+                                        placeholder:text-[var(--theme-text-muted)]
                                         focus:border-[#4AFFC4]/40
                                     "
                                 />

@@ -51,7 +51,7 @@ const ListEditor = ({
                         text-[10px]
                         uppercase
                         tracking-wide
-                        text-[#8D9AAF]
+                        text-[var(--theme-text-secondary)]
                     "
                 >
                     {label}
@@ -66,8 +66,8 @@ const ListEditor = ({
                         gap-1
                         font-mono
                         text-[9px]
-                        text-[#4AFFC4]
-                        hover:text-white
+                        text-[var(--theme-accent)]
+                        hover:text-[var(--theme-text)]
                     "
                 >
                     <Plus size={12} />
@@ -106,15 +106,15 @@ const ListEditor = ({
                                     flex-1
                                     rounded-lg
                                     border
-                                    border-[#1C2734]
-                                    bg-[#0C131C]
+                                    border-[var(--theme-border)]
+                                    bg-[var(--theme-surface-raised)]
                                     px-3
                                     py-2
                                     font-mono
                                     text-[11px]
-                                    text-white
+                                    text-[var(--theme-text)]
                                     outline-none
-                                    placeholder:text-[#455264]
+                                    placeholder:text-[var(--theme-text-muted)]
                                     focus:border-[#4AFFC4]/40
                                 "
                             />
@@ -127,7 +127,7 @@ const ListEditor = ({
                                 className="
                                     rounded-lg
                                     px-2
-                                    text-[#556275]
+                                    text-[var(--theme-text-muted)]
                                     hover:bg-red-500/5
                                     hover:text-red-400
                                 "
@@ -147,13 +147,13 @@ const ListEditor = ({
                             rounded-lg
                             border
                             border-dashed
-                            border-[#1C2734]
+                            border-[var(--theme-border)]
                             px-3
                             py-3
                             text-center
                             font-mono
                             text-[9px]
-                            text-[#455264]
+                            text-[var(--theme-text-muted)]
                         "
                     >
                         No {label.toLowerCase()} added

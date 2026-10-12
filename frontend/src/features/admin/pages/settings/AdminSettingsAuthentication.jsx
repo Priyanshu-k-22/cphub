@@ -146,22 +146,22 @@ const AdminSettingsAuthentication = () => {
             {notice && (
                 <div
                     role="status"
-                    className="mb-4 flex items-center gap-2 rounded-xl border border-[#4AFFC4]/20 bg-[#4AFFC4]/[0.06] px-4 py-3 text-sm text-[#4AFFC4]"
+                    className="mb-4 flex items-center gap-2 rounded-xl border border-[#4AFFC4]/20 bg-[var(--theme-accent)]/[0.06] px-4 py-3 text-sm text-[var(--theme-accent)]"
                 >
                     <Check size={15} />
                     {notice}
                 </div>
             )}
 
-            <section className="overflow-hidden rounded-2xl border border-[#1C2734] bg-[#080D14]">
+            <section className="overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)]">
 
                 {/* Header */}
-                <div className="border-b border-[#1C2734] px-5 py-4">
-                    <h2 className="text-sm font-semibold text-[#DCE4ED]">
+                <div className="border-b border-[var(--theme-border)] px-5 py-4">
+                    <h2 className="text-sm font-semibold text-[var(--theme-text)]">
                         Registration
                     </h2>
 
-                    <p className="mt-1 text-xs text-[#667384]">
+                    <p className="mt-1 text-xs text-[var(--theme-text-muted)]">
                         Controls whether new students can create
                         accounts.
                     </p>
@@ -171,11 +171,11 @@ const AdminSettingsAuthentication = () => {
                 <div className="flex items-center justify-between gap-4 px-5 py-5">
 
                     <div>
-                        <h3 className="text-sm font-semibold text-[#DCE4ED]">
+                        <h3 className="text-sm font-semibold text-[var(--theme-text)]">
                             Student registrations
                         </h3>
 
-                        <p className="mt-1 max-w-xl text-xs leading-5 text-[#667384]">
+                        <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--theme-text-muted)]">
                             When disabled, new accounts are blocked
                             on both the registration page and API.
                         </p>
@@ -198,7 +198,7 @@ const AdminSettingsAuthentication = () => {
                         }
                         className={`relative h-7 w-12 shrink-0 rounded-full transition disabled:opacity-50 ${
                             registrationsEnabled
-                                ? "bg-[#4AFFC4]"
+                                ? "bg-[var(--theme-accent)]"
                                 : "bg-[#26313E]"
                         }`}
                     >
@@ -213,14 +213,14 @@ const AdminSettingsAuthentication = () => {
                 </div>
 
                 {/* Status + Save */}
-                <div className="flex items-center justify-between border-t border-[#1C2734] px-5 py-4">
+                <div className="flex items-center justify-between border-t border-[var(--theme-border)] px-5 py-4">
 
                     <span
                         className={`text-xs font-medium ${
                             loading
-                                ? "text-[#667384]"
+                                ? "text-[var(--theme-text-muted)]"
                                 : registrationsEnabled
-                                  ? "text-[#4AFFC4]"
+                                  ? "text-[var(--theme-accent)]"
                                   : "text-[#F5C542]"
                         }`}
                     >
@@ -237,7 +237,7 @@ const AdminSettingsAuthentication = () => {
                             loading || saving
                         }
                         onClick={saveSettings}
-                        className="inline-flex items-center gap-2 rounded-lg bg-[#4AFFC4] px-4 py-2.5 text-sm font-semibold text-[#06120D] transition hover:brightness-105 disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-lg bg-[var(--theme-accent)] px-4 py-2.5 text-sm font-semibold text-[#06120D] transition hover:brightness-105 disabled:opacity-50"
                     >
                         {saving ? (
                             <RefreshCw

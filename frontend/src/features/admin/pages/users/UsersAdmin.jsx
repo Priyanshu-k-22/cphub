@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Eye, Shield, User } from "lucide-react";
+import { ArrowUpRight, Eye, Shield, User, Users } from "lucide-react";
 
 import AdminLayout from "../../components/AdminLayout";
 import AdminPageHeader from "../../components/AdminPageHeader";
@@ -54,7 +54,7 @@ const UsersAdmin = () => {
 
     return (
         <AdminLayout>
-            <div className="px-4 py-5 sm:px-5 lg:px-7">
+            <div className="mx-auto max-w-[1600px] px-4 py-5 sm:px-6 sm:py-7 xl:px-8">
                 <AdminPageHeader
                     title="All Users"
                     description="Browse registered accounts and open a profile for stored progress and Codeforces stats."
@@ -62,8 +62,12 @@ const UsersAdmin = () => {
 
                 <CodeforcesSyncControl />
 
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                    <div className="w-full max-w-sm">
+                <div className="mb-4 flex flex-col gap-4 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                    <div className="flex items-center gap-3">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]"><Users size={19} /></span>
+                        <div><p className="text-sm font-bold text-[var(--theme-text)]">Community directory</p><p className="mt-0.5 text-xs text-[var(--theme-text-muted)]">{loading ? "Loading member accounts…" : `${total.toLocaleString()} registered member${total === 1 ? "" : "s"}`}</p></div>
+                    </div>
+                    <div className="w-full sm:max-w-sm">
                         <AdminSearch
                             value={search}
                             onChange={(value) => {
@@ -73,9 +77,6 @@ const UsersAdmin = () => {
                             placeholder="Search username or email..."
                         />
                     </div>
-                    <p className="font-mono text-xs text-[#7F8B9C]">
-                        {loading ? "Loading users…" : `${total.toLocaleString()} user${total === 1 ? "" : "s"}`}
-                    </p>
                 </div>
 
                 {error && (
@@ -87,11 +88,11 @@ const UsersAdmin = () => {
                     </div>
                 )}
 
-                <div className="overflow-hidden rounded-2xl border border-[#1C2734] bg-[#080D14] shadow-[0_12px_40px_rgba(0,0,0,0.16)]">
+                <div className="overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-[0_12px_40px_rgba(0,0,0,0.16)]">
                     <div className="overflow-x-auto">
                         <table className="w-full min-w-[760px] text-left">
                             <thead>
-                                <tr className="border-b border-[#1C2734] bg-[#0B1119] font-mono text-[11px] uppercase tracking-wider text-[#7F8B9C]">
+                                <tr className="border-b border-[var(--theme-border)] bg-[var(--theme-surface-raised)] font-mono text-[11px] uppercase tracking-wider text-[var(--theme-text-muted)]">
                                     <th className="px-5 py-4 font-medium">User</th>
                                     <th className="px-5 py-4 font-medium">Email</th>
                                     <th className="px-5 py-4 font-medium">Role</th>
@@ -101,35 +102,35 @@ const UsersAdmin = () => {
                             </thead>
                             <tbody>
                                 {loading ? (
-                                    <tr><td colSpan="5" className="px-4 py-14 text-center text-sm text-[#7F8B9C]">Loading accounts…</td></tr>
+                                    <tr><td colSpan="5" className="px-4 py-14 text-center text-sm text-[var(--theme-text-muted)]">Loading accounts…</td></tr>
                                 ) : users.length === 0 ? (
-                                    <tr><td colSpan="5" className="px-4 py-14 text-center text-sm text-[#7F8B9C]">{error ? "Users could not be loaded." : "No users match this search."}</td></tr>
+                                    <tr><td colSpan="5" className="px-4 py-14 text-center text-sm text-[var(--theme-text-muted)]">{error ? "Users could not be loaded." : "No users match this search."}</td></tr>
                                 ) : users.map((user) => (
-                                    <tr key={user._id} className="group border-b border-[#1C2734]/70 last:border-0 transition-colors hover:bg-[#0D151F]">
+                                    <tr key={user._id} className="group border-b border-[var(--theme-border)]/70 last:border-0 transition-colors hover:bg-[var(--theme-surface-high)]">
                                         <td className="px-5 py-4">
                                             <Link to={`/admin/users/${user._id}`} className="flex min-w-0 items-center gap-3.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-[#4AFFC4]">
-                                                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#4AFFC4]/20 bg-[#4AFFC4]/10 text-sm font-semibold text-[#4AFFC4]">
+                                                <span className="relative flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#4AFFC4]/20 bg-[var(--theme-accent)]/10 text-sm font-semibold text-[var(--theme-accent)]">
                                                     {(user.profile?.avatar || user.profile?.avatarUrl) && <img src={user.profile.avatar || user.profile.avatarUrl} alt="" className="absolute inset-0 h-full w-full object-cover" onError={(event) => event.currentTarget.remove()} />}
                                                     {user.username?.slice(0, 1).toUpperCase() || <User size={17} />}
                                                 </span>
                                                 <span className="min-w-0">
-                                                    <span className="block truncate text-[15px] font-bold text-white transition-colors group-hover:text-[#4AFFC4]">{user.username || "Unnamed user"}</span>
-                                                    <span className="mt-1 block text-xs text-[#687587]">CpHub member</span>
+                                                    <span className="block truncate text-[15px] font-bold text-[var(--theme-text)] transition-colors group-hover:text-[var(--theme-accent)]">{user.username || "Unnamed user"}</span>
+                                                    <span className="mt-1 block text-xs text-[var(--theme-text-muted)]">CpHub member</span>
                                                 </span>
                                             </Link>
                                         </td>
-                                        <td className="max-w-[250px] truncate px-5 py-4 text-[13px] text-[#AEB9C7]">{user.email || "—"}</td>
+                                        <td className="max-w-[250px] truncate px-5 py-4 text-[13px] text-[var(--theme-text-secondary)]">{user.email || "—"}</td>
                                         <td className="px-5 py-4">
-                                            <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${user.role === "admin" ? "border-[#4AFFC4]/25 bg-[#4AFFC4]/10 text-[#4AFFC4]" : "border-[#273342] bg-[#111923] text-[#AEB9C7]"}`}>
+                                            <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${user.role === "admin" ? "border-[#4AFFC4]/25 bg-[var(--theme-accent)]/10 text-[var(--theme-accent)]" : "border-[var(--theme-border)] bg-[var(--theme-surface-high)] text-[var(--theme-text-secondary)]"}`}>
                                                 {user.role === "admin" && <Shield size={12} />}
                                                 {user.role || "student"}
                                             </span>
                                         </td>
-                                        <td className="px-5 py-4 text-[13px] text-[#7F8B9C]">
+                                        <td className="px-5 py-4 text-[13px] text-[var(--theme-text-muted)]">
                                             {user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }) : "—"}
                                         </td>
                                         <td className="px-5 py-4 text-right">
-                                            <Link to={`/admin/users/${user._id}`} aria-label={`Open ${user.username} profile`} className="inline-flex items-center gap-2 rounded-lg border border-[#273342] bg-[#0B1119] px-3 py-2 text-xs font-medium text-[#AEB9C7] transition hover:border-[#4AFFC4]/40 hover:text-[#4AFFC4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4AFFC4]">
+                                            <Link to={`/admin/users/${user._id}`} aria-label={`Open ${user.username} profile`} className="inline-flex items-center gap-2 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 py-2 text-xs font-medium text-[var(--theme-text-secondary)] transition hover:border-[#4AFFC4]/40 hover:text-[var(--theme-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4AFFC4]">
                                                 <Eye size={14} /> <span>View profile</span><ArrowUpRight size={13} />
                                             </Link>
                                         </td>
@@ -141,12 +142,12 @@ const UsersAdmin = () => {
                 </div>
 
                 <div className="mt-3 flex items-center justify-between">
-                    <p className="font-mono text-xs text-[#7F8B9C]">
+                    <p className="font-mono text-xs text-[var(--theme-text-muted)]">
                         {loading ? "" : `Showing ${rangeStart}–${rangeEnd} of ${total}`}
                     </p>
                     <div className="flex gap-2">
-                        <button type="button" disabled={loading || page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-lg border border-[#273342] px-4 py-2.5 text-xs font-medium text-[#AEB9C7] transition hover:border-[#4AFFC4]/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
-                        <button type="button" disabled={loading || page >= totalPages} onClick={() => setPage((current) => current + 1)} className="rounded-lg border border-[#273342] px-4 py-2.5 text-xs font-medium text-[#AEB9C7] transition hover:border-[#4AFFC4]/40 hover:text-white disabled:cursor-not-allowed disabled:opacity-40">Next</button>
+                        <button type="button" disabled={loading || page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-lg border border-[var(--theme-border)] px-4 py-2.5 text-xs font-medium text-[var(--theme-text-secondary)] transition hover:border-[#4AFFC4]/40 hover:text-[var(--theme-text)] disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
+                        <button type="button" disabled={loading || page >= totalPages} onClick={() => setPage((current) => current + 1)} className="rounded-lg border border-[var(--theme-border)] px-4 py-2.5 text-xs font-medium text-[var(--theme-text-secondary)] transition hover:border-[#4AFFC4]/40 hover:text-[var(--theme-text)] disabled:cursor-not-allowed disabled:opacity-40">Next</button>
                     </div>
                 </div>
             </div>

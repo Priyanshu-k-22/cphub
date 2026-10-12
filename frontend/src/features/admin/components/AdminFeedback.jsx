@@ -3,7 +3,7 @@ import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
 const styles = {
     error: { icon: AlertCircle, classes: "border-red-500/30 bg-red-500/10 text-red-300" },
     success: { icon: CheckCircle2, classes: "border-emerald-400/25 bg-emerald-400/10 text-emerald-300" },
-    info: { icon: Info, classes: "border-[#4AFFC4]/25 bg-[#4AFFC4]/5 text-[#B7FCE5]" },
+    info: { icon: Info, classes: "border-[#4AFFC4]/25 bg-[var(--theme-accent)]/5 text-[#B7FCE5]" },
 };
 
 const AdminFeedback = ({ variant = "error", children, onDismiss, className = "" }) => {

@@ -8,13 +8,13 @@ const StatusBadge = ({
     const styles = {
 
         active: `
-            bg-[#4AFFC4]/10
-            text-[#4AFFC4]
+            bg-[var(--theme-accent)]/10
+            text-[var(--theme-accent)]
         `,
 
         inactive: `
             bg-[#556275]/10
-            text-[#687587]
+            text-[var(--theme-text-muted)]
         `,
 
         pending: `
@@ -28,8 +28,8 @@ const StatusBadge = ({
         `,
 
         solved: `
-            bg-[#4AFFC4]/10
-            text-[#4AFFC4]
+            bg-[var(--theme-accent)]/10
+            text-[var(--theme-accent)]
         `
     };
 

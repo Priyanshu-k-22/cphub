@@ -64,32 +64,32 @@ const AdminSettings = () => {
 
     return (
         <AdminLayout>
-            <div className="max-w-4xl px-4 py-5 sm:px-5 lg:px-7">
+            <div className="mx-auto max-w-[1280px] px-4 py-5 sm:px-6 sm:py-7 xl:px-8">
                 <AdminPageHeader
                     title="Settings"
                     description="Platform controls and configuration."
                 />
 
-                <div className="mt-5 overflow-hidden rounded-2xl border border-[#1C2734] bg-[#080D14]">
-                    <div className="border-b border-[#1C2734] px-5 py-4">
+                <div className="mt-5 overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] shadow-sm">
+                    <div className="border-b border-[var(--theme-border)] px-5 py-4">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C2734] bg-[#0B1119] text-[#4AFFC4]">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] text-[var(--theme-accent)]">
                                 <FileCog size={17} />
                             </div>
 
                             <div>
-                                <h2 className="text-sm font-semibold text-[#DCE4ED]">
+                                <h2 className="text-sm font-semibold text-[var(--theme-text)]">
                                     Platform configuration
                                 </h2>
 
-                                <p className="mt-0.5 text-xs text-[#667384]">
+                                <p className="mt-0.5 text-xs text-[var(--theme-text-muted)]">
                                     Choose a settings category to manage.
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="divide-y divide-[#1C2734]">
+                    <div className="grid gap-2 p-3 sm:grid-cols-2 sm:p-4 xl:grid-cols-3">
                         {settingGroups.map(
                             ({
                                 id,
@@ -102,9 +102,9 @@ const AdminSettings = () => {
                                     key={id}
                                     type="button"
                                     onClick={() => navigate(path)}
-                                    className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all duration-150 hover:bg-[#0B1119]"
+                                    className="group flex w-full items-center gap-4 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-4 py-4 text-left transition-all duration-150 hover:border-[var(--theme-accent)]/30 hover:bg-[var(--theme-hover)] hover:shadow-sm"
                                 >
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#1C2734] bg-[#0B1119] text-[#7F8B9C] transition-colors group-hover:border-[#4AFFC4]/20 group-hover:bg-[#4AFFC4]/[0.06] group-hover:text-[#4AFFC4]">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] text-[var(--theme-text-muted)] transition-colors group-hover:border-[#4AFFC4]/20 group-hover:bg-[var(--theme-accent)]/[0.06] group-hover:text-[var(--theme-accent)]">
                                         <Icon
                                             size={17}
                                             strokeWidth={1.8}
@@ -112,18 +112,18 @@ const AdminSettings = () => {
                                     </div>
 
                                     <div className="min-w-0 flex-1">
-                                        <h3 className="text-sm font-semibold text-[#DCE4ED] transition-colors group-hover:text-[#4AFFC4]">
+                                        <h3 className="text-sm font-semibold text-[var(--theme-text)] transition-colors group-hover:text-[var(--theme-accent)]">
                                             {title}
                                         </h3>
 
-                                        <p className="mt-1 text-xs leading-5 text-[#667384]">
+                                        <p className="mt-1 text-xs leading-5 text-[var(--theme-text-muted)]">
                                             {description}
                                         </p>
                                     </div>
 
                                     <ChevronRight
                                         size={17}
-                                        className="shrink-0 text-[#4A5665] transition-all duration-150 group-hover:translate-x-0.5 group-hover:text-[#4AFFC4]"
+                                        className="shrink-0 text-[var(--theme-text-muted)] transition-all duration-150 group-hover:translate-x-0.5 group-hover:text-[var(--theme-accent)]"
                                     />
                                 </button>
                             )

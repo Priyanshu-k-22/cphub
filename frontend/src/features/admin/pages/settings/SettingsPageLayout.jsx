@@ -14,27 +14,28 @@ const SettingsPageLayout = ({
 
     return (
         <AdminLayout>
-            <div className="max-w-4xl px-4 py-5 sm:px-5 lg:px-7">
+            <div className="mx-auto max-w-[1280px] px-4 py-5 sm:px-6 sm:py-7 xl:px-8">
                 <button
                     type="button"
                     onClick={() => navigate("/admin/settings")}
-                    className="mb-4 inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-xs font-medium text-[#7F8B9C] transition hover:bg-[#0D151F] hover:text-[#4AFFC4]"
+                    className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] px-3 text-sm font-semibold text-[var(--theme-text-secondary)] transition hover:text-[var(--theme-accent)]"
                 >
                     <ArrowLeft size={14} />
                     Settings
                 </button>
 
-                <div className="mb-5 flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#1C2734] bg-[#0B1119] text-[#4AFFC4]">
+                <div className="relative mb-5 flex items-center gap-4 overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-5 shadow-sm sm:p-6">
+                    <div aria-hidden="true" className="pointer-events-none absolute -right-8 -top-20 h-48 w-48 rounded-full bg-emerald-400/10 blur-3xl" />
+                    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]">
                         <Icon size={18} />
                     </div>
 
-                    <div>
-                        <h1 className="text-lg font-bold text-[#E8EEF5]">
+                    <div className="relative">
+                        <h1 className="text-xl font-black text-[var(--theme-text)] sm:text-2xl">
                             {title}
                         </h1>
 
-                        <p className="mt-0.5 text-xs text-[#667384]">
+                        <p className="mt-1 text-sm text-[var(--theme-text-muted)]">
                             {description}
                         </p>
                     </div>

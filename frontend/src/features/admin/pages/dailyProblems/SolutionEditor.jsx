@@ -13,15 +13,15 @@ const Input = ({
         w-full
         rounded-lg
         border
-        border-[#1C2734]
-        bg-[#0C131C]
+        border-[var(--theme-border)]
+        bg-[var(--theme-surface-raised)]
         px-3
         py-2
         font-mono
         text-[10px]
-        text-white
+        text-[var(--theme-text)]
         outline-none
-        placeholder:text-[#455264]
+        placeholder:text-[var(--theme-text-muted)]
         focus:border-[#4AFFC4]/40
     `;
 
@@ -234,8 +234,8 @@ const SolutionEditor = ({
                             className="
                                 rounded-xl
                                 border
-                                border-[#1C2734]
-                                bg-[#0A1018]
+                                border-[var(--theme-border)]
+                                bg-[var(--theme-surface-raised)]
                                 p-3
                             "
                         >
@@ -246,7 +246,7 @@ const SolutionEditor = ({
                                     font-mono
                                     text-[10px]
                                     font-semibold
-                                    text-[#4AFFC4]
+                                    text-[var(--theme-accent)]
                                 "
                             >
                                 {title}
@@ -365,7 +365,7 @@ const SectionTitle = ({
         className="
             mb-3
             border-b
-            border-[#1C2734]
+            border-[var(--theme-border)]
             pb-2
         "
     >
@@ -376,7 +376,7 @@ const SectionTitle = ({
                 text-[10px]
                 uppercase
                 tracking-wider
-                text-[#4AFFC4]
+                text-[var(--theme-accent)]
             "
         >
             {children}

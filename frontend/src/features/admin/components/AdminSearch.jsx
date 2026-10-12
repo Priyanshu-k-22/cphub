@@ -19,15 +19,15 @@ const AdminSearch = ({
                 gap-2
                 rounded-lg
                 border
-                border-[#1C2734]
-                bg-[#080D14]
+                border-[var(--theme-border)]
+                bg-[var(--theme-surface)]
                 px-3
             "
         >
 
             <Search
                 size={13}
-                className="text-[#556275]"
+                className="text-[var(--theme-text-muted)]"
             />
 
             <input
@@ -40,7 +40,7 @@ const AdminSearch = ({
                     w-full
                     bg-transparent
                     text-[10px]
-                    text-[#DCE4ED]
+                    text-[var(--theme-text)]
                     outline-none
                     placeholder:text-[#394656]
                 "

@@ -362,7 +362,7 @@ const AddDailyProblemModal = ({
                     overflow-hidden
                     rounded-2xl
                     border
-                    border-[#1C2734]
+                    border-[var(--theme-border)]
                     bg-[var(--theme-surface)]
                     shadow-2xl
                 "
@@ -382,7 +382,7 @@ const AddDailyProblemModal = ({
                         items-center
                         justify-between
                         border-b
-                        border-[#1C2734]
+                        border-[var(--theme-border)]
                         px-5
                         py-4
                     "
@@ -423,10 +423,10 @@ const AddDailyProblemModal = ({
                         className="
                             rounded-lg
                             p-2
-                            text-[#556275]
+                            text-[var(--theme-text-muted)]
                             transition
-                            hover:bg-[#111923]
-                            hover:text-white
+                            hover:bg-[var(--theme-surface-high)]
+                            hover:text-[var(--theme-text)]
                             disabled:opacity-50
                         "
                     >
@@ -593,7 +593,7 @@ const AddDailyProblemModal = ({
                         justify-end
                         gap-2
                         border-t
-                        border-[#1C2734]
+                        border-[var(--theme-border)]
                         px-5
                         py-3
                     "
@@ -613,10 +613,10 @@ const AddDailyProblemModal = ({
                             py-2
                             font-mono
                             text-[10px]
-                            text-[#8D9AAF]
+                            text-[var(--theme-text-secondary)]
                             transition
-                            hover:bg-[#111923]
-                            hover:text-white
+                            hover:bg-[var(--theme-surface-high)]
+                            hover:text-[var(--theme-text)]
                             disabled:opacity-50
                         "
                     >
@@ -632,7 +632,7 @@ const AddDailyProblemModal = ({
                         disabled={loading}
                         className="
                             rounded-lg
-                            bg-[#4AFFC4]
+                            bg-[var(--theme-accent)]
                             px-4
                             py-2
                             font-mono
@@ -686,7 +686,7 @@ const Section = ({
                 className="
                     mb-3
                     border-b
-                    border-[#1C2734]
+                    border-[var(--theme-border)]
                     pb-2
                 "
             >
@@ -697,7 +697,7 @@ const Section = ({
                         text-[10px]
                         uppercase
                         tracking-wider
-                        text-[#4AFFC4]
+                        text-[var(--theme-accent)]
                     "
                 >
                     {title}
@@ -722,15 +722,15 @@ const inputClass = `
     w-full
     rounded-lg
     border
-    border-[#1C2734]
-    bg-[#0C131C]
+    border-[var(--theme-border)]
+    bg-[var(--theme-surface-raised)]
     px-3
     py-2.5
     font-mono
     text-[10px]
-    text-white
+    text-[var(--theme-text)]
     outline-none
-    placeholder:text-[#455264]
+    placeholder:text-[var(--theme-text-muted)]
     focus:border-[#4AFFC4]/40
 `;
 

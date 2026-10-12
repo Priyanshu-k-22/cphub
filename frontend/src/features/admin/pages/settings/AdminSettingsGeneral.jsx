@@ -179,7 +179,7 @@ const AdminSettingsGeneral = () => {
             {notice && (
                 <div
                     role="status"
-                    className="mb-4 flex items-center gap-2 rounded-xl border border-[#4AFFC4]/20 bg-[#4AFFC4]/[0.06] px-4 py-3 text-sm text-[#4AFFC4]"
+                    className="mb-4 flex items-center gap-2 rounded-xl border border-[#4AFFC4]/20 bg-[var(--theme-accent)]/[0.06] px-4 py-3 text-sm text-[var(--theme-accent)]"
                 >
                     <Check size={15} />
                     {notice}
@@ -192,22 +192,22 @@ const AdminSettingsGeneral = () => {
                     PLATFORM
                 ====================================== */}
 
-                <section className="overflow-hidden rounded-2xl border border-[#1C2734] bg-[#080D14]">
+                <section className="overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)]">
 
-                    <div className="border-b border-[#1C2734] px-5 py-4">
+                    <div className="border-b border-[var(--theme-border)] px-5 py-4">
 
                         <div className="flex items-center gap-3">
 
-                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C2734] bg-[#0B1119] text-[#4AFFC4]">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] text-[var(--theme-accent)]">
                                 <Globe2 size={16} />
                             </div>
 
                             <div>
-                                <h2 className="text-sm font-semibold text-[#DCE4ED]">
+                                <h2 className="text-sm font-semibold text-[var(--theme-text)]">
                                     Platform
                                 </h2>
 
-                                <p className="mt-0.5 text-xs text-[#667384]">
+                                <p className="mt-0.5 text-xs text-[var(--theme-text-muted)]">
                                     Basic information displayed across CpHub.
                                 </p>
                             </div>
@@ -223,7 +223,7 @@ const AdminSettingsGeneral = () => {
                         <div>
                             <label
                                 htmlFor="platform-name"
-                                className="mb-2 block text-xs font-semibold text-[#AAB5C3]"
+                                className="mb-2 block text-xs font-semibold text-[var(--theme-text-secondary)]"
                             >
                                 Platform Name
                             </label>
@@ -241,7 +241,7 @@ const AdminSettingsGeneral = () => {
                                         event.target.value
                                     )
                                 }
-                                className="h-10 w-full rounded-xl border border-[#1C2734] bg-[#0B1119] px-3 text-sm text-[#DCE4ED] outline-none transition placeholder:text-[#4A5665] focus:border-[#4AFFC4]/40 focus:ring-1 focus:ring-[#4AFFC4]/10 disabled:opacity-50"
+                                className="h-10 w-full rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 text-sm text-[var(--theme-text)] outline-none transition placeholder:text-[var(--theme-text-muted)] focus:border-[#4AFFC4]/40 focus:ring-1 focus:ring-[#4AFFC4]/10 disabled:opacity-50"
                                 placeholder="CpHub"
                             />
                         </div>
@@ -251,7 +251,7 @@ const AdminSettingsGeneral = () => {
                         <div>
                             <label
                                 htmlFor="platform-description"
-                                className="mb-2 block text-xs font-semibold text-[#AAB5C3]"
+                                className="mb-2 block text-xs font-semibold text-[var(--theme-text-secondary)]"
                             >
                                 Platform Description
                             </label>
@@ -269,11 +269,11 @@ const AdminSettingsGeneral = () => {
                                     )
                                 }
                                 rows={3}
-                                className="w-full resize-none rounded-xl border border-[#1C2734] bg-[#0B1119] px-3 py-2.5 text-sm leading-6 text-[#DCE4ED] outline-none transition placeholder:text-[#4A5665] focus:border-[#4AFFC4]/40 focus:ring-1 focus:ring-[#4AFFC4]/10 disabled:opacity-50"
+                                className="w-full resize-none rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 py-2.5 text-sm leading-6 text-[var(--theme-text)] outline-none transition placeholder:text-[var(--theme-text-muted)] focus:border-[#4AFFC4]/40 focus:ring-1 focus:ring-[#4AFFC4]/10 disabled:opacity-50"
                                 placeholder="Describe CpHub..."
                             />
 
-                            <p className="mt-1.5 text-[10px] text-[#4A5665]">
+                            <p className="mt-1.5 text-[10px] text-[var(--theme-text-muted)]">
                                 Used as the platform's short description.
                             </p>
                         </div>
@@ -285,22 +285,22 @@ const AdminSettingsGeneral = () => {
                     PLATFORM CONTROLS
                 ====================================== */}
 
-                <section className="overflow-hidden rounded-2xl border border-[#1C2734] bg-[#080D14]">
+                <section className="overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)]">
 
-                    <div className="border-b border-[#1C2734] px-5 py-4">
+                    <div className="border-b border-[var(--theme-border)] px-5 py-4">
 
                         <div className="flex items-center gap-3">
 
-                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#1C2734] bg-[#0B1119] text-[#4AFFC4]">
+                            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] text-[var(--theme-accent)]">
                                 <Settings2 size={16} />
                             </div>
 
                             <div>
-                                <h2 className="text-sm font-semibold text-[#DCE4ED]">
+                                <h2 className="text-sm font-semibold text-[var(--theme-text)]">
                                     Platform Controls
                                 </h2>
 
-                                <p className="mt-0.5 text-xs text-[#667384]">
+                                <p className="mt-0.5 text-xs text-[var(--theme-text-muted)]">
                                     Control the availability of the student-facing platform.
                                 </p>
                             </div>
@@ -309,18 +309,18 @@ const AdminSettingsGeneral = () => {
 
                     </div>
 
-                    <div className="divide-y divide-[#1C2734]">
+                    <div className="divide-y divide-[var(--theme-border)]">
 
                         {/* Maintenance Mode */}
 
                         <div className="flex items-center justify-between gap-4 px-5 py-4">
 
                             <div>
-                                <h3 className="text-sm font-semibold text-[#DCE4ED]">
+                                <h3 className="text-sm font-semibold text-[var(--theme-text)]">
                                     Maintenance Mode
                                 </h3>
 
-                                <p className="mt-1 max-w-xl text-xs leading-5 text-[#667384]">
+                                <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--theme-text-muted)]">
                                     Temporarily disable the student-facing platform while administrators can continue working.
                                 </p>
                             </div>
@@ -343,7 +343,7 @@ const AdminSettingsGeneral = () => {
                                 }
                                 className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
                                     maintenanceMode
-                                        ? "bg-[#4AFFC4]"
+                                        ? "bg-[var(--theme-accent)]"
                                         : "bg-[#26313E]"
                                 }`}
                             >
@@ -363,11 +363,11 @@ const AdminSettingsGeneral = () => {
                         <div className="flex items-center justify-between gap-4 px-5 py-4">
 
                             <div>
-                                <h3 className="text-sm font-semibold text-[#DCE4ED]">
+                                <h3 className="text-sm font-semibold text-[var(--theme-text)]">
                                     Show Maintenance Message
                                 </h3>
 
-                                <p className="mt-1 max-w-xl text-xs leading-5 text-[#667384]">
+                                <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--theme-text-muted)]">
                                     Display a maintenance message when maintenance mode is enabled.
                                 </p>
                             </div>
@@ -390,7 +390,7 @@ const AdminSettingsGeneral = () => {
                                 }
                                 className={`relative h-6 w-11 shrink-0 rounded-full transition disabled:opacity-50 ${
                                     showMaintenanceMessage
-                                        ? "bg-[#4AFFC4]"
+                                        ? "bg-[var(--theme-accent)]"
                                         : "bg-[#26313E]"
                                 }`}
                             >
@@ -412,7 +412,7 @@ const AdminSettingsGeneral = () => {
                     SAVE
                 ====================================== */}
 
-                <div className="flex items-center justify-end gap-3 rounded-2xl border border-[#1C2734] bg-[#080D14] p-3">
+                <div className="flex items-center justify-end gap-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3">
 
                     <button
                         type="button"
@@ -421,7 +421,7 @@ const AdminSettingsGeneral = () => {
                             saving
                         }
                         onClick={saveSettings}
-                        className="inline-flex items-center gap-2 rounded-xl bg-[#4AFFC4] px-4 py-2.5 text-sm font-bold text-[#06120D] transition hover:brightness-105 disabled:opacity-50"
+                        className="inline-flex items-center gap-2 rounded-xl bg-[var(--theme-accent)] px-4 py-2.5 text-sm font-bold text-[#06120D] transition hover:brightness-105 disabled:opacity-50"
                     >
                         {saving ? (
                             <RefreshCw

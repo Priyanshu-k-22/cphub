@@ -21,7 +21,7 @@ export default function AdminLayout({ children }) {
             sidebarNavRef.current.scrollTop = adminSidebarScrollTop;
         }
     }, []);
-    return <div className="admin-ui h-screen overflow-hidden bg-[#060A0F] text-white">
+    return <div className="admin-ui h-screen overflow-hidden bg-[var(--theme-page)] text-[var(--theme-text)]">
         <div className="flex h-full min-h-0 overflow-hidden">
             <AdminSidebar
                 mobileOpen={mobileOpen}
