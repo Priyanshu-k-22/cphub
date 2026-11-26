@@ -1,4 +1,5 @@
 import React, {
+    useCallback,
     useEffect,
     useState,
 } from "react";
@@ -61,17 +62,24 @@ const Register = () => {
 
     const [registrationsEnabled, setRegistrationsEnabled] = useState(true);
     const [settingsLoading, setSettingsLoading] = useState(true);
+    const [settingsError, setSettingsError] = useState("");
 
-    useEffect(() => {
-        let active = true;
-        getPublicSettings()
-            .then((response) => {
-                if (active) setRegistrationsEnabled(response?.data?.registrationsEnabled ?? true);
-            })
-            .catch(() => {})
-            .finally(() => { if (active) setSettingsLoading(false); });
-        return () => { active = false; };
+    const refreshRegistrationSettings = useCallback(async () => {
+        setSettingsLoading(true);
+        setSettingsError("");
+        try {
+            const response = await getPublicSettings();
+            setRegistrationsEnabled(response?.data?.authentication?.registrationsEnabled ?? response?.data?.registrationsEnabled ?? true);
+        } catch {
+            // Fail closed in the UI; the backend independently enforces the registration setting.
+            setRegistrationsEnabled(false);
+            setSettingsError("We couldn’t check whether registration is open. Retry before creating an account.");
+        } finally {
+            setSettingsLoading(false);
+        }
     }, []);
+
+    useEffect(() => { refreshRegistrationSettings(); }, [refreshRegistrationSettings]);
 
 
     /*
@@ -348,17 +356,20 @@ const Register = () => {
                         className="space-y-5"
                     >
 
-                        <AuthTextField label="username" id="username" name="username" type="text" value={formData.username} onChange={handleChange} placeholder="your_username" minLength={3} maxLength={30} autoComplete="username" disabled={loading} required />
+                        {settingsError && <AuthFeedback>{settingsError} <button type="button" onClick={refreshRegistrationSettings} className="ml-2 underline underline-offset-2">Retry</button></AuthFeedback>}
+                        {!settingsLoading && !settingsError && !registrationsEnabled && <div role="status" className="rounded-md border border-amber-500/20 bg-amber-500/5 px-4 py-3"><p className="font-mono text-xs leading-5 text-amber-300">New registrations are temporarily paused. Existing members can still sign in below.</p></div>}
 
-                        <AuthTextField label="email" id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" autoComplete="email" disabled={loading} required />
+                        <AuthTextField label="username" id="username" name="username" type="text" value={formData.username} onChange={handleChange} placeholder="your_username" minLength={3} maxLength={30} autoComplete="username" disabled={loading || settingsLoading || !registrationsEnabled} required />
 
-                        <AuthPasswordField id="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" minLength={8} maxLength={100} autoComplete="new-password" disabled={loading} required visible={showPassword} onToggle={() => setShowPassword((previous) => !previous)} />
+                        <AuthTextField label="email" id="email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" autoComplete="email" disabled={loading || settingsLoading || !registrationsEnabled} required />
+
+                        <AuthPasswordField id="password" name="password" value={formData.password} onChange={handleChange} placeholder="••••••••" minLength={8} maxLength={100} autoComplete="new-password" disabled={loading || settingsLoading || !registrationsEnabled} required visible={showPassword} onToggle={() => setShowPassword((previous) => !previous)} />
 
                         {/* SUBMIT */}
 
                         <button
                             type="submit"
-                            disabled={loading || settingsLoading || !registrationsEnabled}
+                            disabled={loading || settingsLoading || !registrationsEnabled || Boolean(settingsError)}
                             className="
                                 group
                                 flex
@@ -383,12 +394,14 @@ const Register = () => {
                         >
 
                             {settingsLoading
-                                ? "checking_registration..."
-                                : !registrationsEnabled
-                                    ? "registration_closed"
+                                ? "Checking registration…"
+                                : settingsError
+                                    ? "Status unavailable"
+                                    : !registrationsEnabled
+                                    ? "Registration paused"
                                     : loading
-                                        ? "creating_account..."
-                                        : "create_account"
+                                        ? "Creating account…"
+                                        : "Create account"
                             }
 
 

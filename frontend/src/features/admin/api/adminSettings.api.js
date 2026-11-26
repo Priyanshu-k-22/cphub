@@ -51,6 +51,36 @@ export const updateAuthenticationSettings = async (
 
 /*
  * ========================================
+ * CONTENT AVAILABILITY
+ * ========================================
+ */
+
+export const getContentAvailability = async () =>
+    (await api.get("/settings/admin/content")).data;
+
+export const updateContentAvailability = async (settings) =>
+    (await api.put("/settings/admin/content", settings)).data;
+
+export const getContestSettings = async () =>
+    (await api.get("/settings/admin/contests")).data;
+
+export const updateContestSettings = async (settings) =>
+    (await api.put("/settings/admin/contests", settings)).data;
+
+export const getNotificationSettings = async () =>
+    (await api.get("/settings/admin/notifications")).data;
+
+export const updateNotificationSettings = async (settings) =>
+    (await api.put("/settings/admin/notifications", settings)).data;
+
+export const getSecuritySettings = async () =>
+    (await api.get("/settings/admin/security")).data;
+
+export const updateSecuritySettings = async (settings) =>
+    (await api.put("/settings/admin/security", settings)).data;
+
+/*
+ * ========================================
  * PUBLIC SETTINGS
  * ========================================
  */

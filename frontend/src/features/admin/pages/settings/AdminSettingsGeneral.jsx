@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import SettingsPageLayout from "./SettingsPageLayout";
+import AdminFeedback from "../../components/AdminFeedback";
 
 import {
     getGeneralSettings,
@@ -33,6 +34,8 @@ const AdminSettingsGeneral = () => {
         showMaintenanceMessage,
         setShowMaintenanceMessage,
     ] = useState(true);
+
+    const [saved, setSaved] = useState(null);
 
     const [loading, setLoading] =
         useState(true);
@@ -64,25 +67,17 @@ const AdminSettingsGeneral = () => {
             const settings =
                 response?.data;
 
-            setPlatformName(
-                settings?.platformName ??
-                    "CpHub"
-            );
-
-            setPlatformDescription(
-                settings?.platformDescription ??
-                    "Smart DSA and Competitive Programming platform."
-            );
-
-            setMaintenanceMode(
-                settings?.maintenanceMode ??
-                    false
-            );
-
-            setShowMaintenanceMessage(
-                settings?.showMaintenanceMessage ??
-                    true
-            );
+            const values = {
+                platformName: settings?.platformName ?? "CpHub",
+                platformDescription: settings?.platformDescription ?? "Smart DSA and Competitive Programming platform.",
+                maintenanceMode: settings?.maintenanceMode ?? false,
+                showMaintenanceMessage: settings?.showMaintenanceMessage ?? true,
+            };
+            setPlatformName(values.platformName);
+            setPlatformDescription(values.platformDescription);
+            setMaintenanceMode(values.maintenanceMode);
+            setShowMaintenanceMessage(values.showMaintenanceMessage);
+            setSaved(values);
         } catch (requestError) {
             setError(
                 requestError?.response?.data
@@ -125,25 +120,18 @@ const AdminSettingsGeneral = () => {
             const settings =
                 response?.data;
 
-            setPlatformName(
-                settings?.platformName ??
-                    platformName
-            );
-
-            setPlatformDescription(
-                settings?.platformDescription ??
-                    platformDescription
-            );
-
-            setMaintenanceMode(
-                settings?.maintenanceMode ??
-                    maintenanceMode
-            );
-
-            setShowMaintenanceMessage(
-                settings?.showMaintenanceMessage ??
-                    showMaintenanceMessage
-            );
+            const values = {
+                platformName: settings?.platformName ?? platformName,
+                platformDescription: settings?.platformDescription ?? platformDescription,
+                maintenanceMode: settings?.maintenanceMode ?? maintenanceMode,
+                showMaintenanceMessage: settings?.showMaintenanceMessage ?? showMaintenanceMessage,
+            };
+            setPlatformName(values.platformName);
+            setPlatformDescription(values.platformDescription);
+            setMaintenanceMode(values.maintenanceMode);
+            setShowMaintenanceMessage(values.showMaintenanceMessage);
+            setSaved(values);
+            window.dispatchEvent(new CustomEvent("cphub-generalsettingschange", { detail: values }));
 
             setNotice(
                 "General settings saved."
@@ -159,6 +147,20 @@ const AdminSettingsGeneral = () => {
         }
     };
 
+    const dirty = Boolean(saved && (
+        platformName !== saved.platformName
+        || platformDescription !== saved.platformDescription
+        || maintenanceMode !== saved.maintenanceMode
+        || showMaintenanceMessage !== saved.showMaintenanceMessage
+    ));
+    const discardChanges = () => {
+        if (!saved) return;
+        setPlatformName(saved.platformName);
+        setPlatformDescription(saved.platformDescription);
+        setMaintenanceMode(saved.maintenanceMode);
+        setShowMaintenanceMessage(saved.showMaintenanceMessage);
+    };
+
     return (
         <SettingsPageLayout
             title="General"
@@ -166,25 +168,10 @@ const AdminSettingsGeneral = () => {
             icon={Globe2}
         >
             {/* Error */}
-            {error && (
-                <div
-                    role="alert"
-                    className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
-                >
-                    {error}
-                </div>
-            )}
+            {error && <AdminFeedback onDismiss={() => setError("")}>{error}<button type="button" onClick={loadSettings} className="ml-3 font-semibold underline">Retry</button></AdminFeedback>}
 
             {/* Success */}
-            {notice && (
-                <div
-                    role="status"
-                    className="mb-4 flex items-center gap-2 rounded-xl border border-[#4AFFC4]/20 bg-[var(--theme-accent)]/[0.06] px-4 py-3 text-sm text-[var(--theme-accent)]"
-                >
-                    <Check size={15} />
-                    {notice}
-                </div>
-            )}
+            {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}><span className="inline-flex items-center gap-2"><Check size={15} />{notice}</span></AdminFeedback>}
 
             <div className="space-y-4">
 

@@ -40,6 +40,47 @@ const authenticationSettingsSchema = new mongoose.Schema(
     { _id: false }
 );
 
+const contentAvailabilitySchema = new mongoose.Schema(
+    {
+        dailyProblems: { type: Boolean, default: true },
+        cpSheet: { type: Boolean, default: true },
+        dsaSheet: { type: Boolean, default: true },
+        learningResources: { type: Boolean, default: true },
+    },
+    { _id: false }
+);
+
+const contestSettingsSchema = new mongoose.Schema(
+    {
+        calendarEnabled: { type: Boolean, default: true },
+        codeforcesSyncEnabled: { type: Boolean, default: true },
+        sources: {
+            codeforces: { type: Boolean, default: true },
+            codechef: { type: Boolean, default: true },
+            atcoder: { type: Boolean, default: true },
+            leetcode: { type: Boolean, default: true },
+        },
+    },
+    { _id: false }
+);
+
+const notificationSettingsSchema = new mongoose.Schema(
+    {
+        announcementEnabled: { type: Boolean, default: false },
+        announcementMessage: { type: String, default: "", trim: true, maxlength: 240 },
+        announcementType: { type: String, enum: ["info", "success", "warning"], default: "info" },
+    },
+    { _id: false }
+);
+
+const securitySettingsSchema = new mongoose.Schema(
+    {
+        studentSessionHours: { type: Number, enum: [1, 6, 12, 24, 72, 168], default: 168 },
+        adminSessionHours: { type: Number, enum: [1, 6, 12, 24], default: 24 },
+    },
+    { _id: false }
+);
+
 const platformSettingsSchema = new mongoose.Schema(
     {
         key: {
@@ -55,6 +96,26 @@ const platformSettingsSchema = new mongoose.Schema(
 
         authentication: {
             type: authenticationSettingsSchema,
+            default: () => ({}),
+        },
+
+        contentAvailability: {
+            type: contentAvailabilitySchema,
+            default: () => ({}),
+        },
+
+        contestSettings: {
+            type: contestSettingsSchema,
+            default: () => ({}),
+        },
+
+        notificationSettings: {
+            type: notificationSettingsSchema,
+            default: () => ({}),
+        },
+
+        securitySettings: {
+            type: securitySettingsSchema,
             default: () => ({}),
         },
 

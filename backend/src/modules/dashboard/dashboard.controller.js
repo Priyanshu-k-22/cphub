@@ -20,6 +20,7 @@ const DSATopic = require("../dsaSheet/dsaTopic.model");
 const DSAProgress = require("../dsaSheet/dsaProgress.model");
 const DailyProblemProgress = require("../problem/dailyProblemProgress.model");
 const { getContests } = require("../contest/contest.service");
+const settingsService = require("../settings/platformSettings.service");
 
 const getTodayDateBounds = () => {
     // The college's local day is India Standard Time (UTC+05:30).
@@ -69,6 +70,7 @@ const getDashboard =
         const utcToday = new Date();
         utcToday.setUTCHours(0, 0, 0, 0);
         const { start: dayStart, end: dayEnd } = getTodayDateBounds();
+        const platformSettings = await settingsService.getSettings();
 
         const [user, codeforces, cpProblems, topics, dailyProblems, contestsResult] = await Promise.all([
             User.findById(userId).select("username profile").lean(),
@@ -78,7 +80,7 @@ const getDashboard =
             Problem.find({ dailyDate: utcToday, isPublished: true })
                 .select("title category difficulty rating platform externalLink dailyDate")
                 .sort({ category: 1 }).lean(),
-            getContests().catch((error) => {
+            getContests({ contestSettings: platformSettings.contestSettings }).catch((error) => {
                 console.error("Dashboard contest fetch failed:", error.message);
                 return null;
             }),

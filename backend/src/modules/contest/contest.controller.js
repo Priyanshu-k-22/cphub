@@ -1,5 +1,6 @@
 const asyncHandler = require("../../middlewares/asyncHandler");
 const ApiResponse = require("../../utils/ApiResponse");
+const settingsService = require("../settings/platformSettings.service");
 
 const {
     getContests
@@ -19,8 +20,11 @@ const getAllContests = asyncHandler(
             category
         } = req.query;
 
+        const settings = await settingsService.getSettings();
+
         const contests = await getContests({
-            category
+            category,
+            contestSettings: settings.contestSettings,
         });
 
         return res.status(200).json(

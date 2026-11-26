@@ -47,7 +47,8 @@ const login = asyncHandler(async (req, res) => {
 
     const {
         user,
-        token
+        token,
+        sessionDurationHours
     } = await authSrevice.loginUser({
         email,
         password
@@ -77,12 +78,7 @@ const login = asyncHandler(async (req, res) => {
                 // the complete backend
                 path: "/",
 
-                maxAge:
-                    7 *
-                    24 *
-                    60 *
-                    60 *
-                    1000
+                maxAge: sessionDurationHours * 60 * 60 * 1000
             }
         )
         .json(

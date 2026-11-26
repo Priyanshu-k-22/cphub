@@ -25,14 +25,14 @@ const settingGroups = [
     {
         id: "authentication",
         title: "Authentication",
-        description: "Registration, verification and session controls.",
+        description: "Registration availability and account creation.",
         icon: LockKeyhole,
         path: "/admin/settings/authentication",
     },
     {
         id: "content",
-        title: "Content",
-        description: "CP, DSA, Daily Problems and learning resources.",
+        title: "Content availability",
+        description: "Control student access to Daily Problems, CP Sheet, DSA Sheet, and the resource library.",
         icon: Layers3,
         path: "/admin/settings/content",
     },
@@ -53,7 +53,7 @@ const settingGroups = [
     {
         id: "security",
         title: "Security & Admin",
-        description: "Sessions, audit logs and sensitive admin actions.",
+        description: "Student and administrator session lifetime controls.",
         icon: ShieldCheck,
         path: "/admin/settings/security",
     },

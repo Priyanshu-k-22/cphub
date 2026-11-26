@@ -14,6 +14,8 @@ const Navbar = ({
     setMenuOpen,
     brightMode,
     onToggleTheme,
+    contentAvailability = {},
+    contestSettings = {},
 }) => {
 
     const {
@@ -71,18 +73,22 @@ const Navbar = ({
         {
             name: "CP Sheet",
             path: "/cp-sheet",
+            module: "cpSheet",
         },
         {
             name: "DSA Sheet",
             path: "/dsa-sheet",
+            module: "dsaSheet",
         },
         {
             name: "Problems",
             path: "/problems",
+            module: "dailyProblems",
         },
         {
             name: "Contest",
             path: "/contests",
+            setting: "calendarEnabled",
         },
 
     ];
@@ -94,9 +100,10 @@ const Navbar = ({
     |--------------------------------------------------------------------------
     */
 
-    const primaryLinks = isAuthenticated
+    const primaryLinks = (isAuthenticated
         ? loggedInLinks
-        : loggedOutLinks;
+        : loggedOutLinks).filter((link) => (!link.module || contentAvailability[link.module] !== false)
+            && (!link.setting || contestSettings[link.setting] !== false));
 
 
     /*

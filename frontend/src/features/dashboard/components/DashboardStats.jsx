@@ -13,7 +13,7 @@ const StatTile = ({ icon: Icon, label, value, detail }) => (
     </div>
 );
 
-const DashboardStats = ({ codeforces, username, loading, syncing, onSync, syncError }) => {
+const DashboardStats = ({ codeforces, username, loading, syncing, onSync, syncError, syncEnabled = true }) => {
     if (loading) {
         return <div className="grid min-h-56 grid-cols-2 gap-3 rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-5 md:grid-cols-4" aria-label="Loading Codeforces stats">
             {[1, 2, 3, 4].map((key) => <div key={key} className="animate-pulse rounded-xl bg-[var(--theme-surface-high)]" />)}
@@ -46,9 +46,9 @@ const DashboardStats = ({ codeforces, username, loading, syncing, onSync, syncEr
                             </a>
                         </div>
                     </div>
-                    <button type="button" onClick={onSync} disabled={syncing} className="inline-flex items-center gap-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 py-2 text-sm font-semibold text-[var(--theme-accent)] transition hover:border-[var(--theme-accent)] hover:bg-[var(--theme-hover)] disabled:cursor-not-allowed disabled:opacity-60">
+                    <button type="button" onClick={onSync} disabled={syncing || !syncEnabled} title={!syncEnabled ? "Codeforces syncing is disabled by an administrator" : undefined} className="inline-flex items-center gap-2 rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-3 py-2 text-sm font-semibold text-[var(--theme-accent)] transition hover:border-[var(--theme-accent)] hover:bg-[var(--theme-hover)] disabled:cursor-not-allowed disabled:opacity-60">
                         <RefreshCw size={15} className={syncing ? "animate-spin" : ""} />
-                        {syncing ? "Syncing" : syncError ? "Retry sync" : "Sync"}
+                        {syncing ? "Syncing" : !syncEnabled ? "Sync disabled" : syncError ? "Retry sync" : "Sync"}
                     </button>
                 </div>
 

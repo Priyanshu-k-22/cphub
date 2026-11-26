@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Check, Info, TriangleAlert, X } from "lucide-react";
 import {
     BrowserRouter,
     Routes,
@@ -36,6 +37,7 @@ import ProtectedRoute from "../features/auth/components/ProtectedRoute.jsx";
 import Profile from "../features/profile/pages/Profile.jsx";
 
 import { AuthProvider } from "../features/auth/context/AuthContext.jsx";
+import { getPublicSettings } from "../features/admin/api/adminSettings.api.js";
 import DSARoadmap from "../features/dsa/pages/DSARoadmap.jsx";
 import DSAPractice from "../features/dsa/pages/DSAPractice.jsx";
 import DSA from "../features/dsa/pages/DSA.jsx";
@@ -116,18 +118,107 @@ import SystemDesignIntroduction from "../features/system-design/pages/SystemDesi
 import SystemDesignWhy from "../features/system-design/pages/SystemDesignWhy.jsx";
 import SystemDesignResources from "../features/system-design/pages/SystemDesignResources.jsx";
 
-const RoleDashboard = () => {
+const RoleDashboard = ({ contentAvailability, contestSettings }) => {
     const { user } = useAuth();
-    return user?.role === "admin" ? <AdminDashboard /> : <UserDashboard />;
+    return user?.role === "admin" ? <AdminDashboard /> : <UserDashboard contentAvailability={contentAvailability} contestSettings={contestSettings} />;
+};
+
+const DEFAULT_CONTENT_AVAILABILITY = {
+    dailyProblems: true,
+    cpSheet: true,
+    dsaSheet: true,
+    learningResources: true,
+};
+
+const normalizeContentAvailability = (value = {}) => Object.fromEntries(
+    Object.keys(DEFAULT_CONTENT_AVAILABILITY).map((key) => [
+        key,
+        typeof value[key] === "boolean" ? value[key] : true,
+    ])
+);
+
+const DEFAULT_CONTEST_SETTINGS = {
+    calendarEnabled: true,
+    codeforcesSyncEnabled: true,
+    sources: { codeforces: true, codechef: true, atcoder: true, leetcode: true },
+};
+
+const DEFAULT_GENERAL_SETTINGS = {
+    platformName: "CpHub",
+    platformDescription: "Smart DSA and Competitive Programming platform.",
+    maintenanceMode: false,
+    showMaintenanceMessage: true,
+};
+
+const normalizeGeneralSettings = (value = {}) => ({
+    platformName: typeof value.platformName === "string" && value.platformName.trim() ? value.platformName.trim() : DEFAULT_GENERAL_SETTINGS.platformName,
+    platformDescription: typeof value.platformDescription === "string" ? value.platformDescription : DEFAULT_GENERAL_SETTINGS.platformDescription,
+    maintenanceMode: value.maintenanceMode === true,
+    showMaintenanceMessage: value.showMaintenanceMessage !== false,
+});
+
+const normalizeContestSettings = (value = {}) => ({
+    calendarEnabled: typeof value.calendarEnabled === "boolean" ? value.calendarEnabled : true,
+    codeforcesSyncEnabled: typeof value.codeforcesSyncEnabled === "boolean" ? value.codeforcesSyncEnabled : true,
+    sources: Object.fromEntries(Object.keys(DEFAULT_CONTEST_SETTINGS.sources).map((key) => [
+        key,
+        typeof value.sources?.[key] === "boolean" ? value.sources[key] : true,
+    ])),
+});
+
+const DEFAULT_NOTIFICATIONS = { announcementEnabled: false, announcementMessage: "", announcementType: "info" };
+const normalizeNotifications = (value = {}) => ({
+    announcementEnabled: value.announcementEnabled === true,
+    announcementMessage: typeof value.announcementMessage === "string" ? value.announcementMessage : "",
+    announcementType: ["info", "success", "warning"].includes(value.announcementType) ? value.announcementType : "info",
+});
+
+const ModuleAvailabilityGate = ({ module, availability, title, children }) => {
+    if (availability[module] !== false) return children;
+
+    return <section className="flex min-h-[55vh] flex-col items-center justify-center px-5 py-12 text-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] text-[var(--theme-text-muted)]" aria-hidden="true">•••</span>
+        <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-[var(--theme-accent)]">Temporarily unavailable</p>
+        <h1 className="mt-2 text-2xl font-black text-[var(--theme-text)]">{title} is currently hidden</h1>
+        <p className="mt-2 max-w-md text-sm leading-6 text-[var(--theme-text-secondary)]">An administrator has temporarily turned off this learning module. You can return to the home page or check back later.</p>
+        <Link to="/" className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[var(--theme-accent)] px-5 text-sm font-bold text-[#06120D] transition hover:brightness-105">Back to CpHub</Link>
+    </section>;
+};
+
+const ContestCalendarGate = ({ settings, children }) => settings.calendarEnabled === false
+    ? <section className="flex min-h-[55vh] flex-col items-center justify-center px-5 py-12 text-center"><span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] text-amber-500" aria-hidden="true">🏆</span><p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-[var(--theme-accent)]">Temporarily unavailable</p><h1 className="mt-2 text-2xl font-black text-[var(--theme-text)]">Contest calendar is currently hidden</h1><p className="mt-2 max-w-md text-sm leading-6 text-[var(--theme-text-secondary)]">An administrator has temporarily turned off the contest calendar. Please check back later.</p><Link to="/" className="mt-6 inline-flex min-h-11 items-center rounded-xl bg-[var(--theme-accent)] px-5 text-sm font-bold text-[#06120D]">Back to CpHub</Link></section>
+    : children;
+
+const MaintenanceNotice = ({ settings, loading }) => <section className="flex min-h-[70vh] flex-col items-center justify-center px-5 py-12 text-center"><span className="flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-500/20 bg-amber-500/10 text-amber-500" aria-hidden="true"><TriangleAlert size={27}/></span><p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-amber-500">{loading ? "Checking access" : "Maintenance in progress"}</p><h1 className="mt-2 text-2xl font-black text-[var(--theme-text)]">{loading ? "Please wait" : `${settings.platformName} is temporarily unavailable`}</h1><p className="mt-2 max-w-md text-sm leading-6 text-[var(--theme-text-secondary)]">{loading ? "We’re checking whether an administrator is signed in." : settings.showMaintenanceMessage ? "We’re making improvements right now. Please try again shortly." : "Service temporarily unavailable."}</p>{!loading && <Link to="/login" className="mt-6 inline-flex min-h-11 items-center rounded-xl border border-[var(--theme-border)] bg-[var(--theme-surface)] px-5 text-sm font-bold text-[var(--theme-text)] transition hover:border-[var(--theme-accent)] hover:text-[var(--theme-accent)]">Administrator sign in</Link>}</section>;
+
+const AnnouncementBanner = ({ settings }) => {
+    const [dismissedAnnouncement, setDismissedAnnouncement] = useState("");
+    const message = settings.announcementMessage.trim();
+    const announcementKey = `${settings.announcementType}:${message}`;
+    useEffect(() => setDismissedAnnouncement(""), [announcementKey]);
+    if (!settings.announcementEnabled || !message || dismissedAnnouncement === announcementKey) return null;
+
+    const variants = {
+        info: { Icon: Info, classes: "border-sky-500/25 bg-sky-500/10 text-sky-900 dark:text-sky-100" },
+        success: { Icon: Check, classes: "border-emerald-500/25 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100" },
+        warning: { Icon: TriangleAlert, classes: "border-amber-500/25 bg-amber-500/10 text-amber-900 dark:text-amber-100" },
+    };
+    const { Icon, classes } = variants[settings.announcementType];
+    return <div role="status" className={`relative z-40 flex items-center justify-center gap-3 border-b px-4 py-2.5 text-sm ${classes}`}><Icon size={17} className="shrink-0"/><p className="text-center leading-5">{message}</p><button type="button" aria-label="Dismiss announcement" onClick={() => setDismissedAnnouncement(announcementKey)} className="ml-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-lg opacity-70 transition hover:bg-black/5 hover:opacity-100 dark:hover:bg-white/10"><X size={15}/></button></div>;
 };
 
 const AppLayout = () => {
     const location = useLocation();
+    const { user: currentUser, loading: authLoading } = useAuth();
     const isAdminRoute = location.pathname.startsWith("/admin");
     const pageScrollRef = useRef(null);
 
     const [menuOpen, setMenuOpen] =
         useState(false);
+    const [contentAvailability, setContentAvailability] = useState(DEFAULT_CONTENT_AVAILABILITY);
+    const [contestSettings, setContestSettings] = useState(DEFAULT_CONTEST_SETTINGS);
+    const [notifications, setNotifications] = useState(DEFAULT_NOTIFICATIONS);
+    const [generalSettings, setGeneralSettings] = useState(DEFAULT_GENERAL_SETTINGS);
     const [brightMode, setBrightMode] = useState(() => {
         try {
             return window.localStorage.getItem("cphub-theme") === "light";
@@ -148,9 +239,66 @@ const AppLayout = () => {
     }, [brightMode]);
 
     useEffect(() => {
+        document.title = `${generalSettings.platformName} — Think. Code. Compete.`;
+        let description = document.querySelector('meta[name="description"]');
+        if (!description) {
+            description = document.createElement("meta");
+            description.name = "description";
+            document.head.appendChild(description);
+        }
+        description.content = generalSettings.platformDescription;
+    }, [generalSettings.platformName, generalSettings.platformDescription]);
+
+    useEffect(() => {
         const handleThemeToggle = () => setBrightMode((current) => !current);
         window.addEventListener("cphub-themetoggle", handleThemeToggle);
         return () => window.removeEventListener("cphub-themetoggle", handleThemeToggle);
+    }, []);
+
+    useEffect(() => {
+        let active = true;
+        let changedWhileLoading = false;
+        let contestSettingsChangedWhileLoading = false;
+        let notificationsChangedWhileLoading = false;
+        let generalSettingsChangedWhileLoading = false;
+        const applyAvailability = (value) => setContentAvailability(normalizeContentAvailability(value));
+        getPublicSettings()
+            .then((response) => {
+                if (active && !changedWhileLoading) applyAvailability(response?.data?.contentAvailability);
+                if (active && !contestSettingsChangedWhileLoading) setContestSettings(normalizeContestSettings(response?.data?.contestSettings));
+                if (active && !notificationsChangedWhileLoading) setNotifications(normalizeNotifications(response?.data?.notifications));
+                if (active && !generalSettingsChangedWhileLoading) setGeneralSettings(normalizeGeneralSettings(response?.data?.general));
+            })
+            .catch(() => {
+                // Keep modules available if the public settings request is temporarily unavailable.
+            });
+        const handleAvailabilityChange = (event) => {
+            changedWhileLoading = true;
+            applyAvailability(event.detail);
+        };
+        const handleContestSettingsChange = (event) => {
+            contestSettingsChangedWhileLoading = true;
+            setContestSettings(normalizeContestSettings(event.detail));
+        };
+        const handleNotificationsChange = (event) => {
+            notificationsChangedWhileLoading = true;
+            setNotifications(normalizeNotifications(event.detail));
+        };
+        const handleGeneralSettingsChange = (event) => {
+            generalSettingsChangedWhileLoading = true;
+            setGeneralSettings(normalizeGeneralSettings(event.detail));
+        };
+        window.addEventListener("cphub-contentavailabilitychange", handleAvailabilityChange);
+        window.addEventListener("cphub-contestsettingschange", handleContestSettingsChange);
+        window.addEventListener("cphub-notificationschange", handleNotificationsChange);
+        window.addEventListener("cphub-generalsettingschange", handleGeneralSettingsChange);
+        return () => {
+            active = false;
+            window.removeEventListener("cphub-contentavailabilitychange", handleAvailabilityChange);
+            window.removeEventListener("cphub-contestsettingschange", handleContestSettingsChange);
+            window.removeEventListener("cphub-notificationschange", handleNotificationsChange);
+            window.removeEventListener("cphub-generalsettingschange", handleGeneralSettingsChange);
+        };
     }, []);
 
     useEffect(() => {
@@ -162,6 +310,9 @@ const AppLayout = () => {
     }, [location.pathname, isAdminRoute]);
 
     const toggleTheme = () => setBrightMode((current) => !current);
+    const maintenanceApplies = generalSettings.maintenanceMode
+        && location.pathname !== "/login"
+        && (authLoading || currentUser?.role !== "admin");
 
     return (
         <div
@@ -177,14 +328,19 @@ const AppLayout = () => {
                 ref={pageScrollRef}
                 className={`app-page min-w-0 flex-1 overflow-x-hidden ${isAdminRoute ? "min-h-screen" : "h-screen min-h-0 overflow-y-auto overscroll-contain"}`}
             >
+                {!isAdminRoute && <AnnouncementBanner settings={notifications} />}
                 {!isAdminRoute && <Navbar
                     menuOpen={menuOpen}
                     setMenuOpen={setMenuOpen}
                     brightMode={brightMode}
                     onToggleTheme={toggleTheme}
+                    contentAvailability={contentAvailability}
+                    contestSettings={contestSettings}
                 />}
                 <main>
-                    <Routes>
+                    {maintenanceApplies
+                        ? <MaintenanceNotice settings={generalSettings} loading={authLoading} />
+                        : <Routes>
 
                         {/* ================================
                             PUBLIC PAGES
@@ -207,12 +363,12 @@ const AppLayout = () => {
 
                         <Route
                             path="/contests"
-                            element={<Contests />}
+                            element={<ContestCalendarGate settings={contestSettings}><Contests /></ContestCalendarGate>}
                         />
 
                         <Route
                             path="/leaderboard"
-                            element={<Leaderboard />}
+                                element={<Leaderboard contentAvailability={contentAvailability} />}
                         />
 
                         <Route
@@ -237,20 +393,20 @@ const AppLayout = () => {
 
                         <Route
                             path="/resources"
-                            element={<Resources />}
+                            element={<ModuleAvailabilityGate module="learningResources" availability={contentAvailability} title="Learning resources"><Resources /></ModuleAvailabilityGate>}
                         />
                         <Route
                             path="/resources/dsa"
-                            element={<ResourcesDSA />}
+                            element={<ModuleAvailabilityGate module="learningResources" availability={contentAvailability} title="Learning resources"><ResourcesDSA /></ModuleAvailabilityGate>}
                         />
                         <Route
                             path="/resources/cp"
-                            element={<ResourcesCP />}
+                            element={<ModuleAvailabilityGate module="learningResources" availability={contentAvailability} title="Learning resources"><ResourcesCP /></ModuleAvailabilityGate>}
                         />
 
                         <Route
                             path="/resources/web-development"
-                            element={<ResourcesWeb />}
+                            element={<ModuleAvailabilityGate module="learningResources" availability={contentAvailability} title="Learning resources"><ResourcesWeb /></ModuleAvailabilityGate>}
                         />
 
                         <Route
@@ -301,7 +457,7 @@ const AppLayout = () => {
 
                             <Route
                                 path="/dashboard"
-                                element={<RoleDashboard />}
+                                element={<RoleDashboard contentAvailability={contentAvailability} contestSettings={contestSettings} />}
                             />
 
                             <Route
@@ -312,37 +468,37 @@ const AppLayout = () => {
                             <Route
                                 path="/problems"
                                 element={
-                                    <Problems />
+                                    <ModuleAvailabilityGate module="dailyProblems" availability={contentAvailability} title="Daily Problems"><Problems /></ModuleAvailabilityGate>
                                 }
                             />
 
                             <Route
                                 path="/problems/history"
                                 element={
-                                    <ProblemHistory />
+                                    <ModuleAvailabilityGate module="dailyProblems" availability={contentAvailability} title="Daily Problems"><ProblemHistory /></ModuleAvailabilityGate>
                                 }
                             />
 
                             <Route
                                 path="/problems/:id"
                                 element={
-                                    <ProblemDetails />
+                                    <ModuleAvailabilityGate module="dailyProblems" availability={contentAvailability} title="Daily Problems"><ProblemDetails /></ModuleAvailabilityGate>
                                 }
                             />
 
                             <Route
                                 path="/cp-sheet"
-                                element={<CPSheet />}
+                                element={<ModuleAvailabilityGate module="cpSheet" availability={contentAvailability} title="CP Sheet"><CPSheet /></ModuleAvailabilityGate>}
                             />
 
                             <Route
                                 path="/dsa-sheet"
-                                element={<DSAPractice />}
+                                element={<ModuleAvailabilityGate module="dsaSheet" availability={contentAvailability} title="DSA Sheet"><DSAPractice /></ModuleAvailabilityGate>}
                             />
 
                             <Route
                                 path="/dsa-sheet/:topicSlug"
-                                element={<DSAPractice />}
+                                element={<ModuleAvailabilityGate module="dsaSheet" availability={contentAvailability} title="DSA Sheet"><DSAPractice /></ModuleAvailabilityGate>}
                             />
 
                             <Route
@@ -354,17 +510,17 @@ const AppLayout = () => {
 
                             <Route
                                 path="/dsa/practice"
-                                element={<DSAPractice />}
+                                element={<ModuleAvailabilityGate module="dsaSheet" availability={contentAvailability} title="DSA Sheet"><DSAPractice /></ModuleAvailabilityGate>}
                             />
 
                             <Route
                                 path="/dsa/practice/:topicSlug"
-                                element={<DSAPractice />}
+                                element={<ModuleAvailabilityGate module="dsaSheet" availability={contentAvailability} title="DSA Sheet"><DSAPractice /></ModuleAvailabilityGate>}
                             />
 
                             <Route
                                 path="/dsa/sheets"
-                                element={<DSASheets />}
+                                element={<ModuleAvailabilityGate module="dsaSheet" availability={contentAvailability} title="DSA Sheet"><DSASheets /></ModuleAvailabilityGate>}
                             />
                             <Route element={<ProtectedRoute requireAdmin />}>
                                 <Route
@@ -478,7 +634,7 @@ const AppLayout = () => {
                         <Route path="/dsa" element={<DSA />} />
                         <Route path="*" element={<NotFound />} />
 
-                    </Routes>
+                    </Routes>}
                 </main>
 
             </div>
@@ -492,6 +648,8 @@ const AppLayout = () => {
                 menuOpen={menuOpen}
                 setMenuOpen={setMenuOpen}
                 brightMode={brightMode}
+                contentAvailability={contentAvailability}
+                contestSettings={contestSettings}
             />}
 
         </div>
@@ -516,7 +674,9 @@ const NotFound = () => (
 const SideMenu = ({
     menuOpen,
     setMenuOpen,
-    brightMode
+    brightMode,
+    contentAvailability = DEFAULT_CONTENT_AVAILABILITY,
+    contestSettings = DEFAULT_CONTEST_SETTINGS,
 }) => {
 
     const navigate = useNavigate();
@@ -543,7 +703,7 @@ const SideMenu = ({
             links: [
                 { name: "Home", path: "/" },
                 { name: "Our Team", path: "/team" },
-                { name: "Contests", path: "/contests" },
+                { name: "Contests", path: "/contests", setting: "calendarEnabled" },
                 { name: "Leaderboard", path: "/leaderboard" },
                 { name: "CP", path: "/cp" },
                 { name: "DSA", path: "/dsa" },
@@ -553,9 +713,9 @@ const SideMenu = ({
             title: "Learning",
             links: [
                 { name: "Dashboard", path: isAdmin ? "/admin/dashboard" : "/dashboard" },
-                { name: "Daily Problems", path: "/problems" },
-                { name: "CP Sheet", path: "/cp-sheet" },
-                { name: "DSA Sheet", path: "/dsa-sheet" },
+                { name: "Daily Problems", path: "/problems", module: "dailyProblems" },
+                { name: "CP Sheet", path: "/cp-sheet", module: "cpSheet" },
+                { name: "DSA Sheet", path: "/dsa-sheet", module: "dsaSheet" },
                 {
                     name: "System Design",
                     path: "/system-design",
@@ -570,6 +730,8 @@ const SideMenu = ({
     const uniqueMenuSections = menuSections.map((section) => ({
         ...section,
         links: section.links.filter((link) => {
+            if (link.module && contentAvailability[link.module] === false) return false;
+            if (link.setting && contestSettings[link.setting] === false) return false;
             if (seenPaths.has(link.path)) return false;
             seenPaths.add(link.path);
             return true;

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import SettingsPageLayout from "./SettingsPageLayout";
+import AdminFeedback from "../../components/AdminFeedback";
 
 import {
     getAuthenticationSettings,
@@ -23,6 +24,8 @@ const AdminSettingsAuthentication = () => {
         registrationsEnabled,
         setRegistrationsEnabled,
     ] = useState(true);
+
+    const [savedRegistrationsEnabled, setSavedRegistrationsEnabled] = useState(true);
 
     const [loading, setLoading] =
         useState(true);
@@ -62,10 +65,9 @@ const AdminSettingsAuthentication = () => {
              * }
              */
 
-            setRegistrationsEnabled(
-                response?.data
-                    ?.registrationsEnabled ?? true
-            );
+            const enabled = response?.data?.registrationsEnabled ?? true;
+            setRegistrationsEnabled(enabled);
+            setSavedRegistrationsEnabled(enabled);
         } catch (requestError) {
             setError(
                 requestError?.response?.data
@@ -106,11 +108,9 @@ const AdminSettingsAuthentication = () => {
              * Use the value returned by backend.
              */
 
-            setRegistrationsEnabled(
-                response?.data
-                    ?.registrationsEnabled ??
-                    registrationsEnabled
-            );
+            const enabled = response?.data?.registrationsEnabled ?? registrationsEnabled;
+            setRegistrationsEnabled(enabled);
+            setSavedRegistrationsEnabled(enabled);
 
             setNotice(
                 "Authentication settings saved."
@@ -129,29 +129,14 @@ const AdminSettingsAuthentication = () => {
     return (
         <SettingsPageLayout
             title="Authentication"
-            description="Registration, verification and session controls."
+            description="Control whether new student accounts can be created. Existing users can still sign in."
             icon={LockKeyhole}
         >
             {/* Error */}
-            {error && (
-                <div
-                    role="alert"
-                    className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
-                >
-                    {error}
-                </div>
-            )}
+            {error && <AdminFeedback onDismiss={() => setError("")}>{error}<button type="button" onClick={loadSettings} className="ml-3 font-semibold underline">Retry</button></AdminFeedback>}
 
             {/* Success */}
-            {notice && (
-                <div
-                    role="status"
-                    className="mb-4 flex items-center gap-2 rounded-xl border border-[#4AFFC4]/20 bg-[var(--theme-accent)]/[0.06] px-4 py-3 text-sm text-[var(--theme-accent)]"
-                >
-                    <Check size={15} />
-                    {notice}
-                </div>
-            )}
+            {notice && <AdminFeedback variant="success" onDismiss={() => setNotice("")}><span className="inline-flex items-center gap-2"><Check size={15} />{notice}</span></AdminFeedback>}
 
             <section className="overflow-hidden rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)]">
 
@@ -162,8 +147,7 @@ const AdminSettingsAuthentication = () => {
                     </h2>
 
                     <p className="mt-1 text-xs text-[var(--theme-text-muted)]">
-                        Controls whether new students can create
-                        accounts.
+                        Registration gate
                     </p>
                 </div>
 
@@ -176,8 +160,7 @@ const AdminSettingsAuthentication = () => {
                         </h3>
 
                         <p className="mt-1 max-w-xl text-xs leading-5 text-[var(--theme-text-muted)]">
-                            When disabled, new accounts are blocked
-                            on both the registration page and API.
+                            When closed, the signup form is clearly marked unavailable and the backend rejects direct registration requests. Current accounts and sign-in are unaffected.
                         </p>
                     </div>
 
@@ -199,7 +182,7 @@ const AdminSettingsAuthentication = () => {
                         className={`relative h-7 w-12 shrink-0 rounded-full transition disabled:opacity-50 ${
                             registrationsEnabled
                                 ? "bg-[var(--theme-accent)]"
-                                : "bg-[#26313E]"
+                                : "bg-[var(--theme-surface-high)]"
                         }`}
                     >
                         <span
@@ -213,9 +196,9 @@ const AdminSettingsAuthentication = () => {
                 </div>
 
                 {/* Status + Save */}
-                <div className="flex items-center justify-between border-t border-[var(--theme-border)] px-5 py-4">
+                <div className="flex flex-col gap-3 border-t border-[var(--theme-border)] bg-[var(--theme-surface-raised)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
 
-                    <span
+                    <span role="status"
                         className={`text-xs font-medium ${
                             loading
                                 ? "text-[var(--theme-text-muted)]"
@@ -231,13 +214,13 @@ const AdminSettingsAuthentication = () => {
                               : "Registrations closed"}
                     </span>
 
+                    <div className="flex justify-end gap-2">
+                    <button type="button" disabled={loading || saving || registrationsEnabled === savedRegistrationsEnabled} onClick={() => setRegistrationsEnabled(savedRegistrationsEnabled)} className="min-h-10 rounded-xl border border-[var(--theme-border)] px-4 text-sm font-semibold text-[var(--theme-text-secondary)] disabled:opacity-40">Discard</button>
                     <button
                         type="button"
-                        disabled={
-                            loading || saving
-                        }
+                        disabled={loading || saving || registrationsEnabled === savedRegistrationsEnabled}
                         onClick={saveSettings}
-                        className="inline-flex items-center gap-2 rounded-lg bg-[var(--theme-accent)] px-4 py-2.5 text-sm font-semibold text-[#06120D] transition hover:brightness-105 disabled:opacity-50"
+                        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-300 to-lime-300 px-4 text-sm font-bold text-emerald-950 transition hover:brightness-105 disabled:opacity-50"
                     >
                         {saving ? (
                             <RefreshCw
@@ -250,8 +233,9 @@ const AdminSettingsAuthentication = () => {
 
                         {saving
                             ? "Saving…"
-                            : "Save setting"}
+                            : "Save changes"}
                     </button>
+                    </div>
                 </div>
             </section>
         </SettingsPageLayout>

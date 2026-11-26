@@ -66,13 +66,18 @@ const loginUser = async({email, password})=>{
         );
     }
 
-    const token = generateToken(user._id);
+    const settings = await platformSettings.getSettings();
+    const sessionDurationHours = user.role === "admin"
+        ? settings.securitySettings.adminSessionHours
+        : settings.securitySettings.studentSessionHours;
+    const token = generateToken(user._id, `${sessionDurationHours}h`);
 
     user.password = null;
 
     return {
         user: user,
-        token
+        token,
+        sessionDurationHours,
     }
 };
 

@@ -13,7 +13,7 @@ import { syncCodeforces } from "../../codeforces/api/codeforces.api";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const UserDashboard = () => {
+const UserDashboard = ({ contentAvailability = {}, contestSettings = {} }) => {
     const { user: authUser } = useAuth();
     const [dashboard, setDashboard] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -52,7 +52,7 @@ const UserDashboard = () => {
             const lastSyncedAt = data?.codeforces?.lastSyncedAt
                 ? new Date(data.codeforces.lastSyncedAt).getTime()
                 : 0;
-            if (!autoSyncStarted.current && (!lastSyncedAt || Date.now() - lastSyncedAt >= DAY_MS)) {
+            if (contestSettings.codeforcesSyncEnabled !== false && !autoSyncStarted.current && (!lastSyncedAt || Date.now() - lastSyncedAt >= DAY_MS)) {
                 autoSyncStarted.current = true;
                 void syncProfile();
             }
@@ -63,7 +63,7 @@ const UserDashboard = () => {
             setLoading(false);
             setRefreshing(false);
         }
-    }, [dashboard, syncProfile]);
+    }, [dashboard, syncProfile, contestSettings.codeforcesSyncEnabled]);
 
     useEffect(() => {
         if (initialLoadStarted.current) return;
@@ -112,19 +112,19 @@ const UserDashboard = () => {
                 )}
 
                 <div className="space-y-3">
-                    <section className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_390px]">
-                        <DashboardStats codeforces={dashboard.codeforces} username={user?.username} loading={false} syncing={syncing} onSync={() => syncProfile()} syncError={codeforcesError} />
-                        <TodayProblems problems={dashboard.todayProblems} loading={false} onRetry={() => loadDashboard()} />
+                    <section className={`grid gap-3 ${contentAvailability.dailyProblems === false ? "lg:grid-cols-1" : "lg:grid-cols-[minmax(0,1fr)_390px]"}`}>
+                        <DashboardStats codeforces={dashboard.codeforces} username={user?.username} loading={false} syncing={syncing} onSync={() => syncProfile()} syncError={codeforcesError} syncEnabled={contestSettings.codeforcesSyncEnabled !== false} />
+                        {contentAvailability.dailyProblems !== false && <TodayProblems problems={dashboard.todayProblems} loading={false} onRetry={() => loadDashboard()} />}
                     </section>
 
-                    <section className="grid gap-3 lg:grid-cols-3">
-                        <TodayProgress progress={dashboard.todayProgress} loading={false} />
-                        <CPProgress codeforces={dashboard.codeforces} progress={dashboard.cpProgress} loading={false} />
-                        <DSAProgress progress={dashboard.dsaProgress} loading={false} />
+                    <section className={`grid gap-3 ${[contentAvailability.dailyProblems, contentAvailability.cpSheet, contentAvailability.dsaSheet].filter((value) => value !== false).length === 1 ? "lg:grid-cols-1" : [contentAvailability.dailyProblems, contentAvailability.cpSheet, contentAvailability.dsaSheet].filter((value) => value !== false).length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"}`}>
+                        <TodayProgress progress={dashboard.todayProgress} loading={false} contentAvailability={contentAvailability} />
+                        {contentAvailability.cpSheet !== false && <CPProgress codeforces={dashboard.codeforces} progress={dashboard.cpProgress} loading={false} />}
+                        {contentAvailability.dsaSheet !== false && <DSAProgress progress={dashboard.dsaProgress} loading={false} />}
                     </section>
 
-                    <section className="grid gap-3 lg:grid-cols-2">
-                        <UpcomingContests contests={dashboard.contests} loading={false} error={contestsError} />
+                    <section className={`grid gap-3 ${contestSettings.calendarEnabled === false ? "lg:grid-cols-1" : "lg:grid-cols-2"}`}>
+                        {contestSettings.calendarEnabled !== false && <UpcomingContests contests={dashboard.contests} loading={false} error={contestsError} />}
                         <RecentActivity activity={dashboard.activity} loading={false} />
                     </section>
                 </div>

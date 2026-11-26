@@ -11,6 +11,7 @@ const {
 
 const authMiddleware = require("../../middlewares/auth.middleware.js");
 const requireAdmin = require("../../middlewares/admin.middleware.js");
+const requireContentAvailability = require("../../middlewares/contentAvailability.middleware.js");
 
 
 const router = express.Router();
@@ -28,6 +29,7 @@ const router = express.Router();
 router.get(
     "/",
     authMiddleware,
+    requireContentAvailability("cpSheet"),
     getCPSheetController
 );
 
@@ -63,6 +65,7 @@ router.delete(
 router.patch(
     "/:problemId/complete",
     authMiddleware,
+    requireContentAvailability("cpSheet"),
     markProblemCompleteController
 );
 
@@ -72,6 +75,7 @@ router.patch(
 router.patch(
     "/:problemId/incomplete",
     authMiddleware,
+    requireContentAvailability("cpSheet"),
     markProblemIncompleteController
 );
 

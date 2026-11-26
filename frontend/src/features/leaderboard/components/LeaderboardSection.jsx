@@ -24,7 +24,12 @@ const rankStyle = (rank) => {
   return "border-transparent text-[#AEB9C7]";
 };
 
-const Leaderboard = () => {
+const Leaderboard = ({ contentAvailability = {} }) => {
+  const availableTypes = TYPES.filter((item) => {
+    if (item.id === "cp-sheet") return contentAvailability.cpSheet !== false;
+    if (item.id === "dsa-sheet") return contentAvailability.dsaSheet !== false;
+    return contentAvailability.dailyProblems !== false;
+  });
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedType = searchParams.get("type");
   const [type, setType] = useState(TYPES.some((item) => item.id === requestedType) ? requestedType : "cp-sheet");
@@ -37,7 +42,22 @@ const Leaderboard = () => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
+    if (availableTypes.some((item) => item.id === type)) return;
+    const nextType = availableTypes[0]?.id || "";
+    setType(nextType);
+    setPage(1);
+    if (nextType) setSearchParams({ type: nextType }, { replace: true });
+    else setSearchParams({}, { replace: true });
+  }, [type, contentAvailability.cpSheet, contentAvailability.dsaSheet, contentAvailability.dailyProblems, setSearchParams]);
+
+  useEffect(() => {
     let active = true;
+    if (!type) {
+      setRows([]);
+      setPagination({ page: 1, limit: 50, total: 0, totalPages: 0 });
+      setLoading(false);
+      return () => { active = false; };
+    }
     setLoading(true);
     setError("");
 
@@ -92,7 +112,7 @@ const Leaderboard = () => {
         </div>
 
         <div className="mb-5 flex flex-wrap gap-2" role="tablist" aria-label="Leaderboard category">
-          {TYPES.map((item) => (
+          {availableTypes.map((item) => (
             <button key={item.id} type="button" role="tab" aria-selected={type === item.id} onClick={() => changeType(item.id)} className={`rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${type === item.id ? "border-[#4AFFC4] bg-[#0E1D18] text-[#4AFFC4]" : "border-[#273342] bg-[#0A1018] text-[#8B95A7] hover:text-[#EDF2F7]"}`}>
               {item.label}
             </button>
@@ -118,7 +138,7 @@ const Leaderboard = () => {
           </div>
         )}
 
-        <div className="scrollbar-thin overflow-x-auto rounded-xl border border-[#1C2734]">
+        {!availableTypes.length ? <div className="rounded-xl border border-dashed border-[#273342] px-6 py-14 text-center text-sm text-[#8B95A7]">Leaderboards are currently unavailable.</div> : <div className="scrollbar-thin overflow-x-auto rounded-xl border border-[#1C2734]">
           <table className="w-full min-w-[620px] border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-[#1C2734] bg-[#0C1420] font-mono text-[10px] uppercase tracking-wider text-[#687587]">
@@ -156,14 +176,14 @@ const Leaderboard = () => {
               )}
             </tbody>
           </table>
-        </div>
+        </div>}
 
         <div className="mt-4 flex items-center justify-between gap-3">
           <p className="text-xs text-[#687587]">{loading ? "" : `Page ${pagination.page} of ${Math.max(1, pagination.totalPages)}`}</p>
-          <div className="flex gap-2">
+          {availableTypes.length > 0 && <div className="flex gap-2">
             <button type="button" disabled={loading || page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded-lg border border-[#273342] px-3.5 py-2 text-xs text-[#AEB9C7] hover:text-white disabled:cursor-not-allowed disabled:opacity-40">Previous</button>
             <button type="button" disabled={loading || page >= pagination.totalPages} onClick={() => setPage((current) => current + 1)} className="rounded-lg border border-[#273342] px-3.5 py-2 text-xs text-[#AEB9C7] hover:text-white disabled:cursor-not-allowed disabled:opacity-40">Next</button>
-          </div>
+          </div>}
         </div>
       </Container>
     </section>

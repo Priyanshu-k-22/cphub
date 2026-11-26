@@ -83,6 +83,35 @@ router.put(
 
 /*
  * ----------------------------------------
+ * Content availability
+ * ----------------------------------------
+ */
+
+router.get(
+    "/admin/content",
+    authenticate,
+    requireAdmin,
+    controller.getContentAvailability
+);
+
+router.put(
+    "/admin/content",
+    authenticate,
+    requireAdmin,
+    controller.updateContentAvailability
+);
+
+router.get("/admin/contests", authenticate, requireAdmin, controller.getContestSettings);
+router.put("/admin/contests", authenticate, requireAdmin, controller.updateContestSettings);
+
+router.get("/admin/notifications", authenticate, requireAdmin, controller.getNotificationSettings);
+router.put("/admin/notifications", authenticate, requireAdmin, controller.updateNotificationSettings);
+
+router.get("/admin/security", authenticate, requireAdmin, controller.getSecuritySettings);
+router.put("/admin/security", authenticate, requireAdmin, controller.updateSecuritySettings);
+
+/*
+ * ----------------------------------------
  * Legacy
  * ----------------------------------------
  *

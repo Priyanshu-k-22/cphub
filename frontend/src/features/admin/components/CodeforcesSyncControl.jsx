@@ -4,6 +4,7 @@ import {
     getBulkCodeforcesSyncStatus,
     startBulkCodeforcesSync
 } from "../../codeforces/api/codeforces.api";
+import { getContestSettings } from "../api/adminSettings.api";
 
 const activeStatuses = new Set(["starting", "running"]);
 
@@ -14,6 +15,7 @@ const CodeforcesSyncControl = () => {
     const [loading, setLoading] = useState(true);
     const [starting, setStarting] = useState(false);
     const [error, setError] = useState("");
+    const [syncEnabled, setSyncEnabled] = useState(true);
 
     const refreshStatus = useCallback(async () => {
         try {
@@ -30,6 +32,12 @@ const CodeforcesSyncControl = () => {
     useEffect(() => {
         refreshStatus();
     }, [refreshStatus]);
+
+    useEffect(() => {
+        getContestSettings()
+            .then((response) => setSyncEnabled(response?.data?.codeforcesSyncEnabled !== false))
+            .catch(() => {});
+    }, []);
 
     useEffect(() => {
         if (!activeStatuses.has(job?.status)) return undefined;
@@ -82,15 +90,17 @@ const CodeforcesSyncControl = () => {
                 <button
                     type="button"
                     onClick={startSync}
-                    disabled={isActive || starting || loading}
+                    disabled={isActive || starting || loading || !syncEnabled}
                     className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[var(--theme-accent)] px-4 py-2.5 text-xs font-semibold text-[#07110E] transition hover:bg-[#72FFD2] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {isActive || starting
                         ? <LoaderCircle size={15} className="animate-spin" />
                         : <RefreshCw size={15} />}
-                    {isActive ? "Syncing users…" : starting ? "Starting…" : "Sync all users"}
+                    {isActive ? "Syncing users…" : starting ? "Starting…" : syncEnabled ? "Sync all users" : "Sync disabled"}
                 </button>
             </div>
+
+            {!syncEnabled && <p className="mt-3 text-xs text-amber-600 dark:text-amber-300" role="status">An administrator has disabled Codeforces syncing in Settings.</p>}
 
             <div className="mt-4 rounded-lg border border-[var(--theme-border)] bg-[var(--theme-surface)] p-3">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">

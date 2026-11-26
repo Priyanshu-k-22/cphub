@@ -367,24 +367,27 @@ const generateLeetCodeContests = () => {
 */
 
 const getContests = async ({
-    category
+    category,
+    contestSettings = {},
 } = {}) => {
+
+    if (contestSettings.calendarEnabled === false) return [];
+
+    const sources = contestSettings.sources || {};
 
     /*
      * Fetch Codeforces contests
      * and generate scheduled contests
      * in parallel.
      */
-    const [
-        codeforcesContests
-    ] = await Promise.all([
-        fetchCodeforcesContests()
-    ]);
+    const codeforcesContests = sources.codeforces === false
+        ? []
+        : await fetchCodeforcesContests();
 
     const scheduledContests = [
-        ...generateCodeChefContests(),
-        ...generateAtCoderContests(),
-        ...generateLeetCodeContests()
+        ...(sources.codechef === false ? [] : generateCodeChefContests()),
+        ...(sources.atcoder === false ? [] : generateAtCoderContests()),
+        ...(sources.leetcode === false ? [] : generateLeetCodeContests())
     ];
 
     let contests = [

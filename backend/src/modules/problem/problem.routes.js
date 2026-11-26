@@ -3,6 +3,7 @@ const express = require("express");
 const authenticate = require("../../middlewares/auth.middleware");
 const requireAdmin = require("../../middlewares/admin.middleware");
 const validate = require("../../middlewares/validate.middleware");
+const requireContentAvailability = require("../../middlewares/contentAvailability.middleware");
 
 const {
     createProblemSchema,
@@ -66,24 +67,28 @@ router.delete(
 */
 router.get(
     "/daily",
+    requireContentAvailability("dailyProblems"),
     getDaily
 );
 
 router.patch(
     "/:id/complete",
     authenticate,
+    requireContentAvailability("dailyProblems"),
     markDailyComplete
 );
 
 router.patch(
     "/:id/incomplete",
     authenticate,
+    requireContentAvailability("dailyProblems"),
     markDailyIncomplete
 );
 
 router.get(
     "/:id/progress",
     authenticate,
+    requireContentAvailability("dailyProblems"),
     getDailyProgress
 );
 
@@ -95,6 +100,7 @@ router.get(
 */
 router.get(
     "/history",
+    requireContentAvailability("dailyProblems"),
     getHistory
 );
 
@@ -106,6 +112,7 @@ router.get(
 */
 router.get(
     "/:id",
+    requireContentAvailability("dailyProblems"),
     getById
 );
 

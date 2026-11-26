@@ -12,6 +12,35 @@ const DEFAULT_AUTHENTICATION_SETTINGS = {
     registrationsEnabled: true,
 };
 
+const DEFAULT_CONTENT_AVAILABILITY = {
+    dailyProblems: true,
+    cpSheet: true,
+    dsaSheet: true,
+    learningResources: true,
+};
+
+const DEFAULT_CONTEST_SETTINGS = {
+    calendarEnabled: true,
+    codeforcesSyncEnabled: true,
+    sources: {
+        codeforces: true,
+        codechef: true,
+        atcoder: true,
+        leetcode: true,
+    },
+};
+
+const DEFAULT_NOTIFICATION_SETTINGS = {
+    announcementEnabled: false,
+    announcementMessage: "",
+    announcementType: "info",
+};
+
+const DEFAULT_SECURITY_SETTINGS = {
+    studentSessionHours: 168,
+    adminSessionHours: 24,
+};
+
 const getSettings = async () => {
     let settings = await PlatformSettings.findOne({
         key: "platform",
@@ -30,6 +59,15 @@ const getSettings = async () => {
 
             authentication:
                 DEFAULT_AUTHENTICATION_SETTINGS,
+
+            contentAvailability:
+                DEFAULT_CONTENT_AVAILABILITY,
+
+            contestSettings: DEFAULT_CONTEST_SETTINGS,
+
+            notificationSettings: DEFAULT_NOTIFICATION_SETTINGS,
+
+            securitySettings: DEFAULT_SECURITY_SETTINGS,
         });
 
         return settings.toObject();
@@ -114,6 +152,46 @@ const getSettings = async () => {
         ] =
             DEFAULT_AUTHENTICATION_SETTINGS
                 .registrationsEnabled;
+    }
+
+    for (const [module, enabled] of Object.entries(
+        DEFAULT_CONTENT_AVAILABILITY
+    )) {
+        if (
+            typeof settings.contentAvailability?.[module] !==
+            "boolean"
+        ) {
+            updates[`contentAvailability.${module}`] =
+                enabled;
+        }
+    }
+
+    for (const [key, enabled] of Object.entries({
+        calendarEnabled: DEFAULT_CONTEST_SETTINGS.calendarEnabled,
+        codeforcesSyncEnabled: DEFAULT_CONTEST_SETTINGS.codeforcesSyncEnabled,
+    })) {
+        if (typeof settings.contestSettings?.[key] !== "boolean") {
+            updates[`contestSettings.${key}`] = enabled;
+        }
+    }
+    for (const [source, enabled] of Object.entries(DEFAULT_CONTEST_SETTINGS.sources)) {
+        if (typeof settings.contestSettings?.sources?.[source] !== "boolean") {
+            updates[`contestSettings.sources.${source}`] = enabled;
+        }
+    }
+
+    for (const [key, value] of Object.entries(DEFAULT_NOTIFICATION_SETTINGS)) {
+        if (typeof settings.notificationSettings?.[key] !== typeof value) {
+            updates[`notificationSettings.${key}`] = value;
+        }
+    }
+
+    const allowedSessionHours = [1, 6, 12, 24, 72, 168];
+    if (!allowedSessionHours.includes(settings.securitySettings?.studentSessionHours)) {
+        updates["securitySettings.studentSessionHours"] = DEFAULT_SECURITY_SETTINGS.studentSessionHours;
+    }
+    if (![1, 6, 12, 24].includes(settings.securitySettings?.adminSessionHours)) {
+        updates["securitySettings.adminSessionHours"] = DEFAULT_SECURITY_SETTINGS.adminSessionHours;
     }
 
     /*
@@ -215,6 +293,72 @@ const setAuthenticationSettings = async ({
 
 /*
  * ----------------------------------------
+ * Content availability
+ * ----------------------------------------
+ */
+
+const setContentAvailability = async (contentAvailability) => {
+    await getSettings();
+
+    return PlatformSettings.findOneAndUpdate(
+        { key: "platform" },
+        {
+            $set: Object.fromEntries(
+                Object.entries(contentAvailability).map(
+                    ([module, enabled]) => [
+                        `contentAvailability.${module}`,
+                        enabled,
+                    ]
+                )
+            ),
+        },
+        { new: true, runValidators: true }
+    ).lean();
+};
+
+const setContestSettings = async ({ calendarEnabled, codeforcesSyncEnabled, sources }) => {
+    await getSettings();
+    const updates = {
+        "contestSettings.calendarEnabled": calendarEnabled,
+        "contestSettings.codeforcesSyncEnabled": codeforcesSyncEnabled,
+        ...Object.fromEntries(Object.entries(sources).map(([source, enabled]) => [
+            `contestSettings.sources.${source}`,
+            enabled,
+        ])),
+    };
+    return PlatformSettings.findOneAndUpdate(
+        { key: "platform" },
+        { $set: updates },
+        { new: true, runValidators: true }
+    ).lean();
+};
+
+const setNotificationSettings = async (notificationSettings) => {
+    await getSettings();
+    return PlatformSettings.findOneAndUpdate(
+        { key: "platform" },
+        { $set: Object.fromEntries(Object.entries(notificationSettings).map(([key, value]) => [
+            `notificationSettings.${key}`,
+            value,
+        ])) },
+        { new: true, runValidators: true }
+    ).lean();
+};
+
+const setSecuritySettings = async (securitySettings) => {
+    await getSettings();
+    return PlatformSettings.findOneAndUpdate(
+        { key: "platform" },
+        { $set: {
+            "securitySettings.studentSessionHours": securitySettings.studentSessionHours,
+            "securitySettings.adminSessionHours": securitySettings.adminSessionHours,
+        } },
+        { new: true, runValidators: true }
+    ).lean();
+};
+
+/*
+ * ----------------------------------------
  * Legacy compatibility
  * ----------------------------------------
  *
@@ -234,5 +378,9 @@ module.exports = {
     getSettings,
     setGeneralSettings,
     setAuthenticationSettings,
+    setContentAvailability,
+    setContestSettings,
+    setNotificationSettings,
+    setSecuritySettings,
     setRegistrationStatus,
 };

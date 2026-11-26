@@ -14,6 +14,7 @@ const authMiddleware =
     require("../../middlewares/auth.middleware");
 const requireAdmin =
     require("../../middlewares/admin.middleware");
+const requireCodeforcesSync = require("../../middlewares/requireCodeforcesSync.middleware");
 const codeforcesService =
     require("./codeforces.service");
 
@@ -42,6 +43,7 @@ router.get(
 router.post(
     "/sync",
     authMiddleware,
+    requireCodeforcesSync,
     syncCodeforces
 );
 
@@ -49,6 +51,7 @@ router.post(
     "/sync-all",
     authMiddleware,
     requireAdmin,
+    requireCodeforcesSync,
     startBulkSync
 );
 

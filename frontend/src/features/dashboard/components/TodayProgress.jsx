@@ -27,13 +27,21 @@ const ProgressRow = ({ icon: Icon, label, solved, total, loading }) => {
     );
 };
 
-const TodayProgress = ({ progress, loading }) => {
+const TodayProgress = ({ progress, loading, contentAvailability = {} }) => {
+    const visibleModules = [
+        contentAvailability.cpSheet !== false,
+        contentAvailability.dsaSheet !== false,
+        contentAvailability.dailyProblems !== false,
+    ];
+    if (!visibleModules.some(Boolean)) return null;
     const values = {
         cp: Number(progress?.cp?.solved) || 0,
         dsa: Number(progress?.dsa?.solved) || 0,
         daily: { solved: Number(progress?.daily?.solved) || 0, total: Number(progress?.daily?.total) || 0 },
     };
-    const solvedTotal = values.cp + values.dsa + values.daily.solved;
+    const solvedTotal = (contentAvailability.cpSheet === false ? 0 : values.cp)
+        + (contentAvailability.dsaSheet === false ? 0 : values.dsa)
+        + (contentAvailability.dailyProblems === false ? 0 : values.daily.solved);
 
     return (
         <section className="rounded-2xl border border-[var(--theme-border)] bg-[var(--theme-surface)] p-4 sm:p-5" aria-labelledby="today-progress-title">
@@ -48,9 +56,9 @@ const TodayProgress = ({ progress, loading }) => {
             </div>
 
             <div className="mt-5 space-y-4">
-                <ProgressRow icon={Code2} label="CP Sheet" solved={values.cp} loading={loading} />
-                <ProgressRow icon={BrainCircuit} label="DSA Sheet" solved={values.dsa} loading={loading} />
-                <ProgressRow icon={CalendarCheck} label="Daily Problems" solved={values.daily.solved} total={values.daily.total} loading={loading} />
+                {contentAvailability.cpSheet !== false && <ProgressRow icon={Code2} label="CP Sheet" solved={values.cp} loading={loading} />}
+                {contentAvailability.dsaSheet !== false && <ProgressRow icon={BrainCircuit} label="DSA Sheet" solved={values.dsa} loading={loading} />}
+                {contentAvailability.dailyProblems !== false && <ProgressRow icon={CalendarCheck} label="Daily Problems" solved={values.daily.solved} total={values.daily.total} loading={loading} />}
             </div>
         </section>
     );

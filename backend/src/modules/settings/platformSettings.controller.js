@@ -35,6 +35,38 @@ const authenticationSettingsSchema = z.object({
     registrationsEnabled: z.boolean(),
 });
 
+const contentAvailabilitySchema = z.object({
+    dailyProblems: z.boolean(),
+    cpSheet: z.boolean(),
+    dsaSheet: z.boolean(),
+    learningResources: z.boolean(),
+}).strict();
+
+const contestSettingsSchema = z.object({
+    calendarEnabled: z.boolean(),
+    codeforcesSyncEnabled: z.boolean(),
+    sources: z.object({
+        codeforces: z.boolean(),
+        codechef: z.boolean(),
+        atcoder: z.boolean(),
+        leetcode: z.boolean(),
+    }).strict(),
+}).strict();
+
+const notificationSettingsSchema = z.object({
+    announcementEnabled: z.boolean(),
+    announcementMessage: z.string().trim().max(240),
+    announcementType: z.enum(["info", "success", "warning"]),
+}).strict().refine((settings) => !settings.announcementEnabled || settings.announcementMessage.length > 0, {
+    message: "Enter an announcement before publishing it",
+    path: ["announcementMessage"],
+});
+
+const securitySettingsSchema = z.object({
+    studentSessionHours: z.union([z.literal(1), z.literal(6), z.literal(12), z.literal(24), z.literal(72), z.literal(168)]),
+    adminSessionHours: z.union([z.literal(1), z.literal(6), z.literal(12), z.literal(24)]),
+}).strict();
+
 /*
  * ----------------------------------------
  * Public settings
@@ -75,6 +107,14 @@ const getPublicSettings = asyncHandler(
                                 .authentication
                                 .registrationsEnabled,
                     },
+
+                    contentAvailability:
+                        settings.contentAvailability,
+
+                    contestSettings:
+                        settings.contestSettings,
+
+                    notifications: settings.notificationSettings,
                 },
 
                 "Platform settings fetched"
@@ -208,6 +248,90 @@ const updateAuthenticationSettings =
         );
     });
 
+const getContentAvailability = asyncHandler(
+    async (_req, res) => {
+        const settings = await settingsService.getSettings();
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                settings.contentAvailability,
+                "Content availability fetched"
+            )
+        );
+    }
+);
+
+const updateContentAvailability = asyncHandler(
+    async (req, res) => {
+        const parsed = contentAvailabilitySchema.safeParse(
+            req.body
+        );
+
+        if (!parsed.success) {
+            throw new ApiError(
+                400,
+                "Invalid content availability settings",
+                parsed.error.flatten()
+            );
+        }
+
+        const settings =
+            await settingsService.setContentAvailability(
+                parsed.data
+            );
+
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                settings.contentAvailability,
+                "Content availability saved"
+            )
+        );
+    }
+);
+
+const getContestSettings = asyncHandler(async (_req, res) => {
+    const settings = await settingsService.getSettings();
+    return res.status(200).json(new ApiResponse(200, settings.contestSettings, "Contest settings fetched"));
+});
+
+const updateContestSettings = asyncHandler(async (req, res) => {
+    const parsed = contestSettingsSchema.safeParse(req.body);
+    if (!parsed.success) {
+        throw new ApiError(400, "Invalid contest settings", parsed.error.flatten());
+    }
+    const settings = await settingsService.setContestSettings(parsed.data);
+    return res.status(200).json(new ApiResponse(200, settings.contestSettings, "Contest settings saved"));
+});
+
+const getNotificationSettings = asyncHandler(async (_req, res) => {
+    const settings = await settingsService.getSettings();
+    return res.status(200).json(new ApiResponse(200, settings.notificationSettings, "Notification settings fetched"));
+});
+
+const updateNotificationSettings = asyncHandler(async (req, res) => {
+    const parsed = notificationSettingsSchema.safeParse(req.body);
+    if (!parsed.success) {
+        throw new ApiError(400, "Invalid notification settings", parsed.error.flatten());
+    }
+    const settings = await settingsService.setNotificationSettings(parsed.data);
+    return res.status(200).json(new ApiResponse(200, settings.notificationSettings, "Notification settings saved"));
+});
+
+const getSecuritySettings = asyncHandler(async (_req, res) => {
+    const settings = await settingsService.getSettings();
+    return res.status(200).json(new ApiResponse(200, settings.securitySettings, "Security settings fetched"));
+});
+
+const updateSecuritySettings = asyncHandler(async (req, res) => {
+    const parsed = securitySettingsSchema.safeParse(req.body);
+    if (!parsed.success) {
+        throw new ApiError(400, "Invalid security settings", parsed.error.flatten());
+    }
+    const settings = await settingsService.setSecuritySettings(parsed.data);
+    return res.status(200).json(new ApiResponse(200, settings.securitySettings, "Security settings saved"));
+});
+
 /*
  * ----------------------------------------
  * Legacy endpoint
@@ -259,6 +383,18 @@ module.exports = {
 
     getAuthenticationSettings,
     updateAuthenticationSettings,
+
+    getContentAvailability,
+    updateContentAvailability,
+
+    getContestSettings,
+    updateContestSettings,
+
+    getNotificationSettings,
+    updateNotificationSettings,
+
+    getSecuritySettings,
+    updateSecuritySettings,
 
     updateAdminSettings,
 };
