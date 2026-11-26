@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Award, BookOpen, BriefcaseBusiness, Check, ChevronDown, Code2, Compass, Gauge, Lightbulb, Menu, MessagesSquare, Sigma, Sparkles, Trophy, X } from "lucide-react";
+import { Award, BookOpen, Check, ChevronDown, Code2, Compass, Gauge, Lightbulb, Menu, Sigma, Sparkles, Trophy, X } from "lucide-react";
 
 const sections = [
     { group: "Understand CP", items: [
-        { id: "why", label: "Why CP?", icon: Lightbulb },
-        { id: "career", label: "CP & Career", icon: BriefcaseBusiness },
-        { id: "interviews", label: "CP & Interviews", icon: MessagesSquare },
+        { id: "why", label: "What is CP?", icon: Lightbulb },
+        { id: "language", label: "Language for CP", icon: Code2 },
+        { id: "approach", label: "Approaching a Problem", icon: Lightbulb },
         { id: "skills", label: "Skills You Build", icon: Award },
     ] },
     { group: "Start Learning", items: [
@@ -39,7 +39,7 @@ const CPSidebar = ({ activeSection, setActiveSection }) => {
             <button type="button" aria-expanded={mobileOpen} aria-controls="cp-mobile-sections" onClick={() => setMobileOpen((open) => !open)} className="flex min-h-[68px] w-full items-center justify-between gap-3 px-4 py-2 text-left">
                 <span className="flex min-w-0 items-center gap-3">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--theme-accent-soft)] text-[var(--theme-accent)]">{mobileOpen ? <X size={18} /> : <ActiveIcon size={18} />}</span>
-                    <span className="min-w-0"><span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--theme-text-muted)]">Competitive programming guide</span><span className="block truncate text-sm font-bold text-[var(--theme-text)]">{activeItem?.label || "Why CP?"}</span></span>
+                    <span className="min-w-0"><span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--theme-text-muted)]">Competitive programming guide</span><span className="block truncate text-sm font-bold text-[var(--theme-text)]">{activeItem?.label || "What is CP?"}</span></span>
                 </span>
                 <ChevronDown size={18} className={`shrink-0 text-[var(--theme-text-muted)] transition-transform ${mobileOpen ? "rotate-180" : ""}`} />
             </button>

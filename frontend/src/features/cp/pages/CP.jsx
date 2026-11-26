@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import CPSidebar from "../components/CPSidebar";
 
 import CPWhy from "../components/sections/CPWhy";
-import CPCareer from "../components/sections/CPCareer";
-import CPInterviews from "../components/sections/CPInterviews";
+import CPLanguage from "../components/sections/CPLanguage";
+import CPApproach from "../components/sections/CPApproach";
 import CPSkills from "../components/sections/CPSkills";
 
 import CPStartHere from "../components/sections/CPStartHere";
@@ -33,11 +33,11 @@ const CP = () => {
             case "why":
                 return <CPWhy />;
 
-            case "career":
-                return <CPCareer />;
+            case "language":
+                return <CPLanguage />;
 
-            case "interviews":
-                return <CPInterviews />;
+            case "approach":
+                return <CPApproach />;
 
             case "skills":
                 return <CPSkills />;
